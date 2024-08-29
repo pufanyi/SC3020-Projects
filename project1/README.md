@@ -27,4 +27,4 @@ make
 
 ## Lint
 
-Please read [contribute.md](../contribute.md) before contributing.
+Please read [contribute.md](../docs/contribute.md) before contributing.
