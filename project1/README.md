@@ -24,3 +24,7 @@ make
 ```bash
 ./project1
 ```
+
+## Lint
+
+Please read [contribute.md](../contribute.md) before contributing.
