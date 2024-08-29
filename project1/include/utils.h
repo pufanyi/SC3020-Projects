@@ -1,6 +1,8 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-int getSystemBlockSize();
+#include <cstddef>
+
+size_t getSystemBlockSize();
 
 #endif  // UTILS_H

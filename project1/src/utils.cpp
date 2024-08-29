@@ -8,18 +8,18 @@
 #include <unistd.h>
 #endif
 
-int getSystemBlockSize() {
+size_t getSystemBlockSize() {
 #ifdef _WIN32
   // Get the block size on Windows
   DWORD sectorsPerCluster, bytesPerSector;
   GetDiskFreeSpace(nullptr, &sectorsPerCluster, &bytesPerSector, nullptr,
                    nullptr);
-  return sectorsPerCluster * bytesPerSector;
+  return (size_t)sectorsPerCluster * (size_t)bytesPerSector;
 #elif __linux__ || __APPLE__
   // Get the block size of the filesystem on Linux
   struct stat fi;
   stat("/", &fi);
-  return fi.st_blksize;
+  return (size_t)fi.st_blksize;
 #else
   std::cerr << "Error: Unsupported operating system when trying to get the "
                "block size."
