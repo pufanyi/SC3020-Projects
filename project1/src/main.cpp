@@ -1,8 +1,9 @@
 #include <iostream>
+#include "utils.h"
 
-#include "data_loader.h"
-
-int main(int argc, char *argv[]) {
-  std::cout << "Hello, World!" << std::endl;
-  return 0;
+int main()
+{
+    std::cout << "Hello World!" << std::endl;
+    std::cout << "System block size: " << getSystemBlockSize() << std::endl;
+    return 0;
 }
