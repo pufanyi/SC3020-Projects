@@ -12,4 +12,4 @@ aux_source_directory(src SOURCES)
 include_directories(include)
 
 # Add your executable target
-add_executable(out ${SOURCES})
+add_executable(project1 ${SOURCES})
