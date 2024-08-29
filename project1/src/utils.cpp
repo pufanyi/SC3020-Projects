@@ -1,14 +1,29 @@
 #include "utils.h"
-#include <sys/types.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#elif __linux__ || __APPLE__
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
-#include <stdio.h>
+#endif
 
-
-int getSystemBlockSize()
-{
-    // Get the block size of the filesystem
-    struct stat fi;
-    stat("/", &fi);
-    return fi.st_blksize;
+int getSystemBlockSize() {
+#ifdef _WIN32
+  // Get the block size on Windows
+  DWORD sectorsPerCluster, bytesPerSector;
+  GetDiskFreeSpace(nullptr, &sectorsPerCluster, &bytesPerSector, nullptr,
+                   nullptr);
+  return sectorsPerCluster * bytesPerSector;
+#elif __linux__ || __APPLE__
+  // Get the block size of the filesystem on Linux
+  struct stat fi;
+  stat("/", &fi);
+  return fi.st_blksize;
+#else
+  std::cerr << "Error: Unsupported operating system when trying to get the "
+               "block size."
+            << std::endl;
+  return 4096;
+#endif
 }
