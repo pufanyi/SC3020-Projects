@@ -6,10 +6,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Add your source files here
-aux_source_directory(./src SOURCES)
+aux_source_directory(src SOURCES)
 
 # Add your header files here
-include_directories(./include)
+include_directories(include)
 
 # Add your executable target
 add_executable(out ${SOURCES})

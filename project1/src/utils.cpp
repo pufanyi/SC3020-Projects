@@ -1,6 +1,6 @@
 #include "utils.h"
 
-#ifdef _WIN32 || _WIN64
+#ifdef _WIN32
 #include <windows.h>
 #elif __linux__ || __APPLE__
 #include <sys/stat.h>
@@ -9,7 +9,7 @@
 #endif
 
 int getSystemBlockSize() {
-#ifdef _WIN32 || _WIN64
+#ifdef _WIN32
   // Get the block size on Windows
   DWORD sectorsPerCluster, bytesPerSector;
   GetDiskFreeSpace(nullptr, &sectorsPerCluster, &bytesPerSector, nullptr,
