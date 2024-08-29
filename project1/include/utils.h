@@ -3,4 +3,4 @@
 
 int getSystemBlockSize();
 
-#endif // UTILS_H
+#endif  // UTILS_H

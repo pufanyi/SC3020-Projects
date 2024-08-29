@@ -6,7 +6,7 @@
 class DataLoader {
   std::string file_name;
 
-public:
+ public:
   DataLoader(const std::string &file_name) : file_name(file_name) {}
 };
 
