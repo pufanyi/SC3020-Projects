@@ -1,0 +1,41 @@
+name: Unit Test - Project1
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "project1"
+  pull_request:
+    branches: [ main ]
+    paths:
+      - "project1"
+  workflow_dispatch:
+
+concurrency:
+  group: unit-test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Dependencies
+        id: depends
+        continue-on-error: true
+        run: |
+          brew update
+      - name: Build
+        id: cmake_build
+        run: |
+          sysctl -a
+          cd project1
+          mkdir build
+          cd build
+          cmake ..
+          make
+      - name: Test
+        id: cmake_test
+        run: |
+          cd project1/build
+          ./unittest
