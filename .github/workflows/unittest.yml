@@ -1,6 +1,19 @@
 name: Unit Test - Project1
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "project1"
+  pull_request:
+    branches: [ main ]
+    paths:
+      - "project1"
+  workflow_dispatch:
+
+concurrency:
+  group: unit-test-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   lint:
