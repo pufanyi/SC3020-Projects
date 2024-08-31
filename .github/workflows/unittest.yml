@@ -1,0 +1,31 @@
+name: Lint
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Dependencies
+        id: depends
+        continue-on-error: true
+        run: |
+          brew update
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Build
+        id: cmake_build
+        run: |
+          sysctl -a
+          mkdir build
+          cd build
+          cmake ..
+          make
+      - name: Test
+        id: cmake_test
+        run: |
+          cd build
+          ./unittest
