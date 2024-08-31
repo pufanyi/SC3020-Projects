@@ -1,15 +1,6 @@
 name: Unit Test - Project1
 
-on:
-  push:
-    branches: [ main ]
-    paths:
-      - "project1"
-  pull_request:
-    branches: [ main ]
-    paths:
-      - "project1"
-  workflow_dispatch:
+on: [push, pull_request]
 
 concurrency:
   group: unit-test-${{ github.ref }}
