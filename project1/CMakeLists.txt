@@ -11,5 +11,29 @@ aux_source_directory(src SOURCES)
 # Add your header files here
 include_directories(include)
 
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  # Specify the commit you depend on and update it regularly.
+  URL https://github.com/google/googletest/archive/5376968f6948923e2411081fd9372e71a59d8e77.zip
+)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
+# Now simply link against gtest or gtest_main as needed. Eg
+aux_source_directory(test TEST_SOURCES)
+
+add_executable(
+    unittest
+    ${TEST_SOURCES}
+    ${PROJECT_SOURCE_DIR}/src/utils.cpp
+    # Note: it is possible to use file(GLOB ...) to add all files in a directory
+    # but it is not recommended by CMake and the suggested way is to list all files
+    # Add your source files here
+    )
+target_link_libraries(unittest gtest_main)
+add_test(NAME UnitTest COMMAND unittest)
+
 # Add your executable target
 add_executable(project1 ${SOURCES})
