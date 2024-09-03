@@ -3,8 +3,10 @@
 
 #include <cstdio>
 
-std::size_t getSystemBlockSize();
+namespace SystemUtils {
+std::size_t __get_system_block_size();
+}
 
-const std::size_t BLOCK_SIZE = getSystemBlockSize();
+const std::size_t BLOCK_SIZE = SystemUtils::__get_system_block_size();
 
 #endif  // UTILS_H

@@ -8,7 +8,8 @@
 #include <unistd.h>
 #endif
 
-std::size_t getSystemBlockSize() {
+namespace SystemUtils {
+std::size_t __get_system_block_size() {
 #ifdef _WIN32
   // Get the block size on Windows
   DWORD sectorsPerCluster, bytesPerSector;
@@ -27,3 +28,4 @@ std::size_t getSystemBlockSize() {
   return 4096;
 #endif
 }
+}  // namespace SystemUtils
