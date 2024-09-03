@@ -6,19 +6,19 @@
 
 #include "utils.h"
 
-class Block {
+class BlockData {
  private:
-  char *data;
+  Byte *data;
 
  public:
-  Block();
-  Block(const char *data);
-  Block(const Block &block);
+  BlockData();
+  BlockData(const Byte *data);
+  BlockData(const BlockData &block);
 
-  virtual ~Block() { delete[] data; }
+  virtual ~BlockData() { delete[] data; }
 
-  const char &operator[](std::size_t index) const;
-  char &operator[](std::size_t index);
+  const Byte &operator[](std::size_t index) const;
+  Byte &operator[](std::size_t index);
 };
 
 #endif  // BLOCK_H

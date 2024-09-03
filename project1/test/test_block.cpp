@@ -4,7 +4,9 @@
 
 TEST(BlockTest, BlockConstructor) {
   EXPECT_NO_THROW({
-    Block block("Hello World!");
+    const char* str = "Hello World!";
+    const Byte* byteStr = reinterpret_cast<const Byte*>(str);
+    BlockData block(byteStr);
     EXPECT_EQ(block[0], 'H');
     EXPECT_EQ(block[1], 'e');
     EXPECT_EQ(block[2], 'l');

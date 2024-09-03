@@ -1,19 +1,22 @@
 #include "block.h"
 
-Block::Block() : data(new char[BLOCK_SIZE]) {}
+BlockData::BlockData() : data(new Byte[BLOCK_SIZE]) {
+  memset(data, 0, BLOCK_SIZE);
+}
 
-Block::Block(const char *data) : data(new char[BLOCK_SIZE]) {
+BlockData::BlockData(const Byte *data) : data(new Byte[BLOCK_SIZE]) {
+  memset(this->data, 0, BLOCK_SIZE);
   if (data != nullptr) {
-    memcpy(this->data, data, BLOCK_SIZE);
-  } else {
-    memset(this->data, 0, BLOCK_SIZE);
+    memcpy(this->data, data, BLOCK_SIZE * sizeof(Byte));
   }
 }
 
-Block::Block(const Block &block) : data(new char[BLOCK_SIZE]) {
+BlockData::BlockData(const BlockData &block) : data(new Byte[BLOCK_SIZE]) {
   memcpy(data, block.data, BLOCK_SIZE);
 }
 
-const char &Block::operator[](std::size_t index) const { return data[index]; }
+const Byte &BlockData::operator[](std::size_t index) const {
+  return data[index];
+}
 
-char &Block::operator[](std::size_t index) { return data[index]; }
+Byte &BlockData::operator[](std::size_t index) { return data[index]; }

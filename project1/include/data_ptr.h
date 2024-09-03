@@ -3,9 +3,17 @@
 
 #include <fstream>
 
+#include "block.h"
 #include "utils.h"
 
-class DataPtr {};
+class DataPtr {
+ private:
+  const std::fstream *file;
+  std::streamoff offset;
+
+ public:
+  DataPtr(const std::fstream *file, const std::streamoff &offset);
+};
 
 class FileManager {
   std::fstream file;
@@ -13,7 +21,7 @@ class FileManager {
  public:
   FileManager(const std::string &file_name);
 
-  ~FileManager() { file.close(); }
+  ~FileManager();
 
   DataPtr newPtr();
 };
