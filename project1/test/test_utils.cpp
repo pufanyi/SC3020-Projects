@@ -2,4 +2,4 @@
 
 #include "utils.h"
 
-TEST(UtillTest, BlockSizeTest) { getSystemBlockSize(); }
+TEST(UtilTest, BlockSizeTest) { getSystemBlockSize(); }
