@@ -1,8 +1,10 @@
 #ifndef DATA_LOADER_H
 #define DATA_LOADER_H
 
+#include <cassert>
 #include <cstdint>
 #include <iostream>
+#include <string>
 
 class Date {
   uint16_t year;
@@ -37,11 +39,28 @@ class Date {
   // friend std::ostream &operator<<(std::ostream &os, const Date &date);
 };
 
+class Record {
+ private:
+  Date gameDateEst;
+  std::string teamIdHome;
+  uint32_t ptsHome;
+  float fgPctHome;  // ? float32_t introduced in C++23
+                    // ...
+
+ public:
+  Record(const Date &gameDateEst, const std::string &teamIdHome)
+      : gameDateEst(gameDateEst), teamIdHome(teamIdHome) {
+    assert(teamIdHome.size() == 10);
+  }
+};
+
 class DataLoader {
   std::string file_name;
 
  public:
   DataLoader(const std::string &file_name) : file_name(file_name) {}
+
+  void load() {}  // -> std::vector<Record>
 };
 
 #endif
