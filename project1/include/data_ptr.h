@@ -5,8 +5,7 @@
 
 #include "utils.h"
 
-class DataPtr {
-};
+class DataPtr {};
 
 class FileManager {
   std::fstream file;
