@@ -1,13 +1,47 @@
 #include "data_ptr.h"
 
-DataPtr::DataPtr(const std::fstream *file, const std::streamoff &offset)
+DataPtr::DataPtr(std::fstream *file, const std::streamoff &offset)
     : file(file), offset(offset) {}
 
 FileManager::FileManager(const std::string &file_name)
     : file(file_name, std::ios::in | std::ios::out | std::ios::binary) {
   if (!file.is_open()) {
-    throw std::runtime_error("Failed to open file");
+    file.open(file_name, std::ios::out | std::ios::binary);
+    if (!file.is_open()) {
+      throw std::runtime_error("Failed to create file");
+    }
+    file.close();
+
+    // Reopen the file in read/write mode
+    file.open(file_name, std::ios::in | std::ios::out | std::ios::binary);
+    if (!file.is_open()) {
+      throw std::runtime_error("Failed to open file after creating it");
+    }
   }
+}
+
+BlockData DataPtr::load() const {
+  BlockData block;
+
+  // Seek to the position of the block
+  file->seekg(offset, std::ios::beg);
+
+  // Read the block from the file
+  file->read(reinterpret_cast<char *>(block.data), BLOCK_SIZE);
+
+  // Return the block
+  return block;
+}
+
+void DataPtr::store(const BlockData &block) const {
+  // Seek to the position of the block
+  file->seekp(offset, std::ios::beg);
+
+  // Write the block to the file
+  file->write(reinterpret_cast<const char *>(block.data), BLOCK_SIZE);
+
+  // Flush to ensure the block is written
+  file->flush();
 }
 
 FileManager::~FileManager() { file.close(); }

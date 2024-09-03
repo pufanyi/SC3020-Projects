@@ -15,6 +15,8 @@ BlockData::BlockData(const BlockData &block) : data(new Byte[BLOCK_SIZE]) {
   memcpy(data, block.data, BLOCK_SIZE);
 }
 
+const Byte *BlockData::getData() const { return data; }
+
 const Byte &BlockData::operator[](std::size_t index) const {
   return data[index];
 }

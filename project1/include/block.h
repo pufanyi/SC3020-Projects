@@ -19,6 +19,10 @@ class BlockData {
 
   const Byte &operator[](std::size_t index) const;
   Byte &operator[](std::size_t index);
+
+  const Byte *getData() const;
+
+  friend class DataPtr;
 };
 
 #endif  // BLOCK_H

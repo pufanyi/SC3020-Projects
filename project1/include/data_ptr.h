@@ -8,11 +8,14 @@
 
 class DataPtr {
  private:
-  const std::fstream *file;
+  std::fstream *file;
   std::streamoff offset;
 
  public:
-  DataPtr(const std::fstream *file, const std::streamoff &offset);
+  DataPtr(std::fstream *file, const std::streamoff &offset);
+
+  BlockData load() const;
+  void store(const BlockData &block) const;
 };
 
 class FileManager {

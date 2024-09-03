@@ -11,6 +11,6 @@ std::size_t __get_system_block_size();
 
 const std::size_t BLOCK_SIZE = SystemUtils::__get_system_block_size();
 
-using Byte = std::uint8_t;
+using Byte = char;
 
 #endif  // UTILS_H
