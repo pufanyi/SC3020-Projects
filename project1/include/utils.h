@@ -1,8 +1,10 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include <cstddef>
+#include <cstdio>
 
-size_t getSystemBlockSize();
+std::size_t getSystemBlockSize();
+
+const std::size_t BLOCK_SIZE = getSystemBlockSize();
 
 #endif  // UTILS_H
