@@ -1,7 +1,5 @@
 #include <gtest/gtest.h>
 
-#include <stdexcept>
-
 #include "data_loader.h"
 
 TEST(DataLoaderTest, DateConstructorValidInput) {

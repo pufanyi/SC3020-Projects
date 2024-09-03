@@ -49,3 +49,6 @@ _deps
 .cache/
 build/
 .DS_Store
+
+# Database files
+*.db

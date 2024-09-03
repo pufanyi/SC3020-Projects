@@ -7,6 +7,6 @@ class Field {
  public:
   virtual ~Field() = default;
   virtual void parse(const std::string &field) = 0;
-}
+};
 
 #endif
