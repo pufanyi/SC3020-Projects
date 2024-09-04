@@ -4,36 +4,6 @@
 #include <iostream>
 #include <string>
 
-Field::Field(FieldType type, int& size) {
-  this->type = type;
-  this->size = size;
-}
-
-IntField::IntField() {
-  this->type = FieldType::INT;
-  this->size = 4;
-}
-
-CharField::CharField() {
-  this->type = FieldType::CHAR;
-  this->size = 1;
-}
-
-DateField::DateField() {
-  this->type = FieldType::DATE;
-  this->size = 10;
-}
-
-FloatField::FloatField() {
-  this->type = FieldType::FLOAT;
-  this->size = 4;
-}
-
-BooleanField::BooleanField() {
-  this->type = FieldType::BOOLEAN;
-  this->size = 1;
-}
-
 Field* FieldCreator::createField(FieldType& type) {
   switch (type) {
     case FieldType::INT:

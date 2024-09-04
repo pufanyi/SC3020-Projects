@@ -1,6 +1,7 @@
 #ifndef FIELD_H
 #define FIELD_H
 
+#include <cstring>
 #include <sstream>
 #include <string>
 
@@ -19,11 +20,12 @@ enum class FieldType {
 class Field {
  protected:
   FieldType type;
-  int size;
+  size_t size;
 
  public:
   Field() = default;
-  Field(FieldType type, int& size);
+  Field(const FieldType type, const size_t size) : type(type), size(size) {}
+
   virtual ~Field() = default;
   virtual Byte* stringToBytes(const std::string& value) = 0;
   virtual std::string bytesToString(const Byte* value) = 0;
@@ -46,35 +48,35 @@ class Field {
 
 class IntField : public Field {
  public:
-  IntField();
+  IntField() : Field(FieldType::INT, sizeof(int)) {}
   Byte* stringToBytes(const std::string& value) override;
   std::string bytesToString(const Byte* value) override;
 };
 
 class CharField : public Field {
  public:
-  CharField();
+  CharField() : Field(FieldType::CHAR, sizeof(char)) {}
   Byte* stringToBytes(const std::string& value) override;
   std::string bytesToString(const Byte* value) override;
 };
 
 class DateField : public Field {
  public:
-  DateField();
+  DateField() : Field(FieldType::DATE, strlen("1999/99/99") * sizeof(char)) {}
   Byte* stringToBytes(const std::string& value) override;
   std::string bytesToString(const Byte* value) override;
 };
 
 class FloatField : public Field {
  public:
-  FloatField();
+  FloatField() : Field(FieldType::FLOAT, sizeof(float)) {}
   Byte* stringToBytes(const std::string& value) override;
   std::string bytesToString(const Byte* value) override;
 };
 
 class BooleanField : public Field {
  public:
-  BooleanField();
+  BooleanField() : Field(FieldType::BOOLEAN, sizeof(bool)) {}
   Byte* stringToBytes(const std::string& value) override;
   std::string bytesToString(const Byte* value) override;
 };
