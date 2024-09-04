@@ -51,3 +51,19 @@ TEST(FieldTest, CharFieldTest) {
   std::string result = field->bytesToString(bytes);
   EXPECT_EQ(value, result);
 }
+
+TEST(FieldTest, VarcharFieldTest) {
+  FieldType type = FieldType::VARCHAR;
+  Field *field = FieldCreator::createField(type, 10);
+  std::string value = "abcdefgh";
+  Byte *bytes = field->stringToBytes(value);
+  std::string result = field->bytesToString(bytes);
+  EXPECT_EQ(value, result);
+}
+
+TEST(FieldTest, VarcharInvalidFieldSizeTest) {
+  FieldType type = FieldType::VARCHAR;
+  Field *field = FieldCreator::createField(type, 10);
+  std::string value = "abcdefghijk";
+  EXPECT_THROW(field->stringToBytes(value), std::invalid_argument);
+}
