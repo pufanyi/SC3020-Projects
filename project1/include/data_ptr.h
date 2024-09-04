@@ -18,15 +18,4 @@ class DataPtr {
   void store(const BlockData &block) const;
 };
 
-class FileManager {
-  std::fstream file;
-
- public:
-  FileManager(const std::string &file_name);
-
-  ~FileManager();
-
-  DataPtr newPtr();
-};
-
 #endif  // DATA_PTR_H
