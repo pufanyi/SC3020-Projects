@@ -1,6 +1,7 @@
 #ifndef FIELD_H
 #define FIELD_H
 
+#include <sstream>
 #include <string>
 
 #include "utils.h"
@@ -26,6 +27,21 @@ class Field {
   virtual ~Field() = default;
   virtual Byte* stringToBytes(const std::string& value) = 0;
   virtual std::string bytesToString(const Byte* value) = 0;
+
+  template <typename T>
+  Byte* valueToBytes(const T& value) {
+    std::stringstream ss;
+    ss << value;
+    std::string str_value = ss.str();
+    return stringToBytes(str_value);
+  }
+
+  template <typename T>
+  void bytesToValue(const Byte* value, T& result) {
+    std::string str_value = bytesToString(value);
+    std::stringstream ss(str_value);
+    ss >> result;
+  }
 };
 
 class IntField : public Field {

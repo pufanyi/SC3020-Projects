@@ -9,6 +9,11 @@ TEST(FieldTest, IntFieldTest) {
   Byte *bytes = field->stringToBytes(value);
   std::string result = field->bytesToString(bytes);
   EXPECT_EQ(value, result);
+
+  int val = 1234;
+  bytes = field->valueToBytes(val);
+  field->bytesToValue(bytes, val);
+  EXPECT_EQ(val, 1234);
 }
 
 TEST(FieldTest, FloatFieldTest) {
