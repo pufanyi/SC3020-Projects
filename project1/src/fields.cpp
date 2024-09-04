@@ -144,7 +144,7 @@ Byte* VarcharField::stringToBytes(const std::string& value) const {
   if (value.length() > size) {
     throw std::invalid_argument("String value too long");
   }
-  Byte *byte_value = new Byte[size];
+  Byte* byte_value = new Byte[size];
   std::fill(byte_value, byte_value + size, 0);
   std::copy(value.begin(), value.end(), byte_value);
   return byte_value;
