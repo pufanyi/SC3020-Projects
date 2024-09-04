@@ -10,8 +10,7 @@
 enum class FieldType {
   INT,
   CHAR,
-  // VARCHAR, # Maybe include this later, for simplicity, I will not include
-  // this for now
+  VARCHAR,
   DATE,
   FLOAT,
   BOOLEAN,
@@ -81,9 +80,21 @@ class BooleanField : public Field {
   std::string bytesToString(const Byte* value) override;
 };
 
+class VarcharField : public Field {
+ private:
+  const size_t size;
+
+ public:
+  VarcharField(const size_t size)
+      : Field(FieldType::VARCHAR, size * sizeof(char)), size(size) {}
+  Byte* stringToBytes(const std::string& value) override;
+  std::string bytesToString(const Byte* value) override;
+  const size_t getSize() const { return size; }
+};
+
 class FieldCreator {
  public:
-  static Field* createField(FieldType& type);
+  static Field* createField(FieldType& type, size_t size = 1);
 };
 
 #endif

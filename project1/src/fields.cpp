@@ -4,7 +4,14 @@
 #include <iostream>
 #include <string>
 
-Field* FieldCreator::createField(FieldType& type) {
+Field* FieldCreator::createField(FieldType& type, size_t size) {
+  if (size == 0) {
+    throw std::invalid_argument("Invalid field size");
+  }
+  if (size > 1 && type != FieldType::VARCHAR) {
+    throw std::invalid_argument(
+        "Size greater than 1 is only allowed for VARCHAR fields");
+  }
   switch (type) {
     case FieldType::INT:
       return new IntField();
@@ -16,6 +23,8 @@ Field* FieldCreator::createField(FieldType& type) {
       return new FloatField();
     case FieldType::BOOLEAN:
       return new BooleanField();
+    case FieldType::VARCHAR:
+      return new VarcharField(size);
     default:
       throw std::invalid_argument("Invalid field type");
   }
@@ -129,4 +138,16 @@ std::string FloatField::bytesToString(const Byte* value) {
   } catch (const std::out_of_range& e) {
     throw std::runtime_error("Float value out of range");
   }
+}
+
+Byte* VarcharField::stringToBytes(const std::string& value) {
+  if (value.length() > size) {
+    throw std::invalid_argument("String value too long");
+  }
+  Byte* byte_value = reinterpret_cast<Byte*>(const_cast<char*>(value.c_str()));
+  return byte_value;
+}
+
+std::string VarcharField::bytesToString(const Byte* value) {
+  return std::string(reinterpret_cast<const char*>(value));
 }
