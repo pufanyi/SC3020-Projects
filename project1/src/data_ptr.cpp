@@ -52,7 +52,10 @@ DataPtr FileManager::newPtr() {
   std::streampos fileEnd = file.tellp();
 
   // Create a new block of zeros
-  char newBlock[BLOCK_SIZE] = {0};
+  char newBlock[BLOCK_SIZE];
+  // Instead of variable-sized assignment,
+  // use this
+  memset(newBlock, 0, BLOCK_SIZE);
 
   // Write the new block to the end of the file
   file.write(newBlock, BLOCK_SIZE);
