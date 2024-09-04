@@ -55,7 +55,7 @@ TEST(FieldTest, CharFieldTest) {
 TEST(FieldTest, VarcharFieldTest) {
   FieldType type = FieldType::VARCHAR;
   Field *field = FieldCreator::createField(type, 10);
-  std::string value = "abcdefghij";
+  std::string value = "abcdefgh";
   Byte *bytes = field->stringToBytes(value);
   std::string result = field->bytesToString(bytes);
   EXPECT_EQ(value, result);

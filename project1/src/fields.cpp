@@ -144,10 +144,19 @@ Byte* VarcharField::stringToBytes(const std::string& value) const {
   if (value.length() > size) {
     throw std::invalid_argument("String value too long");
   }
-  Byte* byte_value = reinterpret_cast<Byte*>(const_cast<char*>(value.c_str()));
+  Byte *byte_value = new Byte[size];
+  std::fill(byte_value, byte_value + size, 0);
+  std::copy(value.begin(), value.end(), byte_value);
   return byte_value;
 }
 
 std::string VarcharField::bytesToString(const Byte* value) const {
-  return std::string(reinterpret_cast<const char*>(value));
+  std::string result;
+  for (size_t i = 0; i < size; i++) {
+    if (value[i] == 0) {
+      break;
+    }
+    result.push_back(value[i]);
+  }
+  return result;
 }
