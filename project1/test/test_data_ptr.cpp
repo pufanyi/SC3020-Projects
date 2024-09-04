@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "data_ptr.h"
+#include "managers.h"
 
 TEST(DataPtrTest, DataPtrConstructor) {
   EXPECT_NO_THROW({
