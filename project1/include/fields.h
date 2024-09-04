@@ -23,7 +23,7 @@ class Field {
  public:
   Field() = default;
   Field(FieldType type, int& size);
-  ~Field() = default;
+  virtual ~Field() = default;
   virtual Byte* stringToBytes(const std::string& value) = 0;
   virtual std::string bytesToString(const Byte* value) = 0;
 };
