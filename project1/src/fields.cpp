@@ -30,7 +30,7 @@ Field* FieldCreator::createField(FieldType& type, size_t size) {
   }
 }
 
-Byte* IntField::stringToBytes(const std::string& value) {
+Byte* IntField::stringToBytes(const std::string& value) const {
   // Parse the field
   try {
     int int_value = std::stoi(value);
@@ -49,22 +49,22 @@ Byte* IntField::stringToBytes(const std::string& value) {
   }
 }
 
-std::string IntField::bytesToString(const Byte* value) {
+std::string IntField::bytesToString(const Byte* value) const {
   int int_value;
   std::memcpy(&int_value, value, sizeof(int));
   return std::to_string(int_value);
 }
 
-Byte* CharField::stringToBytes(const std::string& value) {
+Byte* CharField::stringToBytes(const std::string& value) const {
   Byte* byte_value = reinterpret_cast<Byte*>(const_cast<char*>(value.c_str()));
   return byte_value;
 }
 
-std::string CharField::bytesToString(const Byte* value) {
+std::string CharField::bytesToString(const Byte* value) const {
   return std::string(reinterpret_cast<const char*>(value));
 }
 
-Byte* DateField::stringToBytes(const std::string& value) {
+Byte* DateField::stringToBytes(const std::string& value) const {
   if (value.length() != 10 || value[2] != '/' || value[5] != '/') {
     throw std::invalid_argument("Invalid date format");
   }
@@ -80,11 +80,11 @@ Byte* DateField::stringToBytes(const std::string& value) {
   return byte_value;
 }
 
-std::string DateField::bytesToString(const Byte* value) {
+std::string DateField::bytesToString(const Byte* value) const {
   return std::string(reinterpret_cast<const char*>(value));
 }
 
-Byte* BooleanField::stringToBytes(const std::string& value) {
+Byte* BooleanField::stringToBytes(const std::string& value) const {
   if (value == "1") {
     Byte* byte_value = new Byte[1];
     byte_value[0] = 1;
@@ -98,7 +98,7 @@ Byte* BooleanField::stringToBytes(const std::string& value) {
   }
 }
 
-std::string BooleanField::bytesToString(const Byte* value) {
+std::string BooleanField::bytesToString(const Byte* value) const {
   if (value[0] == 1) {
     return "1";
   } else if (value[0] == 0) {
@@ -108,7 +108,7 @@ std::string BooleanField::bytesToString(const Byte* value) {
   }
 }
 
-Byte* FloatField::stringToBytes(const std::string& value) {
+Byte* FloatField::stringToBytes(const std::string& value) const {
   try {
     float float_value = std::stof(value);
     static char bytes[sizeof(float_value)];
@@ -126,7 +126,7 @@ Byte* FloatField::stringToBytes(const std::string& value) {
   }
 }
 
-std::string FloatField::bytesToString(const Byte* value) {
+std::string FloatField::bytesToString(const Byte* value) const {
   try {
     float result;
     std::copy(reinterpret_cast<const char*>(&value[0]),
@@ -140,7 +140,7 @@ std::string FloatField::bytesToString(const Byte* value) {
   }
 }
 
-Byte* VarcharField::stringToBytes(const std::string& value) {
+Byte* VarcharField::stringToBytes(const std::string& value) const {
   if (value.length() > size) {
     throw std::invalid_argument("String value too long");
   }
@@ -148,6 +148,6 @@ Byte* VarcharField::stringToBytes(const std::string& value) {
   return byte_value;
 }
 
-std::string VarcharField::bytesToString(const Byte* value) {
+std::string VarcharField::bytesToString(const Byte* value) const {
   return std::string(reinterpret_cast<const char*>(value));
 }
