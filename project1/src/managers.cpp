@@ -15,6 +15,7 @@ FileManager::FileManager(const std::string &file_name)
       throw std::runtime_error("Failed to open file after creating it");
     }
   }
+  this->num_blocks = 0;
 }
 
 FileManager::~FileManager() { file.close(); }
@@ -35,8 +36,23 @@ DataPtr FileManager::newPtr() {
 
   // Flush to ensure the block is written
   file.flush();
+  this->num_blocks++;
 
   // Create and return a DataPtr object pointing to the new block
   return DataPtr(&file, static_cast<std::streamoff>(
                             fileEnd));  // Record the position of the new block
+}
+
+std::vector<DataPtr> FileManager::getPtrs() {
+  std::vector<DataPtr> ptrs;
+  // Go to the beginning of the file
+  file.seekg(0, std::ios::beg);
+
+  // Read blocks from the file
+  for (int i = 0; i < this->num_blocks; i++) {
+    DataPtr ptr(&file, static_cast<std::streamoff>(i * BLOCK_SIZE));
+    ptrs.push_back(ptr);
+  }
+
+  return ptrs;
 }
