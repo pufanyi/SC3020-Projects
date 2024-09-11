@@ -30,5 +30,8 @@ TEST(DataPtrTest, DataPtrConstructor) {
     EXPECT_EQ(new_block2[3], 'l');
     EXPECT_EQ(new_block2[4], 'o');
     EXPECT_EQ(new_block2[5], ' ');
+    EXPECT_EQ(fileManager.getPtrs().size(), 3);
+    EXPECT_EQ(fileManager.getPtrs()[1].load()[0], 'H');
+    remove("test_file.db");
   });
 };
