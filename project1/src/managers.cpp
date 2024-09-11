@@ -26,10 +26,10 @@ DataPtr FileManager::newPtr() {
   std::streampos fileEnd = file.tellp();
 
   // Create a new block of zeros
-  char newBlock[BLOCK_SIZE];
+  Byte newBlock[BLOCK_SIZE];
   // Instead of variable-sized assignment,
   // use this
-  memset(newBlock, 0, BLOCK_SIZE);
+  memset(newBlock, 0, sizeof(newBlock));
 
   // Write the new block to the end of the file
   file.write(newBlock, BLOCK_SIZE);
@@ -39,8 +39,8 @@ DataPtr FileManager::newPtr() {
   this->num_blocks++;
 
   // Create and return a DataPtr object pointing to the new block
-  return DataPtr(&file, static_cast<std::streamoff>(
-                            fileEnd));  // Record the position of the new block
+  // Record the position of the new block
+  return DataPtr(&file, static_cast<std::streamoff>(fileEnd));
 }
 
 std::vector<DataPtr> FileManager::getPtrs() {
