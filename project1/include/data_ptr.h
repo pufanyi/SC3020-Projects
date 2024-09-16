@@ -13,9 +13,13 @@ class DataPtr {
 
  public:
   DataPtr(std::fstream *file, const std::streamoff &offset);
+  DataPtr(const Byte* bytes);
 
   BlockData load() const;
   void store(const BlockData &block) const;
+  Byte* getBytes() const;
+  static DataPtr* fromBytes(const Byte* bytes);
+  static size_t size();
 };
 
 #endif  // DATA_PTR_H
