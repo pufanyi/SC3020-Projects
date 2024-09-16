@@ -65,7 +65,7 @@ TEST(DataPtrTest, DataPtrSave) {
     EXPECT_EQ(new_block2[5], ' ');
     EXPECT_EQ(fileManager.getPtrs().size(), 3);
     EXPECT_EQ(fileManager.getPtrs()[1].load()[0], 'H');
-    
+
     Byte* bytes = dataPtr2.getBytes();
     DataPtr* dataPtr4 = DataPtr::fromBytes(bytes);
 
