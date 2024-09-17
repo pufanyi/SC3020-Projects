@@ -305,3 +305,11 @@ std::ostream& operator<<(std::ostream& os, const DataTypes& data_types) {
   os << data_types.to_table();
   return os;
 }
+
+size_t DataTypes::size() const {
+  size_t size = 0;
+  for (const auto& [name, field] : *this) {
+    size += field->getSize();
+  }
+  return size;
+}

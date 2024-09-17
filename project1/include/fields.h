@@ -133,6 +133,7 @@ class DataTypes {
   void addField(const std::string& field_name, const FieldType type,
                 const size_t size = 1);
   void addField(const std::string& field_name, const std::string& type);
+  std::size_t size() const;
 
   class Iterator {
    private:
