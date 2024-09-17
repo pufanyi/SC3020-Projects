@@ -1,5 +1,7 @@
 #include "block.h"
 
+#include <stdexcept>
+
 BlockData::BlockData() : data(new Byte[BLOCK_SIZE]) {
   memset(data, 0, BLOCK_SIZE);
 }
