@@ -2,9 +2,11 @@
 
 #include <algorithm>
 #include <cstring>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 std::shared_ptr<Field> FieldCreator::createField(const FieldType& type,
                                                  const size_t size) {
@@ -244,4 +246,62 @@ bool DataTypes::Iterator::operator!=(const Iterator& other) const {
 
 bool DataTypes::Iterator::operator==(const Iterator& other) const {
   return name_it == other.name_it && field_it == other.field_it;
+}
+
+std::ostream& operator<<(std::ostream& os, const Field& field) {
+  os << field.to_string();
+  return os;
+}
+
+std::string DataTypes::to_string() const {
+  std::stringstream ss;
+  for (const auto& [name, field] : *this) {
+    ss << name << " " << *field << ",\n";
+  }
+  std::string result = ss.str();
+  return result.substr(0, result.size() - 2);
+}
+
+std::string DataTypes::to_table(const size_t min_name_length,
+                                const size_t min_type_length) const {
+  std::stringstream ss;
+
+  auto max_name_length = min_name_length;
+  auto max_type_length = min_type_length;
+
+  // Determine maximum lengths
+  for (const auto& [name, field] : *this) {
+    max_name_length = std::max(max_name_length, name.length());
+    max_type_length = std::max(max_type_length, field->to_string().length());
+  }
+
+  // Add some padding
+  max_name_length += 2;
+  max_type_length += 2;
+
+  // Create the header
+  ss << "+" << std::string(max_name_length, '-') << "+"
+     << std::string(max_type_length, '-') << "+\n";
+  ss << "| " << std::left << std::setw(max_name_length - 2) << "Field Name"
+     << " | " << std::setw(max_type_length - 2) << "Field Type"
+     << " |\n";
+  ss << "+" << std::string(max_name_length, '-') << "+"
+     << std::string(max_type_length, '-') << "+\n";
+
+  // Add rows
+  for (const auto& [name, field] : *this) {
+    ss << "| " << std::left << std::setw(max_name_length - 2) << name << " | "
+       << std::setw(max_type_length - 2) << field->to_string() << " |\n";
+  }
+
+  // Add footer
+  ss << "+" << std::string(max_name_length, '-') << "+"
+     << std::string(max_type_length, '-') << "+\n";
+
+  return ss.str();
+}
+
+std::ostream& operator<<(std::ostream& os, const DataTypes& data_types) {
+  os << data_types.to_table();
+  return os;
 }

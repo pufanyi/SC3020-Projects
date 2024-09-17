@@ -30,6 +30,7 @@ class Field {
   virtual ~Field() = default;
   virtual Byte* stringToBytes(const std::string& value) const = 0;
   virtual std::string bytesToString(const Byte* value) const = 0;
+  virtual std::string to_string() const = 0;
 
   const FieldType getType() const { return type; }
   const size_t getSize() const { return size; }
@@ -48,6 +49,8 @@ class Field {
     std::stringstream ss(str_value);
     ss >> result;
   }
+
+  friend std::ostream& operator<<(std::ostream& os, const Field& field);
 };
 
 class IntField : public Field {
@@ -55,6 +58,7 @@ class IntField : public Field {
   IntField() : Field(FieldType::INT, sizeof(int)) {}
   Byte* stringToBytes(const std::string& value) const override;
   std::string bytesToString(const Byte* value) const override;
+  std::string to_string() const override { return "INT"; }
 };
 
 class CharField : public Field {
@@ -62,6 +66,7 @@ class CharField : public Field {
   CharField() : Field(FieldType::CHAR, sizeof(char)) {}
   Byte* stringToBytes(const std::string& value) const override;
   std::string bytesToString(const Byte* value) const override;
+  std::string to_string() const override { return "CHAR"; }
 };
 
 class DateField : public Field {
@@ -69,6 +74,7 @@ class DateField : public Field {
   DateField() : Field(FieldType::DATE, strlen("1999/99/99") * sizeof(char)) {}
   Byte* stringToBytes(const std::string& value) const override;
   std::string bytesToString(const Byte* value) const override;
+  std::string to_string() const override { return "DATE"; }
 };
 
 class FloatField : public Field {
@@ -76,6 +82,7 @@ class FloatField : public Field {
   FloatField() : Field(FieldType::FLOAT, sizeof(float)) {}
   Byte* stringToBytes(const std::string& value) const override;
   std::string bytesToString(const Byte* value) const override;
+  std::string to_string() const override { return "FLOAT"; }
 };
 
 class BooleanField : public Field {
@@ -83,6 +90,7 @@ class BooleanField : public Field {
   BooleanField() : Field(FieldType::BOOLEAN, sizeof(bool)) {}
   Byte* stringToBytes(const std::string& value) const override;
   std::string bytesToString(const Byte* value) const override;
+  std::string to_string() const override { return "BOOLEAN"; }
 };
 
 class VarcharField : public Field {
@@ -95,6 +103,9 @@ class VarcharField : public Field {
   Byte* stringToBytes(const std::string& value) const override;
   std::string bytesToString(const Byte* value) const override;
   const size_t getSize() const { return size; }
+  std::string to_string() const override {
+    return "VARCHAR(" + std::to_string(size) + ")";
+  }
 };
 
 class FieldCreator {
@@ -145,6 +156,13 @@ class DataTypes {
 
   Iterator begin() const;
   Iterator end() const;
+
+  std::string to_string() const;
+  std::string to_table(const size_t min_name_length = 10,
+                       const size_t min_type_length = 10) const;
+
+  friend std::ostream& operator<<(std::ostream& os,
+                                  const DataTypes& data_types);
 };
 
 #endif
