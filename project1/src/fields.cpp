@@ -218,3 +218,30 @@ void DataTypes::addField(const std::string& field_name,
   auto field = FieldCreator::createField(type);
   fields.push_back(field);
 }
+
+DataTypes::Iterator DataTypes::begin() const {
+  return Iterator(field_names.begin(), fields.begin());
+}
+
+DataTypes::Iterator DataTypes::end() const {
+  return Iterator(field_names.end(), fields.end());
+}
+
+
+std::pair<const std::string&, const std::shared_ptr<Field>&> DataTypes::Iterator::operator*() const {
+  return {*name_it, *field_it};
+}
+
+DataTypes::Iterator &DataTypes::Iterator::operator++() {
+  ++name_it;
+  ++field_it;
+  return *this;
+}
+
+bool DataTypes::Iterator::operator!=(const Iterator &other) const {
+  return name_it != other.name_it || field_it != other.field_it;
+}
+
+bool DataTypes::Iterator::operator==(const Iterator &other) const {
+  return name_it == other.name_it && field_it == other.field_it;
+}

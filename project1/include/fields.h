@@ -31,6 +31,9 @@ class Field {
   virtual Byte* stringToBytes(const std::string& value) const = 0;
   virtual std::string bytesToString(const Byte* value) const = 0;
 
+  const FieldType getType() const { return type; }
+  const size_t getSize() const { return size; }
+
   template <typename T>
   Byte* valueToBytes(const T& value) const {
     std::stringstream ss;
@@ -119,6 +122,27 @@ class DataTypes {
   void addField(const std::string& field_name, const FieldType type,
                 const size_t size = 1);
   void addField(const std::string& field_name, const std::string& type);
+
+  class Iterator {
+   private:
+    typename std::vector<std::string>::const_iterator name_it;
+    typename std::vector<std::shared_ptr<Field>>::const_iterator field_it;
+
+   public:
+    Iterator(typename std::vector<std::string>::const_iterator name_it,
+             typename std::vector<std::shared_ptr<Field>>::const_iterator field_it)
+        : name_it(name_it), field_it(field_it) {}
+
+    std::pair<const std::string&, const std::shared_ptr<Field>&> operator*() const;
+
+    Iterator& operator++();
+
+    bool operator!=(const Iterator& other) const;
+    bool operator==(const Iterator& other) const;
+  };
+
+  Iterator begin() const;
+  Iterator end() const;
 };
 
 #endif
