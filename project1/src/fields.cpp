@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <algorithm>
 
 std::shared_ptr<Field> FieldCreator::createField(const FieldType& type,
                                                  const size_t size) {
