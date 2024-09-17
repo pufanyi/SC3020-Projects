@@ -129,11 +129,13 @@ class DataTypes {
     typename std::vector<std::shared_ptr<Field>>::const_iterator field_it;
 
    public:
-    Iterator(typename std::vector<std::string>::const_iterator name_it,
-             typename std::vector<std::shared_ptr<Field>>::const_iterator field_it)
+    Iterator(
+        typename std::vector<std::string>::const_iterator name_it,
+        typename std::vector<std::shared_ptr<Field>>::const_iterator field_it)
         : name_it(name_it), field_it(field_it) {}
 
-    std::pair<const std::string&, const std::shared_ptr<Field>&> operator*() const;
+    std::pair<const std::string&, const std::shared_ptr<Field>&> operator*()
+        const;
 
     Iterator& operator++();
 

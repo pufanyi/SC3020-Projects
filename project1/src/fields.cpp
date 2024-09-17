@@ -227,21 +227,21 @@ DataTypes::Iterator DataTypes::end() const {
   return Iterator(field_names.end(), fields.end());
 }
 
-
-std::pair<const std::string&, const std::shared_ptr<Field>&> DataTypes::Iterator::operator*() const {
+std::pair<const std::string&, const std::shared_ptr<Field>&>
+DataTypes::Iterator::operator*() const {
   return {*name_it, *field_it};
 }
 
-DataTypes::Iterator &DataTypes::Iterator::operator++() {
+DataTypes::Iterator& DataTypes::Iterator::operator++() {
   ++name_it;
   ++field_it;
   return *this;
 }
 
-bool DataTypes::Iterator::operator!=(const Iterator &other) const {
+bool DataTypes::Iterator::operator!=(const Iterator& other) const {
   return name_it != other.name_it || field_it != other.field_it;
 }
 
-bool DataTypes::Iterator::operator==(const Iterator &other) const {
+bool DataTypes::Iterator::operator==(const Iterator& other) const {
   return name_it == other.name_it && field_it == other.field_it;
 }
