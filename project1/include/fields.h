@@ -98,6 +98,9 @@ class FieldCreator {
  public:
   static std::shared_ptr<Field> createField(const FieldType& type,
                                             const size_t size = 1);
+
+  // VARCHAR should be "VARCHAR(size)"
+  static std::shared_ptr<Field> createField(std::string type);
 };
 
 class DataTypes {
@@ -115,6 +118,7 @@ class DataTypes {
                 const std::shared_ptr<Field>& field);
   void addField(const std::string& field_name, const FieldType type,
                 const size_t size = 1);
+  void addField(const std::string& field_name, const std::string& type);
 };
 
 #endif

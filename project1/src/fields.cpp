@@ -2,6 +2,7 @@
 
 #include <cstring>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 std::shared_ptr<Field> FieldCreator::createField(const FieldType& type,
@@ -29,6 +30,41 @@ std::shared_ptr<Field> FieldCreator::createField(const FieldType& type,
     default:
       throw std::invalid_argument("Invalid field type");
   }
+}
+
+std::shared_ptr<Field> FieldCreator::createField(std::string type) {
+  std::transform(type.begin(), type.end(), type.begin(), ::toupper);
+  FieldType fieldType;
+  size_t size = 1;
+
+  if (type == "INT") {
+    fieldType = FieldType::INT;
+  } else if (type == "CHAR") {
+    fieldType = FieldType::CHAR;
+  } else if (type == "DATE") {
+    fieldType = FieldType::DATE;
+  } else if (type == "FLOAT") {
+    fieldType = FieldType::FLOAT;
+  } else if (type == "BOOLEAN") {
+    fieldType = FieldType::BOOLEAN;
+  } else if (type.substr(0, 7) == "VARCHAR") {
+    fieldType = FieldType::VARCHAR;
+    const auto start = type.find("(");
+    const auto end = type.find(")");
+    if (start == std::string::npos || end == std::string::npos ||
+        start >= end - 1) {
+      throw std::invalid_argument("Invalid VARCHAR field format");
+    }
+    std::string size_str = type.substr(start + 1, end - start - 1);
+    std::stringstream ss(size_str);
+    if (!(ss >> size) || size == 0 || !ss.eof()) {
+      throw std::invalid_argument("Invalid VARCHAR field size");
+    }
+  } else {
+    throw std::invalid_argument("Invalid field type");
+  }
+
+  return createField(fieldType, size);
 }
 
 Byte* IntField::stringToBytes(const std::string& value) const {
@@ -172,5 +208,12 @@ void DataTypes::addField(const std::string& field_name, const FieldType type,
                          const size_t size) {
   field_names.push_back(field_name);
   auto field = FieldCreator::createField(type, size);
+  fields.push_back(field);
+}
+
+void DataTypes::addField(const std::string& field_name,
+                         const std::string& type) {
+  field_names.push_back(field_name);
+  auto field = FieldCreator::createField(type);
   fields.push_back(field);
 }
