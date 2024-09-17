@@ -1,10 +1,15 @@
 #include "fields.h"
 
+#include <algorithm>
 #include <cstring>
+#include <iomanip>
 #include <iostream>
+#include <sstream>
 #include <string>
+#include <vector>
 
-Field* FieldCreator::createField(FieldType& type, size_t size) {
+std::shared_ptr<Field> FieldCreator::createField(const FieldType& type,
+                                                 const size_t size) {
   if (size == 0) {
     throw std::invalid_argument("Invalid field size");
   }
@@ -14,20 +19,55 @@ Field* FieldCreator::createField(FieldType& type, size_t size) {
   }
   switch (type) {
     case FieldType::INT:
-      return new IntField();
+      return std::make_shared<IntField>();
     case FieldType::CHAR:
-      return new CharField();
+      return std::make_shared<CharField>();
     case FieldType::DATE:
-      return new DateField();
+      return std::make_shared<DateField>();
     case FieldType::FLOAT:
-      return new FloatField();
+      return std::make_shared<FloatField>();
     case FieldType::BOOLEAN:
-      return new BooleanField();
+      return std::make_shared<BooleanField>();
     case FieldType::VARCHAR:
-      return new VarcharField(size);
+      return std::make_shared<VarcharField>(size);
     default:
       throw std::invalid_argument("Invalid field type");
   }
+}
+
+std::shared_ptr<Field> FieldCreator::createField(std::string type) {
+  std::transform(type.begin(), type.end(), type.begin(), ::toupper);
+  FieldType fieldType;
+  size_t size = 1;
+
+  if (type == "INT") {
+    fieldType = FieldType::INT;
+  } else if (type == "CHAR") {
+    fieldType = FieldType::CHAR;
+  } else if (type == "DATE") {
+    fieldType = FieldType::DATE;
+  } else if (type == "FLOAT") {
+    fieldType = FieldType::FLOAT;
+  } else if (type == "BOOLEAN") {
+    fieldType = FieldType::BOOLEAN;
+  } else if (type.substr(0, 7) == "VARCHAR") {
+    fieldType = FieldType::VARCHAR;
+    const auto start = type.find("(");
+    const auto end = type.find(")");
+    if (start == std::string::npos || end == std::string::npos ||
+        start >= end - 1) {
+      throw std::invalid_argument("Invalid VARCHAR field format");
+    }
+    std::string size_str = type.substr(start + 1, end - start - 1);
+    std::stringstream ss(size_str);
+    if (!(ss >> size) || size == 0 || !ss.eof()) {
+      throw std::invalid_argument("Invalid VARCHAR field size");
+    }
+  } else {
+    throw std::invalid_argument("Invalid field type");
+  }
+
+  return createField(fieldType, size);
 }
 
 Byte* IntField::stringToBytes(const std::string& value) const {
@@ -159,4 +199,117 @@ std::string VarcharField::bytesToString(const Byte* value) const {
     result.push_back(value[i]);
   }
   return result;
+}
+
+void DataTypes::addField(const std::string& field_name,
+                         const std::shared_ptr<Field>& field) {
+  field_names.push_back(field_name);
+  fields.push_back(field);
+}
+
+void DataTypes::addField(const std::string& field_name, const FieldType type,
+                         const size_t size) {
+  field_names.push_back(field_name);
+  auto field = FieldCreator::createField(type, size);
+  fields.push_back(field);
+}
+
+void DataTypes::addField(const std::string& field_name,
+                         const std::string& type) {
+  field_names.push_back(field_name);
+  auto field = FieldCreator::createField(type);
+  fields.push_back(field);
+}
+
+DataTypes::Iterator DataTypes::begin() const {
+  return Iterator(field_names.begin(), fields.begin());
+}
+
+DataTypes::Iterator DataTypes::end() const {
+  return Iterator(field_names.end(), fields.end());
+}
+
+std::pair<const std::string&, const std::shared_ptr<Field>&>
+DataTypes::Iterator::operator*() const {
+  return {*name_it, *field_it};
+}
+
+DataTypes::Iterator& DataTypes::Iterator::operator++() {
+  ++name_it;
+  ++field_it;
+  return *this;
+}
+
+bool DataTypes::Iterator::operator!=(const Iterator& other) const {
+  return name_it != other.name_it || field_it != other.field_it;
+}
+
+bool DataTypes::Iterator::operator==(const Iterator& other) const {
+  return name_it == other.name_it && field_it == other.field_it;
+}
+
+std::ostream& operator<<(std::ostream& os, const Field& field) {
+  os << field.to_string();
+  return os;
+}
+
+std::string DataTypes::to_string() const {
+  std::stringstream ss;
+  for (const auto& [name, field] : *this) {
+    ss << name << " " << *field << ",\n";
+  }
+  std::string result = ss.str();
+  return result.substr(0, result.size() - 2);
+}
+
+std::string DataTypes::to_table(const size_t min_name_length,
+                                const size_t min_type_length) const {
+  std::stringstream ss;
+
+  auto max_name_length = min_name_length - 2;
+  auto max_type_length = min_type_length - 2;
+
+  // Determine maximum lengths
+  for (const auto& [name, field] : *this) {
+    max_name_length = std::max(max_name_length, name.length());
+    max_type_length = std::max(max_type_length, field->to_string().length());
+  }
+
+  // Add some padding
+  max_name_length += 2;
+  max_type_length += 2;
+
+  // Create the header
+  ss << "+" << std::string(max_name_length, '-') << "+"
+     << std::string(max_type_length, '-') << "+\n";
+  ss << "| " << std::left << std::setw(max_name_length - 2) << "Field Name"
+     << " | " << std::setw(max_type_length - 2) << "Field Type"
+     << " |\n";
+  ss << "+" << std::string(max_name_length, '-') << "+"
+     << std::string(max_type_length, '-') << "+\n";
+
+  // Add rows
+  for (const auto& [name, field] : *this) {
+    ss << "| " << std::left << std::setw(max_name_length - 2) << name << " | "
+       << std::setw(max_type_length - 2) << field->to_string() << " |\n";
+  }
+
+  // Add footer
+  ss << "+" << std::string(max_name_length, '-') << "+"
+     << std::string(max_type_length, '-') << "+\n";
+
+  return ss.str();
+}
+
+std::ostream& operator<<(std::ostream& os, const DataTypes& data_types) {
+  os << data_types.to_table();
+  return os;
+}
+
+size_t DataTypes::size() const {
+  size_t size = 0;
+  for (const auto& [name, field] : *this) {
+    size += field->getSize();
+  }
+  return size;
 }
