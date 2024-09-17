@@ -19,7 +19,7 @@ class DataPtr {
   void store(const BlockData& block) const;
   Byte* getBytes() const;
   static DataPtr* fromBytes(const Byte* bytes);
-  static size_t size();
+  static std::size_t size();
 };
 
 #endif  // DATA_PTR_H

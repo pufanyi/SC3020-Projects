@@ -21,11 +21,12 @@ enum class FieldType {
 class Field {
  protected:
   FieldType type;
-  size_t size;
+  std::size_t size;
 
  public:
   Field() = default;
-  Field(const FieldType type, const size_t size) : type(type), size(size) {}
+  Field(const FieldType type, const std::size_t size)
+      : type(type), size(size) {}
 
   virtual ~Field() = default;
   virtual Byte* stringToBytes(const std::string& value) const = 0;
@@ -33,7 +34,7 @@ class Field {
   virtual std::string to_string() const = 0;
 
   const FieldType getType() const { return type; }
-  const size_t getSize() const { return size; }
+  const std::size_t getSize() const { return size; }
 
   template <typename T>
   Byte* valueToBytes(const T& value) const {
@@ -95,14 +96,14 @@ class BooleanField : public Field {
 
 class VarcharField : public Field {
  private:
-  const size_t size;
+  const std::size_t size;
 
  public:
-  VarcharField(const size_t size)
+  VarcharField(const std::size_t size)
       : Field(FieldType::VARCHAR, size * sizeof(char)), size(size) {}
   Byte* stringToBytes(const std::string& value) const override;
   std::string bytesToString(const Byte* value) const override;
-  const size_t getSize() const { return size; }
+  const std::size_t getSize() const { return size; }
   std::string to_string() const override {
     return "VARCHAR(" + std::to_string(size) + ")";
   }
@@ -111,7 +112,7 @@ class VarcharField : public Field {
 class FieldCreator {
  public:
   static std::shared_ptr<Field> createField(const FieldType& type,
-                                            const size_t size = 1);
+                                            const std::size_t size = 1);
 
   // VARCHAR should be "VARCHAR(size)"
   static std::shared_ptr<Field> createField(std::string type);
@@ -131,7 +132,7 @@ class DataTypes {
   void addField(const std::string& field_name,
                 const std::shared_ptr<Field>& field);
   void addField(const std::string& field_name, const FieldType type,
-                const size_t size = 1);
+                const std::size_t size = 1);
   void addField(const std::string& field_name, const std::string& type);
   std::size_t size() const;
 
@@ -159,8 +160,8 @@ class DataTypes {
   Iterator end() const;
 
   std::string to_string() const;
-  std::string to_table(const size_t min_name_length = 10,
-                       const size_t min_type_length = 10) const;
+  std::string to_table(const std::size_t min_name_length = 10,
+                       const std::size_t min_type_length = 10) const;
 
   friend std::ostream& operator<<(std::ostream& os,
                                   const DataTypes& data_types);
