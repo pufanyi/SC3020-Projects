@@ -266,8 +266,8 @@ std::string DataTypes::to_table(const size_t min_name_length,
                                 const size_t min_type_length) const {
   std::stringstream ss;
 
-  auto max_name_length = min_name_length;
-  auto max_type_length = min_type_length;
+  auto max_name_length = min_name_length - 2;
+  auto max_type_length = min_type_length - 2;
 
   // Determine maximum lengths
   for (const auto& [name, field] : *this) {
