@@ -17,6 +17,8 @@ class Schema {
   Schema(const std::vector<std::pair<std::string, std::string>> &dtypes);
   Schema(const std::vector<std::string> &dtypes);
   Schema(const std::string &dtypes);
+
+  const DataTypes &dtypes() const { return data_types; }
 };
 
 #endif  // SCHEMA_H
