@@ -2,8 +2,10 @@
 #define FIELD_H
 
 #include <cstring>
+#include <memory>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include "utils.h"
 
@@ -94,7 +96,25 @@ class VarcharField : public Field {
 
 class FieldCreator {
  public:
-  static Field* createField(FieldType& type, size_t size = 1);
+  static std::shared_ptr<Field> createField(const FieldType& type,
+                                            const size_t size = 1);
+};
+
+class DataTypes {
+ private:
+  std::vector<std::string> field_names;
+  std::vector<std::shared_ptr<Field>> fields;
+
+ public:
+  DataTypes() = default;
+  DataTypes(std::vector<std::shared_ptr<Field>> fields)
+      : fields(std::move(fields)) {}
+  virtual ~DataTypes() = default;
+
+  void addField(const std::string& field_name,
+                const std::shared_ptr<Field>& field);
+  void addField(const std::string& field_name, const FieldType type,
+                const size_t size = 1);
 };
 
 #endif

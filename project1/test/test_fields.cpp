@@ -4,7 +4,7 @@
 
 TEST(FieldTest, IntFieldTest) {
   FieldType type = FieldType::INT;
-  Field *field = FieldCreator::createField(type);
+  auto field = FieldCreator::createField(type);
   std::string value = "1234";
   Byte *bytes = field->stringToBytes(value);
   std::string result = field->bytesToString(bytes);
@@ -18,7 +18,7 @@ TEST(FieldTest, IntFieldTest) {
 
 TEST(FieldTest, FloatFieldTest) {
   FieldType type = FieldType::FLOAT;
-  Field *field = FieldCreator::createField(type);
+  auto field = FieldCreator::createField(type);
   std::string value = "1.430000";
   Byte *bytes = field->stringToBytes(value);
   std::string result = field->bytesToString(bytes);
@@ -27,7 +27,7 @@ TEST(FieldTest, FloatFieldTest) {
 
 TEST(FieldTest, DateFieldTest) {
   FieldType type = FieldType::DATE;
-  Field *field = FieldCreator::createField(type);
+  auto field = FieldCreator::createField(type);
   std::string value = "22/12/2022";
   Byte *bytes = field->stringToBytes(value);
   std::string result = field->bytesToString(bytes);
@@ -36,7 +36,7 @@ TEST(FieldTest, DateFieldTest) {
 
 TEST(FieldTest, BooleanFieldTest) {
   FieldType type = FieldType::BOOLEAN;
-  Field *field = FieldCreator::createField(type);
+  auto field = FieldCreator::createField(type);
   std::string value = "1";
   Byte *bytes = field->stringToBytes(value);
   std::string result = field->bytesToString(bytes);
@@ -45,7 +45,7 @@ TEST(FieldTest, BooleanFieldTest) {
 
 TEST(FieldTest, CharFieldTest) {
   FieldType type = FieldType::CHAR;
-  Field *field = FieldCreator::createField(type);
+  auto field = FieldCreator::createField(type);
   std::string value = "a";
   Byte *bytes = field->stringToBytes(value);
   std::string result = field->bytesToString(bytes);
@@ -54,7 +54,7 @@ TEST(FieldTest, CharFieldTest) {
 
 TEST(FieldTest, VarcharFieldTest) {
   FieldType type = FieldType::VARCHAR;
-  Field *field = FieldCreator::createField(type, 10);
+  auto field = FieldCreator::createField(type, 10);
   std::string value = "abcdefgh";
   Byte *bytes = field->stringToBytes(value);
   std::string result = field->bytesToString(bytes);
@@ -63,7 +63,7 @@ TEST(FieldTest, VarcharFieldTest) {
 
 TEST(FieldTest, VarcharInvalidFieldSizeTest) {
   FieldType type = FieldType::VARCHAR;
-  Field *field = FieldCreator::createField(type, 10);
+  auto field = FieldCreator::createField(type, 10);
   std::string value = "abcdefghijk";
   EXPECT_THROW(field->stringToBytes(value), std::invalid_argument);
 }

@@ -4,7 +4,8 @@
 #include <iostream>
 #include <string>
 
-Field* FieldCreator::createField(FieldType& type, size_t size) {
+std::shared_ptr<Field> FieldCreator::createField(const FieldType& type,
+                                                 const size_t size) {
   if (size == 0) {
     throw std::invalid_argument("Invalid field size");
   }
@@ -14,17 +15,17 @@ Field* FieldCreator::createField(FieldType& type, size_t size) {
   }
   switch (type) {
     case FieldType::INT:
-      return new IntField();
+      return std::make_shared<IntField>();
     case FieldType::CHAR:
-      return new CharField();
+      return std::make_shared<CharField>();
     case FieldType::DATE:
-      return new DateField();
+      return std::make_shared<DateField>();
     case FieldType::FLOAT:
-      return new FloatField();
+      return std::make_shared<FloatField>();
     case FieldType::BOOLEAN:
-      return new BooleanField();
+      return std::make_shared<BooleanField>();
     case FieldType::VARCHAR:
-      return new VarcharField(size);
+      return std::make_shared<VarcharField>(size);
     default:
       throw std::invalid_argument("Invalid field type");
   }
@@ -159,4 +160,17 @@ std::string VarcharField::bytesToString(const Byte* value) const {
     result.push_back(value[i]);
   }
   return result;
+}
+
+void DataTypes::addField(const std::string& field_name,
+                         const std::shared_ptr<Field>& field) {
+  field_names.push_back(field_name);
+  fields.push_back(field);
+}
+
+void DataTypes::addField(const std::string& field_name, const FieldType type,
+                         const size_t size) {
+  field_names.push_back(field_name);
+  auto field = FieldCreator::createField(type, size);
+  fields.push_back(field);
 }
