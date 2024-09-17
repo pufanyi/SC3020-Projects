@@ -9,7 +9,7 @@
 
 class FileManager {
   std::fstream file;
-  size_t num_blocks;
+  std::size_t num_blocks;
 
  public:
   FileManager(const std::string &file_name);

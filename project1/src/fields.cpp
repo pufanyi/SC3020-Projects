@@ -9,7 +9,7 @@
 #include <vector>
 
 std::shared_ptr<Field> FieldCreator::createField(const FieldType& type,
-                                                 const size_t size) {
+                                                 const std::size_t size) {
   if (size == 0) {
     throw std::invalid_argument("Invalid field size");
   }
@@ -38,7 +38,7 @@ std::shared_ptr<Field> FieldCreator::createField(const FieldType& type,
 std::shared_ptr<Field> FieldCreator::createField(std::string type) {
   std::transform(type.begin(), type.end(), type.begin(), ::toupper);
   FieldType fieldType;
-  size_t size = 1;
+  std::size_t size = 1;
 
   if (type == "INT") {
     fieldType = FieldType::INT;
@@ -192,7 +192,7 @@ Byte* VarcharField::stringToBytes(const std::string& value) const {
 
 std::string VarcharField::bytesToString(const Byte* value) const {
   std::string result;
-  for (size_t i = 0; i < size; i++) {
+  for (std::size_t i = 0; i < size; i++) {
     if (value[i] == 0) {
       break;
     }
@@ -208,7 +208,7 @@ void DataTypes::addField(const std::string& field_name,
 }
 
 void DataTypes::addField(const std::string& field_name, const FieldType type,
-                         const size_t size) {
+                         const std::size_t size) {
   field_names.push_back(field_name);
   auto field = FieldCreator::createField(type, size);
   fields.push_back(field);
@@ -262,8 +262,8 @@ std::string DataTypes::to_string() const {
   return result.substr(0, result.size() - 2);
 }
 
-std::string DataTypes::to_table(const size_t min_name_length,
-                                const size_t min_type_length) const {
+std::string DataTypes::to_table(const std::size_t min_name_length,
+                                const std::size_t min_type_length) const {
   std::stringstream ss;
 
   auto max_name_length = min_name_length - 2;
@@ -306,8 +306,8 @@ std::ostream& operator<<(std::ostream& os, const DataTypes& data_types) {
   return os;
 }
 
-size_t DataTypes::size() const {
-  size_t size = 0;
+std::size_t DataTypes::size() const {
+  std::size_t size = 0;
   for (const auto& [name, field] : *this) {
     size += field->getSize();
   }

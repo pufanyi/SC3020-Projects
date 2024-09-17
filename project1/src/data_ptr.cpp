@@ -39,7 +39,7 @@ Byte *DataPtr::getBytes() const {
   return bytes;
 }
 
-size_t DataPtr::size() {
+std::size_t DataPtr::size() {
   return sizeof(std::fstream *) + sizeof(std::streamoff);
 }
 

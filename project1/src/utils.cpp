@@ -15,12 +15,12 @@ std::size_t __get_system_block_size() {
   DWORD sectorsPerCluster, bytesPerSector;
   GetDiskFreeSpace(nullptr, &sectorsPerCluster, &bytesPerSector, nullptr,
                    nullptr);
-  return (size_t)sectorsPerCluster * (size_t)bytesPerSector;
+  return (std::size_t)sectorsPerCluster * (std::size_t)bytesPerSector;
 #elif __linux__ || __APPLE__
   // Get the block size of the filesystem on Linux
   struct stat fi;
   stat("/", &fi);
-  return (size_t)fi.st_blksize;
+  return (std::size_t)fi.st_blksize;
 #else
   std::cerr << "Error: Unsupported operating system when trying to get the "
                "block size."

@@ -11,8 +11,8 @@ class Schema {
  private:
   const std::string schema_name;
   DataTypes data_types;
-  size_t _row_size;
-  size_t _length;
+  std::size_t _row_size;
+  std::size_t _length;
 
  public:
   Schema() = delete;
@@ -27,8 +27,8 @@ class Schema {
   Schema(const std::string &name, const std::string &dtypes);
 
   const DataTypes &dtypes() const { return data_types; }
-  const size_t row_size() const { return _row_size; }
-  const size_t length() const { return _length; }
+  const std::size_t row_size() const { return _row_size; }
+  const std::size_t length() const { return _length; }
 };
 
 #endif  // SCHEMA_H
