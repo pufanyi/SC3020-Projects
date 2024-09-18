@@ -1,16 +1,20 @@
 #include "block_ptr.h"
 
 #include <fcntl.h>
+
 #include <iostream>
 
-std::unordered_map<std::streamoff, std::shared_ptr<BlockData>> BlockPtr::_blocks;
+std::unordered_map<std::streamoff, std::shared_ptr<BlockData>>
+    BlockPtr::_blocks;
 std::unordered_map<std::streamoff, std::size_t> BlockPtr::_block_ref_count;
 std::queue<std::streamoff> BlockPtr::_block_queue;
 
-BlockPtr::BlockPtr(const std::shared_ptr<std::fstream> &file, const std::streamoff &offset)
+BlockPtr::BlockPtr(const std::shared_ptr<std::fstream> &file,
+                   const std::streamoff &offset)
     : _file(file), _offset(offset) {}
 
-BlockPtr::BlockPtr(const std::shared_ptr<std::fstream> &file, const Byte *bytes) : _file(file) {
+BlockPtr::BlockPtr(const std::shared_ptr<std::fstream> &file, const Byte *bytes)
+    : _file(file) {
   memcpy(&_offset, bytes, sizeof(_offset));
 }
 

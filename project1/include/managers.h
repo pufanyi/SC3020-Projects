@@ -18,7 +18,9 @@ class FileManager {
   ~FileManager();
 
   BlockPtr newPtr();
-  BlockPtr getPtr(const std::streamoff &offset) { return BlockPtr(file, offset); }
+  BlockPtr getPtr(const std::streamoff &offset) {
+    return BlockPtr(file, offset);
+  }
   BlockPtr getPtr(const Byte *bytes) { return BlockPtr(file, bytes); }
 
   const std::string &file_name() const { return _file_name; }

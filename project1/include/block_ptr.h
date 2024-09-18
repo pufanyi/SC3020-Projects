@@ -20,7 +20,8 @@ class BlockPtr {
   static const std::size_t MAX_BLOCKS_CACHED = 100;
 
  public:
-  BlockPtr(const std::shared_ptr<std::fstream> &file, const std::streamoff &offset);
+  BlockPtr(const std::shared_ptr<std::fstream> &file,
+           const std::streamoff &offset);
   BlockPtr(const std::shared_ptr<std::fstream> &file, const Byte *bytes);
 
   BlockPtr get_other(const Byte *bytes) const { return BlockPtr(_file, bytes); }

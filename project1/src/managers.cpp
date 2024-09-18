@@ -10,8 +10,10 @@
 #include <unistd.h>
 #endif
 
-FileManager::FileManager(const std::string &file_name, bool create_new) : _file_name(file_name) {
-  std::ios_base::openmode mode = std::ios::in | std::ios::out | std::ios::binary;
+FileManager::FileManager(const std::string &file_name, bool create_new)
+    : _file_name(file_name) {
+  std::ios_base::openmode mode =
+      std::ios::in | std::ios::out | std::ios::binary;
   if (create_new) {
     mode |= std::ios::trunc;
   }
