@@ -12,15 +12,13 @@ class Schema {
   const std::string schema_name;
   DataTypes data_types;
   std::size_t _row_size;
-  std::size_t _length;
 
  public:
   Schema() = delete;
   Schema(const std::string &name, const DataTypes &data_types)
       : schema_name(name),
         data_types(data_types),
-        _row_size(data_types.size()),
-        _length(0) {}
+        _row_size(data_types.size()) {}
   Schema(const std::string &name,
          const std::vector<std::pair<std::string, std::string>> &dtypes);
   Schema(const std::string &name, const std::vector<std::string> &dtypes);
@@ -28,7 +26,6 @@ class Schema {
 
   const DataTypes &dtypes() const { return data_types; }
   const std::size_t row_size() const { return _row_size; }
-  const std::size_t length() const { return _length; }
 };
 
 #endif  // SCHEMA_H
