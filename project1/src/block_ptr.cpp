@@ -62,7 +62,7 @@ BlockData &BlockPtr::load() const {
 void BlockPtr::store(const BlockData &block) const {
   auto it = _blocks.find(_offset);
   if (it != _blocks.end()) {
-    *it->second = block;
+    std::memcpy(it->second->data, block.data, BLOCK_SIZE);
   }
   _file->seekp(_offset, std::ios::beg);
   if (_file->fail()) {
