@@ -4,20 +4,33 @@
 #include <fstream>
 #include <vector>
 
-#include "data_ptr.h"
+#include "block_ptr.h"
 #include "fields.h"
 
 class FileManager {
-  std::fstream file;
-  std::size_t num_blocks;
+  std::shared_ptr<std::fstream> file;
+  const std::string _file_name;
+  std::size_t _num_blocks;
 
  public:
-  FileManager(const std::string &file_name);
+  FileManager(const std::string &file_name, bool create_new = false);
 
   ~FileManager();
 
-  DataPtr newPtr();
-  std::vector<DataPtr> getPtrs();
+  BlockPtr newPtr();
+  BlockPtr getPtr(const std::streamoff &offset) { return BlockPtr(file, offset); }
+  BlockPtr getPtr(const Byte *bytes) { return BlockPtr(file, bytes); }
+
+  const std::string &file_name() const { return _file_name; }
+  std::size_t num_blocks() const { return _num_blocks; }
+
+  std::vector<BlockPtr> getPtrs() const {
+    std::vector<BlockPtr> ptrs;
+    for (std::size_t i = 0; i < _num_blocks; i++) {
+      ptrs.push_back(BlockPtr(file, i * BLOCK_SIZE));
+    }
+    return ptrs;
+  }
 };
 
 #endif  // MANAGERS_H

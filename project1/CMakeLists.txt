@@ -29,7 +29,7 @@ add_executable(
     ${TEST_SOURCES}
     ${PROJECT_SOURCE_DIR}/src/block.cpp
     ${PROJECT_SOURCE_DIR}/src/data_loader.cpp
-    ${PROJECT_SOURCE_DIR}/src/data_ptr.cpp
+    ${PROJECT_SOURCE_DIR}/src/block_ptr.cpp
     ${PROJECT_SOURCE_DIR}/src/utils.cpp
     ${PROJECT_SOURCE_DIR}/src/managers.cpp
     ${PROJECT_SOURCE_DIR}/src/fields.cpp
