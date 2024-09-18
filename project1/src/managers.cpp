@@ -10,8 +10,8 @@
 #include <unistd.h>
 #endif
 
-FileManager::FileManager(const std::string &file_name, bool create_new)
-    : _file_name(file_name) {
+FileManager::FileManager(const std::string &file_name, bool create_new, std::size_t max_blocks_cached)
+    : _file_name(file_name), buffer(std::make_shared<BlockBuffer>(max_blocks_cached)) {
   std::ios_base::openmode mode =
       std::ios::in | std::ios::out | std::ios::binary;
   if (create_new) {
@@ -65,5 +65,5 @@ BlockPtr FileManager::newPtr() {
 
   this->_num_blocks++;
 
-  return BlockPtr(file, fileEnd);
+  return BlockPtr(file, fileEnd, buffer);
 }

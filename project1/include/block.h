@@ -23,6 +23,7 @@ class BlockData {
   const Byte *getData() const;
 
   friend class BlockPtr;
+  friend class BlockBuffer;
 };
 
 #endif  // BLOCK_H

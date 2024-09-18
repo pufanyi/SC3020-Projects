@@ -1,39 +1,23 @@
 #include "block_ptr.h"
 
 #include <fcntl.h>
-
 #include <iostream>
 
-std::unordered_map<std::streamoff, std::shared_ptr<BlockData>>
-    BlockPtr::_blocks;
-std::unordered_map<std::streamoff, std::size_t> BlockPtr::_block_ref_count;
-std::queue<std::streamoff> BlockPtr::_block_queue;
-
 BlockPtr::BlockPtr(const std::shared_ptr<std::fstream> &file,
-                   const std::streamoff &offset)
-    : _file(file), _offset(offset) {}
+                   const std::streamoff &offset,
+                   const std::shared_ptr<BlockBuffer> &buffer)
+    : _file(file), _offset(offset), _buffer(buffer) {}
 
-BlockPtr::BlockPtr(const std::shared_ptr<std::fstream> &file, const Byte *bytes)
-    : _file(file) {
+BlockPtr::BlockPtr(const std::shared_ptr<std::fstream> &file, const Byte *bytes, const std::shared_ptr<BlockBuffer> &buffer)
+    : _file(file), _buffer(buffer) {
   memcpy(&_offset, bytes, sizeof(_offset));
 }
 
 std::shared_ptr<BlockData> BlockPtr::load_ptr() const {
-  auto it = _blocks.find(_offset);
-  if (it != _blocks.end()) {
-    return it->second;
-  }
-
-  if (_blocks.size() >= MAX_BLOCKS_CACHED) {
-    std::streamoff offset = _block_queue.front();
-    _block_queue.pop();
-    auto ref_count_it = _block_ref_count.find(offset);
-    if (ref_count_it->second > 1) {
-      ref_count_it->second--;
-    } else {
-      _block_ref_count.erase(ref_count_it);
-      _blocks.erase(offset);
-    }
+  auto ptr = _buffer->from_buffer(_offset);
+  
+  if (ptr != nullptr) {
+    return ptr;
   }
 
   std::shared_ptr<BlockData> block = std::make_shared<BlockData>();
@@ -49,9 +33,8 @@ std::shared_ptr<BlockData> BlockPtr::load_ptr() const {
     throw std::runtime_error("Error reading block");
   }
 
-  _block_queue.push(_offset);
-  _block_ref_count[_offset]++;
-  return _blocks[_offset] = block;
+  _buffer->to_buffer(_offset, block);
+  return block;
 }
 
 BlockData &BlockPtr::load() const {
@@ -60,10 +43,7 @@ BlockData &BlockPtr::load() const {
 }
 
 void BlockPtr::store(const BlockData &block) const {
-  auto it = _blocks.find(_offset);
-  if (it != _blocks.end()) {
-    std::memcpy(it->second->data, block.data, BLOCK_SIZE);
-  }
+  _buffer->update_buffer(_offset, block);
   _file->seekp(_offset, std::ios::beg);
   if (_file->fail()) {
     throw std::runtime_error("Error seeking to block");
