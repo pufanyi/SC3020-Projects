@@ -4,8 +4,8 @@
 #include <fstream>
 #include <memory>
 
-#include "buffer.h"
 #include "block.h"
+#include "buffer.h"
 #include "utils.h"
 
 class BlockPtr {
@@ -16,10 +16,14 @@ class BlockPtr {
 
  public:
   BlockPtr(const std::shared_ptr<std::fstream> &file,
-           const std::streamoff &offset, const std::shared_ptr<BlockBuffer> &buffer);
-  BlockPtr(const std::shared_ptr<std::fstream> &file, const Byte *bytes, const std::shared_ptr<BlockBuffer> &buffer);
+           const std::streamoff &offset,
+           const std::shared_ptr<BlockBuffer> &buffer);
+  BlockPtr(const std::shared_ptr<std::fstream> &file, const Byte *bytes,
+           const std::shared_ptr<BlockBuffer> &buffer);
 
-  BlockPtr get_other(const Byte *bytes) const { return BlockPtr(_file, bytes, _buffer); }
+  BlockPtr get_other(const Byte *bytes) const {
+    return BlockPtr(_file, bytes, _buffer);
+  }
   BlockPtr get_other(const std::streamoff &offset) const {
     return BlockPtr(_file, offset, _buffer);
   }

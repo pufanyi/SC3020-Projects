@@ -1,6 +1,7 @@
 #include "block_ptr.h"
 
 #include <fcntl.h>
+
 #include <iostream>
 
 BlockPtr::BlockPtr(const std::shared_ptr<std::fstream> &file,
@@ -8,14 +9,15 @@ BlockPtr::BlockPtr(const std::shared_ptr<std::fstream> &file,
                    const std::shared_ptr<BlockBuffer> &buffer)
     : _file(file), _offset(offset), _buffer(buffer) {}
 
-BlockPtr::BlockPtr(const std::shared_ptr<std::fstream> &file, const Byte *bytes, const std::shared_ptr<BlockBuffer> &buffer)
+BlockPtr::BlockPtr(const std::shared_ptr<std::fstream> &file, const Byte *bytes,
+                   const std::shared_ptr<BlockBuffer> &buffer)
     : _file(file), _buffer(buffer) {
   memcpy(&_offset, bytes, sizeof(_offset));
 }
 
 std::shared_ptr<BlockData> BlockPtr::load_ptr() const {
   auto ptr = _buffer->from_buffer(_offset);
-  
+
   if (ptr != nullptr) {
     return ptr;
   }

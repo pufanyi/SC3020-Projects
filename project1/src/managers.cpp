@@ -10,8 +10,10 @@
 #include <unistd.h>
 #endif
 
-FileManager::FileManager(const std::string &file_name, bool create_new, std::size_t max_blocks_cached)
-    : _file_name(file_name), buffer(std::make_shared<BlockBuffer>(max_blocks_cached)) {
+FileManager::FileManager(const std::string &file_name, bool create_new,
+                         std::size_t max_blocks_cached)
+    : _file_name(file_name),
+      buffer(std::make_shared<BlockBuffer>(max_blocks_cached)) {
   std::ios_base::openmode mode =
       std::ios::in | std::ios::out | std::ios::binary;
   if (create_new) {
