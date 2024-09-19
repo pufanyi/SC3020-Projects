@@ -69,3 +69,18 @@ BlockPtr FileManager::newPtr() {
 
   return BlockPtr(file, fileEnd, buffer);
 }
+
+std::vector<BlockPtr> FileManager::getPtrs() const {
+  std::vector<BlockPtr> ptrs;
+  for (std::size_t i = 0; i < _num_blocks; i++) {
+    ptrs.push_back(BlockPtr(file, i * BLOCK_SIZE, buffer));
+  }
+  return ptrs;
+}
+
+BlockPtr FileManager::getPtr(const std::streamoff &offset) {
+  return BlockPtr(file, offset, buffer);
+}
+BlockPtr FileManager::getPtr(const Byte *bytes) {
+  return BlockPtr(file, bytes, buffer);
+}

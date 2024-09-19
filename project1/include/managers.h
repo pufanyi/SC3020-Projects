@@ -21,21 +21,13 @@ class FileManager {
   ~FileManager();
 
   BlockPtr newPtr();
-  BlockPtr getPtr(const std::streamoff &offset) {
-    return BlockPtr(file, offset, buffer);
-  }
-  BlockPtr getPtr(const Byte *bytes) { return BlockPtr(file, bytes, buffer); }
+  BlockPtr getPtr(const std::streamoff &offset);
+  BlockPtr getPtr(const Byte *bytes);
 
   const std::string &file_name() const { return _file_name; }
   std::size_t num_blocks() const { return _num_blocks; }
 
-  std::vector<BlockPtr> getPtrs() const {
-    std::vector<BlockPtr> ptrs;
-    for (std::size_t i = 0; i < _num_blocks; i++) {
-      ptrs.push_back(BlockPtr(file, i * BLOCK_SIZE, buffer));
-    }
-    return ptrs;
-  }
+  std::vector<BlockPtr> getPtrs() const;
 };
 
 #endif  // MANAGERS_H
