@@ -24,8 +24,10 @@ std::shared_ptr<Field> FieldCreator::createField(const FieldType& type,
       return std::make_shared<CharField>();
     case FieldType::DATE:
       return std::make_shared<DateField>();
-    case FieldType::FLOAT:
-      return std::make_shared<FloatField>();
+    case FieldType::FLOAT32:
+      return std::make_shared<Float32Field>();
+    case FieldType::FLOAT64:
+      return std::make_shared<Float64Field>();
     case FieldType::BOOLEAN:
       return std::make_shared<BooleanField>();
     case FieldType::VARCHAR:
@@ -46,8 +48,10 @@ std::shared_ptr<Field> FieldCreator::createField(std::string type) {
     fieldType = FieldType::CHAR;
   } else if (type == "DATE") {
     fieldType = FieldType::DATE;
-  } else if (type == "FLOAT") {
-    fieldType = FieldType::FLOAT;
+  } else if (type == "FLOAT32") {
+    fieldType = FieldType::FLOAT32;
+  } else if (type == "FLOAT64") {
+    fieldType = FieldType::FLOAT64;
   } else if (type == "BOOLEAN") {
     fieldType = FieldType::BOOLEAN;
   } else if (type.substr(0, 7) == "VARCHAR") {
@@ -148,7 +152,7 @@ std::string BooleanField::bytesToString(const Byte* value) const {
   }
 }
 
-Byte* FloatField::stringToBytes(const std::string& value) const {
+Byte* Float32Field::stringToBytes(const std::string& value) const {
   try {
     float float_value = std::stof(value);
     static char bytes[sizeof(float_value)];
@@ -165,8 +169,25 @@ Byte* FloatField::stringToBytes(const std::string& value) const {
     throw std::runtime_error("Float value out of range");
   }
 }
+Byte* Float64Field::stringToBytes(const std::string& value) const {
+  try {
+    double float_value = std::stod(value);
+    static char bytes[sizeof(float_value)];
+    std::copy(reinterpret_cast<const char*>(
+                  reinterpret_cast<const void*>(&float_value)),
+              reinterpret_cast<const char*>(
+                  reinterpret_cast<const void*>(&float_value)) +
+                  sizeof(float_value),
+              bytes);
+    return bytes;
+  } catch (const std::invalid_argument& e) {
+    throw std::runtime_error("Invalid float value");
+  } catch (const std::out_of_range& e) {
+    throw std::runtime_error("Float value out of range");
+  }
+}
 
-std::string FloatField::bytesToString(const Byte* value) const {
+std::string Float32Field::bytesToString(const Byte* value) const {
   try {
     float result;
     std::copy(reinterpret_cast<const char*>(&value[0]),
@@ -177,6 +198,19 @@ std::string FloatField::bytesToString(const Byte* value) const {
     throw std::runtime_error("Invalid float value");
   } catch (const std::out_of_range& e) {
     throw std::runtime_error("Float value out of range");
+  }
+}
+std::string Float64Field::bytesToString(const Byte* value) const {
+  try {
+    double result;
+    std::copy(reinterpret_cast<const char*>(&value[0]),
+              reinterpret_cast<const char*>(&value[8]),
+              reinterpret_cast<char*>(&result));
+    return std::to_string(result);
+  } catch (const std::invalid_argument& e) {
+    throw std::runtime_error("Invalid float value");
+  } catch (const std::out_of_range& e) {
+    throw std::runtime_error("Double value out of range");
   }
 }
 

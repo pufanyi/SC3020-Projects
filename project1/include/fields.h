@@ -1,7 +1,9 @@
 #ifndef FIELD_H
 #define FIELD_H
 
+#include <cassert>
 #include <cstring>
+#include <iostream>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -14,7 +16,8 @@ enum class FieldType {
   CHAR,
   VARCHAR,
   DATE,
-  FLOAT,
+  FLOAT32,
+  FLOAT64,
   BOOLEAN,
 };
 
@@ -38,17 +41,25 @@ class Field {
 
   template <typename T>
   Byte* valueToBytes(const T& value) const {
-    std::stringstream ss;
-    ss << value;
-    std::string str_value = ss.str();
-    return stringToBytes(str_value);
+    Byte* data = nullptr;
+    if constexpr (std::is_same_v<T, std::string>) {
+      data = stringToBytes(value);
+    } else {
+      data = new Byte[size];
+      assert(size == sizeof(T));
+      memcpy(data, &value, size);
+    }
+    return data;
   }
 
   template <typename T>
   void bytesToValue(const Byte* value, T& result) const {
-    std::string str_value = bytesToString(value);
-    std::stringstream ss(str_value);
-    ss >> result;
+    if constexpr (std::is_same_v<T, std::string>) {
+      result = bytesToString(value);
+    } else {
+      assert(size == sizeof(T));
+      memcpy(&result, value, sizeof(T));
+    }
   }
 
   friend std::ostream& operator<<(std::ostream& os, const Field& field);
@@ -78,12 +89,20 @@ class DateField : public Field {
   std::string to_string() const override { return "DATE"; }
 };
 
-class FloatField : public Field {
+class Float32Field : public Field {
  public:
-  FloatField() : Field(FieldType::FLOAT, sizeof(float)) {}
+  Float32Field() : Field(FieldType::FLOAT32, sizeof(float)) {}
   Byte* stringToBytes(const std::string& value) const override;
   std::string bytesToString(const Byte* value) const override;
-  std::string to_string() const override { return "FLOAT"; }
+  std::string to_string() const override { return "FLOAT32"; }
+};
+
+class Float64Field : public Field {
+ public:
+  Float64Field() : Field(FieldType::FLOAT64, sizeof(double)) {}
+  Byte* stringToBytes(const std::string& value) const override;
+  std::string bytesToString(const Byte* value) const override;
+  std::string to_string() const override { return "FLOAT64"; }
 };
 
 class BooleanField : public Field {

@@ -13,6 +13,7 @@ class BlockPtr {
   std::streamoff _offset;
   std::shared_ptr<std::fstream> _file;
   std::shared_ptr<BlockBuffer> _buffer;
+  mutable std::weak_ptr<BlockData> _block_data;
 
  public:
   BlockPtr(const std::shared_ptr<std::fstream> &file,
@@ -30,7 +31,7 @@ class BlockPtr {
 
   std::size_t offset() const { return _offset; }
 
-  std::shared_ptr<BlockData> load_ptr() const;
+  std::weak_ptr<BlockData> load_ptr() const;
   BlockData &load() const;
   void store(const BlockData &block) const;
   Byte *getBytes() const;
