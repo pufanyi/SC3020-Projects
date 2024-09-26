@@ -41,16 +41,25 @@ class Field {
 
   template <typename T>
   Byte* valueToBytes(const T& value) const {
-    assert(size == sizeof(T));
-    Byte* data = new Byte[size];
-    memcpy(data, &value, size);
+    Byte* data = nullptr;
+    if constexpr (std::is_same_v<T, std::string>) {
+      data = stringToBytes(value);
+    } else {
+      data = new Byte[size];
+      assert(size == sizeof(T));
+      memcpy(data, &value, size);
+    }
     return data;
   }
 
   template <typename T>
   void bytesToValue(const Byte* value, T& result) const {
-    assert(size == sizeof(T));
-    memcpy(&result, value, sizeof(T));
+    if constexpr (std::is_same_v<T, std::string>) {
+      result = bytesToString(value);
+    } else {
+      assert(size == sizeof(T));
+      memcpy(&result, value, sizeof(T));
+    }
   }
 
   friend std::ostream& operator<<(std::ostream& os, const Field& field);

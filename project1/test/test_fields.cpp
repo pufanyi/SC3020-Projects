@@ -51,6 +51,11 @@ TEST(FieldTest, DateFieldTest) {
   Byte *bytes = field->stringToBytes(value);
   std::string result = field->bytesToString(bytes);
   EXPECT_EQ(value, result);
+
+  std::string date;
+  bytes = field->valueToBytes(value);
+  field->bytesToValue(bytes, date);
+  EXPECT_EQ(date, "22/12/2022");
 }
 
 TEST(FieldTest, BooleanFieldTest) {
@@ -60,6 +65,11 @@ TEST(FieldTest, BooleanFieldTest) {
   Byte *bytes = field->stringToBytes(value);
   std::string result = field->bytesToString(bytes);
   EXPECT_EQ(value, result);
+
+  bool val = true;
+  bytes = field->valueToBytes(val);
+  field->bytesToValue(bytes, val);
+  EXPECT_EQ(val, true);
 }
 
 TEST(FieldTest, CharFieldTest) {
@@ -69,6 +79,11 @@ TEST(FieldTest, CharFieldTest) {
   Byte *bytes = field->stringToBytes(value);
   std::string result = field->bytesToString(bytes);
   EXPECT_EQ(value, result);
+
+  char val = 'a';
+  bytes = field->valueToBytes(val);
+  field->bytesToValue(bytes, val);
+  EXPECT_EQ(val, 'a');
 }
 
 TEST(FieldTest, VarcharFieldTest) {
@@ -78,6 +93,11 @@ TEST(FieldTest, VarcharFieldTest) {
   Byte *bytes = field->stringToBytes(value);
   std::string result = field->bytesToString(bytes);
   EXPECT_EQ(value, result);
+
+  std::string val = "abcdefgh";
+  bytes = field->valueToBytes(val);
+  field->bytesToValue(bytes, val);
+  EXPECT_EQ(val, "abcdefgh");
 }
 
 TEST(FieldTest, VarcharInvalidFieldSizeTest) {
