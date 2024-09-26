@@ -8,17 +8,17 @@
 class DataPtr {
  private:
   std::shared_ptr<Field> _field;
-  std::shared_ptr<BlockPtr> _block_ptr;
+  BlockPtr _block_ptr;
   off_t _offset;
 
-  BlockData& getBlockData() const { return _block_ptr->load(); }
+  BlockData& getBlockData() const { return _block_ptr.load(); }
 
  public:
   DataPtr(const std::shared_ptr<Field>& field,
-          const std::shared_ptr<BlockPtr>& block_ptr, off_t offset)
+          BlockPtr& block_ptr, off_t offset)
       : _field(field), _block_ptr(block_ptr), _offset(offset) {}
 
-  DataPtr(const FieldType& type, const std::shared_ptr<BlockPtr>& block_ptr,
+  DataPtr(const FieldType& type, const BlockPtr& block_ptr,
           off_t offset)
       : _field(FieldCreator::createField(type)),
         _block_ptr(block_ptr),
@@ -42,12 +42,12 @@ class DataPtr {
 
   template <typename T>
   void load(T& value) {
-    _field->bytesToValue(&_block_ptr->load()[_offset], value);
+    _field->bytesToValue(&_block_ptr.load()[_offset], value);
   }
 
   template <typename T>
   void load_value(T& value) {
-    _field->bytesToValue(&_block_ptr->load()[_offset], value);
+    _field->bytesToValue(&_block_ptr.load()[_offset], value);
   }
 };
 
