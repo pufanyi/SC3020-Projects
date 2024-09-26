@@ -41,7 +41,6 @@ class Field {
 
   template <typename T>
   Byte* valueToBytes(const T& value) const {
-    std::cerr << "Size: " << size << " sizeof(T): " << sizeof(T) << std::endl;
     assert(size == sizeof(T));
     Byte* data = new Byte[size];
     memcpy(data, &value, size);
