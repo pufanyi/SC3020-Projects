@@ -36,7 +36,7 @@ std::weak_ptr<BlockData> BlockPtr::load_ptr() const {
   }
   _file->seekg(_offset, std::ios::beg);
   if (_file->fail()) {
-    throw std::runtime_error("Error seeking to block 1");
+    throw std::runtime_error("Error seeking to block");
   }
   _file->read(block->data, BLOCK_SIZE);
   if (_file->fail()) {

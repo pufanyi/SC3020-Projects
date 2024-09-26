@@ -43,11 +43,6 @@ void BlockData::save() const {
   }
   _file->seekp(_offset, std::ios::beg);
   if (_file->fail()) {
-    std::cerr << "Error seeking to block at offset " << _offset << std::endl;
-    std::cerr << "File state: " << _file->rdstate() << std::endl;
-    if (_file->eof()) std::cerr << "End of file reached" << std::endl;
-    if (_file->bad())
-      std::cerr << "Bad bit set (possible I/O error)" << std::endl;
     throw std::runtime_error("Error seeking to block");
   }
   _file->write(data, BLOCK_SIZE);
