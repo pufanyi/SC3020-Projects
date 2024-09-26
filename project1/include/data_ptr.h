@@ -2,23 +2,26 @@
 #define DATA_PTR_H
 
 #include "block.h"
+#include "block_ptr.h"
 #include "fields.h"
 
 class DataPtr {
  private:
   std::shared_ptr<Field> _field;
-  std::shared_ptr<BlockData> _block_data;
-  std::size_t _offset;
+  std::shared_ptr<BlockPtr> _block_ptr;
+  off_t _offset;
+
+  BlockData& getBlockData() const { return _block_ptr->load(); }
 
  public:
   DataPtr(const std::shared_ptr<Field>& field,
-          const std::shared_ptr<BlockData>& block_data, std::size_t offset)
-      : _field(field), _block_data(block_data), _offset(offset) {}
+          const std::shared_ptr<BlockPtr>& block_ptr, off_t offset)
+      : _field(field), _block_ptr(block_ptr), _offset(offset) {}
 
-  DataPtr(const FieldType& type, const std::shared_ptr<BlockData>& block_data,
-          std::size_t offset)
+  DataPtr(const FieldType& type, const std::shared_ptr<BlockPtr>& block_ptr,
+          off_t offset)
       : _field(FieldCreator::createField(type)),
-        _block_data(block_data),
+        _block_ptr(block_ptr),
         _offset(offset) {}
 
   DataPtr(const DataPtr& data_ptr) = default;
@@ -39,12 +42,12 @@ class DataPtr {
 
   template <typename T>
   void load(T& value) {
-    _field->bytesToValue(&(*_block_data)[_offset], value);
+    _field->bytesToValue(&_block_ptr->load()[_offset], value);
   }
 
   template <typename T>
   void load_value(T& value) {
-    _field->bytesToValue(&(*_block_data)[_offset], value);
+    _field->bytesToValue(&_block_ptr->load()[_offset], value);
   }
 };
 

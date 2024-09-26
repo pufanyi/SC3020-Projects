@@ -44,8 +44,6 @@ FileManager::FileManager(const std::string &file_name, bool create_new,
   }
 }
 
-FileManager::~FileManager() { file->close(); }
-
 BlockPtr FileManager::newPtr() {
   file->seekp(0, std::ios::end);
   std::streampos fileEnd = file->tellp();
