@@ -3,33 +3,33 @@
 #include "block_ptr.h"
 #include "managers.h"
 
-// TEST(BlockPtrTest, BlockPtrConstructor) {
-//   EXPECT_NO_THROW({
-//     FileManager fileManager("test_file.db", true);
-//     BlockPtr BlockPtr1 = fileManager.newPtr();
-//     BlockPtr BlockPtr2 = fileManager.newPtr();
-//     BlockPtr BlockPtr3 = fileManager.newPtr();
-//     BlockData &block1 = BlockPtr1.load();
-//     BlockData &block2 = BlockPtr2.load();
-//     BlockData &block3 = BlockPtr3.load();
-//     block2[0] = 'H';
-//     block2[1] = 'e';
-//     block2[2] = 'l';
-//     block2[3] = 'l';
-//     block2[4] = 'o';
-//     block2[5] = ' ';
-//     block2[6] = 'W';
-//     const BlockData& new_block2 = BlockPtr2.load();
-//     EXPECT_EQ(new_block2[0], 'H');
-//     EXPECT_EQ(new_block2[1], 'e');
-//     EXPECT_EQ(new_block2[2], 'l');
-//     EXPECT_EQ(new_block2[3], 'l');
-//     EXPECT_EQ(new_block2[4], 'o');
-//     EXPECT_EQ(new_block2[5], ' ');
-//     EXPECT_EQ(fileManager.getPtrs().size(), 3);
-//     EXPECT_EQ(fileManager.getPtrs()[1].load()[0], 'H');
-//   });
-// };
+TEST(BlockPtrTest, BlockPtrConstructor) {
+  EXPECT_NO_THROW({
+    FileManager fileManager("test_file.db", true);
+    BlockPtr BlockPtr1 = fileManager.newPtr();
+    BlockPtr BlockPtr2 = fileManager.newPtr();
+    BlockPtr BlockPtr3 = fileManager.newPtr();
+    BlockData &block1 = BlockPtr1.load();
+    BlockData &block2 = BlockPtr2.load();
+    BlockData &block3 = BlockPtr3.load();
+    block2[0] = 'H';
+    block2[1] = 'e';
+    block2[2] = 'l';
+    block2[3] = 'l';
+    block2[4] = 'o';
+    block2[5] = ' ';
+    block2[6] = 'W';
+    const BlockData& new_block2 = BlockPtr2.load();
+    EXPECT_EQ(new_block2[0], 'H');
+    EXPECT_EQ(new_block2[1], 'e');
+    EXPECT_EQ(new_block2[2], 'l');
+    EXPECT_EQ(new_block2[3], 'l');
+    EXPECT_EQ(new_block2[4], 'o');
+    EXPECT_EQ(new_block2[5], ' ');
+    EXPECT_EQ(fileManager.getPtrs().size(), 3);
+    EXPECT_EQ(fileManager.getPtrs()[1].load()[0], 'H');
+  });
+};
 
 TEST(BlockPtrTest, BlockPtrSave) {
   EXPECT_NO_THROW({
