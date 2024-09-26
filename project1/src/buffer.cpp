@@ -19,7 +19,12 @@ void BlockBuffer::to_buffer(const std::streamoff &offset,
       ref_count_it->second--;
     } else {
       _block_ref_count.erase(ref_count_it);
-      _blocks.erase(offset);
+      // _blocks.erase(offset);
+      auto it = _blocks.find(offset);
+      if (it->second.use_count() > 1) {
+        it->second->save();
+      }
+      _blocks.erase(it);
     }
   }
 
