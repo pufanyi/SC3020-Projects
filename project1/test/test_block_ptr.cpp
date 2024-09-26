@@ -19,7 +19,7 @@ TEST(BlockPtrTest, BlockPtrConstructor) {
     block2[4] = 'o';
     block2[5] = ' ';
     block2[6] = 'W';
-    const BlockData& new_block2 = BlockPtr2.load();
+    const BlockData &new_block2 = BlockPtr2.load();
     EXPECT_EQ(new_block2[0], 'H');
     EXPECT_EQ(new_block2[1], 'e');
     EXPECT_EQ(new_block2[2], 'l');
