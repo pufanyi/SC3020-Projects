@@ -1,6 +1,7 @@
 #ifndef FIELD_H
 #define FIELD_H
 
+#include <cassert>
 #include <cstring>
 #include <memory>
 #include <sstream>
@@ -38,17 +39,16 @@ class Field {
 
   template <typename T>
   Byte* valueToBytes(const T& value) const {
-    std::stringstream ss;
-    ss << value;
-    std::string str_value = ss.str();
-    return stringToBytes(str_value);
+    assert(size == sizeof(T));
+    Byte* data = new Byte[size];
+    memcpy(data, &value, size);
+    return data;
   }
 
   template <typename T>
   void bytesToValue(const Byte* value, T& result) const {
-    std::string str_value = bytesToString(value);
-    std::stringstream ss(str_value);
-    ss >> result;
+    assert(size == sizeof(T));
+    memcpy(&result, value, sizeof(T));
   }
 
   friend std::ostream& operator<<(std::ostream& os, const Field& field);
