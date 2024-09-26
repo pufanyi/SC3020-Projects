@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "fields.h"
 #include "data_ptr.h"
+#include "fields.h"
 #include "managers.h"
 
 TEST(DataPtrTest, DataPtrConstructor) {

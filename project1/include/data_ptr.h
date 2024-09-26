@@ -14,12 +14,11 @@ class DataPtr {
   BlockData& getBlockData() const { return _block_ptr.load(); }
 
  public:
-  DataPtr(const std::shared_ptr<Field>& field,
-          BlockPtr& block_ptr, off_t offset)
+  DataPtr(const std::shared_ptr<Field>& field, BlockPtr& block_ptr,
+          off_t offset)
       : _field(field), _block_ptr(block_ptr), _offset(offset) {}
 
-  DataPtr(const FieldType& type, const BlockPtr& block_ptr,
-          off_t offset)
+  DataPtr(const FieldType& type, const BlockPtr& block_ptr, off_t offset)
       : _field(FieldCreator::createField(type)),
         _block_ptr(block_ptr),
         _offset(offset) {}
