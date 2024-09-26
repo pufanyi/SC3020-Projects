@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <cstring>
+#include <iostream>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -15,7 +16,8 @@ enum class FieldType {
   CHAR,
   VARCHAR,
   DATE,
-  FLOAT,
+  FLOAT32,
+  FLOAT64,
   BOOLEAN,
 };
 
@@ -39,6 +41,7 @@ class Field {
 
   template <typename T>
   Byte* valueToBytes(const T& value) const {
+    std::cerr << "Size: " << size << " sizeof(T): " << sizeof(T) << std::endl;
     assert(size == sizeof(T));
     Byte* data = new Byte[size];
     memcpy(data, &value, size);
@@ -78,12 +81,20 @@ class DateField : public Field {
   std::string to_string() const override { return "DATE"; }
 };
 
-class FloatField : public Field {
+class Float32Field : public Field {
  public:
-  FloatField() : Field(FieldType::FLOAT, sizeof(float)) {}
+  Float32Field() : Field(FieldType::FLOAT32, sizeof(float)) {}
   Byte* stringToBytes(const std::string& value) const override;
   std::string bytesToString(const Byte* value) const override;
-  std::string to_string() const override { return "FLOAT"; }
+  std::string to_string() const override { return "FLOAT32"; }
+};
+
+class Float64Field : public Field {
+ public:
+  Float64Field() : Field(FieldType::FLOAT64, sizeof(double)) {}
+  Byte* stringToBytes(const std::string& value) const override;
+  std::string bytesToString(const Byte* value) const override;
+  std::string to_string() const override { return "FLOAT64"; }
 };
 
 class BooleanField : public Field {
