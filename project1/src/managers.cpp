@@ -76,7 +76,7 @@ std::vector<BlockPtr> FileManager::getPtrs() const {
   return ptrs;
 }
 
-BlockPtr FileManager::getPtr(const std::streamoff &offset) {
+BlockPtr FileManager::getPtr(const BlockIndex &offset) {
   return BlockPtr(file, offset, buffer);
 }
 BlockPtr FileManager::getPtr(const Byte *bytes) {

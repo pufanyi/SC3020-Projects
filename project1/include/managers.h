@@ -19,7 +19,7 @@ class FileManager {
               std::size_t max_blocks_cached = 100);
 
   BlockPtr newPtr();
-  BlockPtr getPtr(const std::streamoff &offset);
+  BlockPtr getPtr(const BlockIndex &offset);
   BlockPtr getPtr(const Byte *bytes);
 
   const std::string &file_name() const { return _file_name; }

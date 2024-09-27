@@ -5,7 +5,7 @@
 #include <iostream>
 
 BlockPtr::BlockPtr(const std::shared_ptr<std::fstream> &file,
-                   const std::streamoff &offset,
+                   const BlockIndex &offset,
                    const std::shared_ptr<BlockBuffer> &buffer)
     : _file(file), _offset(offset), _buffer(buffer) {
   this->load_ptr();
@@ -56,9 +56,27 @@ BlockData &BlockPtr::load() const {
   return *block.lock();
 }
 
+void BlockPtr::load(Byte *dst, const std::size_t begin,
+                    const std::size_t end) const {
+  if (end > BLOCK_SIZE || begin > end) {
+    throw std::runtime_error("Error reading block");
+  }
+  auto &block_data = load();
+  memcpy(dst, block_data.data + begin, end - begin);
+}
+
 void BlockPtr::store(const BlockData &block) const {
   auto &block_data = load();
   memcpy(block_data.data, block.data, BLOCK_SIZE);
+}
+
+void BlockPtr::store(const Byte *bytes, std::size_t begin,
+                     std::size_t end) const {
+  if (end > BLOCK_SIZE || begin > end) {
+    throw std::runtime_error("Error writing block");
+  }
+  auto &block_data = load();
+  memcpy(block_data.data + begin, bytes, end - begin);
 }
 
 Byte *BlockPtr::getBytes() const {

@@ -37,6 +37,7 @@ add_executable(
     ${PROJECT_SOURCE_DIR}/src/buffer.cpp
     ${PROJECT_SOURCE_DIR}/src/data_ptr.cpp
     ${PROJECT_SOURCE_DIR}/src/record.cpp
+    ${PROJECT_SOURCE_DIR}/src/block_list.cpp
     # Note: it is possible to use file(GLOB ...) to add all files in a directory
     # but it is not recommended by CMake and the suggested way is to list all files
     # Add your source files here

@@ -2,8 +2,12 @@
 #define B_PLUS_TREE_H
 
 #include "block.h"
+#include "block_ptr.h"
 
-class BPlusTreeNode {};
+class BPlusTreeNode {
+ protected:
+  BlockPtr _block_ptr;
+};
 
 class BPlusTreeLeafNode : public BPlusTreeNode {};
 
