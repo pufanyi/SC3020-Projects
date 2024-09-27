@@ -10,6 +10,7 @@ class DataPtr {
   BlockPtr _block_ptr;
   off_t _offset;
 
+ protected:
   BlockData& getBlockData() const { return _block_ptr.load(); }
 
  public:
