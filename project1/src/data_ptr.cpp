@@ -1,16 +1,15 @@
 #include "data_ptr.h"
 
-void DataPtr::store(const std::string& value) {
-  Byte* bytes = _field->stringToBytes(value);
-  memcpy(&_block_ptr.load()[_offset], bytes, _field->getSize());
-}
-
 void DataPtr::store(const Byte* bytes) {
-  memcpy(&_block_ptr.load()[_offset], bytes, _field->getSize());
+  memcpy(&_block_ptr.load()[_offset], bytes, size());
 }
 
-Byte* DataPtr::getBytes() const { return &_block_ptr.load()[_offset]; }
+const Byte* DataPtr::getBytes() const { return &_block_ptr.load()[_offset]; }
 
-std::string DataPtr::load_str() {
-  return _field->bytesToString(&_block_ptr.load()[_offset]);
+Byte& DataPtr::operator[](std::size_t index) {
+  return _block_ptr.load()[_offset + index];
+}
+
+const Byte& DataPtr::operator[](std::size_t index) const {
+  return _block_ptr.load()[_offset + index];
 }
