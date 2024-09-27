@@ -3,7 +3,6 @@
 
 #include "data_ptr.h"
 
-class Record : public DataPtr {
-};
+class Record : public DataPtr {};
 
-#endif // RECORD_H
+#endif  // RECORD_H
