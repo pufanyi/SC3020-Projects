@@ -28,3 +28,18 @@ std::ostream &operator<<(std::ostream &os, const Record &record) {
   }
   return os;
 }
+void RecordPtr::save(Byte *bytes) const {
+  BlockIndex _block_offset = _block.offset();
+  memcpy(bytes, &_block_offset, sizeof(BlockIndex));
+  memcpy(bytes + sizeof(BlockIndex), &_pos, sizeof(BlockIndex));
+}
+
+void RecordPtr::load(const Byte *bytes,
+                     const std::shared_ptr<std::fstream> &file,
+                     const std::shared_ptr<BlockBuffer> &buffer,
+                     const std::shared_ptr<Schema> &schema) {
+  BlockIndex _block_offset;
+  memcpy(&_block_offset, bytes, sizeof(BlockIndex));
+  _block = BlockPtr(file, _block_offset, buffer);
+  memcpy(&_pos, bytes + sizeof(std::size_t), sizeof(std::size_t));
+}

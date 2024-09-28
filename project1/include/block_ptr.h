@@ -16,6 +16,7 @@ class BlockPtr {
   mutable std::weak_ptr<BlockData> _block_data;
 
  public:
+  BlockPtr() : _offset(0), _file(nullptr), _buffer(nullptr) {}
   BlockPtr(const std::shared_ptr<std::fstream> &file, const BlockIndex &offset,
            const std::shared_ptr<BlockBuffer> &buffer);
   BlockPtr(const std::shared_ptr<std::fstream> &file, const Byte *bytes,
