@@ -24,7 +24,6 @@ class Record : public DataPtr {
     const BlockPtr &block() const { return _block; }
     const std::size_t pos() const { return _pos; }
 
-    const BlockPtr &block() const { return _block; }
     void save(Byte *bytes) const;
     void load(const Byte *bytes, const std::shared_ptr<std::fstream> &file,
               const std::shared_ptr<BlockBuffer> &buffer,
@@ -40,7 +39,7 @@ class Record : public DataPtr {
   mutable std::shared_ptr<RecordPtr> _next;
 
  public:
-  Record(BlockPtr &block_ptr, off_t offset, std::shared_ptr<Schema> schema)
+  Record(const BlockPtr &block_ptr, off_t offset, std::shared_ptr<Schema> schema)
       : DataPtr(block_ptr, offset), _schema(schema) {}
 
   Record(const Record &record) = default;
