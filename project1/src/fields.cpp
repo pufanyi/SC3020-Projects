@@ -200,6 +200,7 @@ std::string Float32Field::bytesToString(const Byte* value) const {
     throw std::runtime_error("Float value out of range");
   }
 }
+
 std::string Float64Field::bytesToString(const Byte* value) const {
   try {
     double result;
