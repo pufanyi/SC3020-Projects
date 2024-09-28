@@ -39,7 +39,8 @@ class Record : public DataPtr {
   mutable std::shared_ptr<RecordPtr> _next;
 
  public:
-  Record(const BlockPtr &block_ptr, off_t offset, std::shared_ptr<Schema> schema)
+  Record(const BlockPtr &block_ptr, off_t offset,
+         std::shared_ptr<Schema> schema)
       : DataPtr(block_ptr, offset), _schema(schema) {}
 
   Record(const Record &record) = default;
