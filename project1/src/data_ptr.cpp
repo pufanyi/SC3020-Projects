@@ -1,7 +1,19 @@
 #include "data_ptr.h"
 
 void DataPtr::store(const Byte* bytes) {
-  memcpy(&getBlockData()[_offset], bytes, size());
+  _block_ptr.store(bytes, _offset, _offset + size());
+}
+
+void DataPtr::store(const Byte* bytes, std::size_t begin, std::size_t end) {
+  _block_ptr.store(bytes, _offset + begin, _offset + end);
+}
+
+void DataPtr::load(Byte* bytes) const {
+  _block_ptr.load(bytes, _offset, _offset + size());
+}
+
+void DataPtr::load(Byte* bytes, std::size_t begin, std::size_t end) const {
+  _block_ptr.load(bytes, _offset + begin, _offset + end);
 }
 
 const Byte* DataPtr::getBytes() const { return &getBlockData()[_offset]; }

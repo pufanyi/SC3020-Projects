@@ -30,6 +30,9 @@ class BlockPtr {
     return BlockPtr(_file, offset, _buffer);
   }
 
+  const std::shared_ptr<std::fstream> &file() const { return _file; }
+  const std::shared_ptr<BlockBuffer> &buffer() const { return _buffer; }
+
   std::size_t offset() const { return _offset; }
 
   std::weak_ptr<BlockData> load_ptr() const;
@@ -39,6 +42,7 @@ class BlockPtr {
   void store(const Byte *bytes, std::size_t begin, std::size_t end) const;
   Byte *getBytes() const;
   static std::size_t size();
+  bool is_nullptr() const;
 };
 
 #endif  // BLOCK_PTR_H

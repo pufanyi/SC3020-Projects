@@ -86,3 +86,5 @@ Byte *BlockPtr::getBytes() const {
 }
 
 std::size_t BlockPtr::size() { return sizeof(_offset); }
+
+bool BlockPtr::is_nullptr() const { return _file == nullptr; }
