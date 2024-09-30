@@ -28,39 +28,7 @@ std::ostream &operator<<(std::ostream &os, const Record &record) {
   }
   return os;
 }
-void Record::RecordPtr::save(Byte *bytes) const {
-  BlockIndex _block_offset = _block.offset();
-  memcpy(bytes, &_block_offset, sizeof(BlockIndex));
-  memcpy(bytes + sizeof(BlockIndex), &_pos, sizeof(BlockIndex));
-}
 
-void Record::RecordPtr::load(const Byte *bytes,
-                             const std::shared_ptr<std::fstream> &file,
-                             const std::shared_ptr<BlockBuffer> &buffer,
-                             const std::shared_ptr<Schema> &schema) {
-  BlockIndex _block_offset;
-  memcpy(&_block_offset, bytes, sizeof(BlockIndex));
-  _block = BlockPtr(file, _block_offset, buffer);
-  memcpy(&_pos, bytes + sizeof(std::size_t), sizeof(std::size_t));
-}
+std::size_t Record::size() const { return _schema->row_size(); }
 
-bool Record::RecordPtr::is_nullptr() const { return _block.is_nullptr(); }
-
-std::shared_ptr<Record> Record::next() const {
-  if (_next == nullptr) {
-    Byte *bytes = new Byte[record_header_size()];
-    load(bytes, sizeof(BlockIndex), record_header_size());
-    _next = std::make_shared<RecordPtr>(bytes, file(), buffer(), _schema);
-    delete[] bytes;
-  }
-
-  return std::make_shared<Record>(_next->block(), _next->pos(), _schema);
-}
-
-void Record::set_next(const std::shared_ptr<Record> &next) {
-  Byte *bytes = new Byte[RecordPtr::size()];
-  _next = std::make_shared<RecordPtr>(next->block(), next->offset());
-  _next->save(bytes);
-  store(bytes, sizeof(BlockIndex), record_header_size());
-  delete[] bytes;
-}
+const Byte *Record::getData() const { return getBytes(); }

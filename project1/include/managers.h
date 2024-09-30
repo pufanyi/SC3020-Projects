@@ -7,6 +7,7 @@
 #include "block_ptr.h"
 #include "buffer.h"
 #include "fields.h"
+#include "record.h"
 
 class FileManager {
   std::shared_ptr<std::fstream> file;
@@ -26,6 +27,11 @@ class FileManager {
   std::size_t num_blocks() const { return _num_blocks; }
 
   std::vector<BlockPtr> getPtrs() const;
+};
+
+class DatabaseManager {
+  std::vector<Record> load_from_csv(const std::string &file_name,
+                                    FileManager &file_manager);
 };
 
 #endif  // MANAGERS_H
