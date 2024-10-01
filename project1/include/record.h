@@ -20,6 +20,7 @@ class Record : public DataPtr {
   friend std::ostream &operator<<(std::ostream &os, const Record &record);
 
   const Byte *getData() const;
+  std::string toString() const;
 };
 
 #endif  // RECORD_H

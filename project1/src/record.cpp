@@ -32,3 +32,19 @@ std::ostream &operator<<(std::ostream &os, const Record &record) {
 std::size_t Record::size() const { return _schema->row_size(); }
 
 const Byte *Record::getData() const { return getBytes(); }
+
+std::string Record::toString() const {
+  std::vector<std::shared_ptr<Field>> fields = _schema->dtypes().getFields();
+  const Byte *bytes = this->getData();
+  std::string result = "";
+  int index = 0;
+  size_t size = fields.size();
+  std::cout << "Size: " << size << std::endl;
+  std::cout << "Bytes: " << bytes << std::endl;
+  // for (const auto &field : fields) {
+  // Byte *single_field = std::copy(bytes + index, bytes + index +
+  // field->getSize(), single_field); result +=
+  // field->bytesToString(single_field) + " ";
+  // }
+  return result;
+}
