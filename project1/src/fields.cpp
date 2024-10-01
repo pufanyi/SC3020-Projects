@@ -125,7 +125,7 @@ Byte* DateField::stringToBytes(const std::string& value) const {
 }
 
 std::string DateField::bytesToString(const Byte* value) const {
-  return std::string(reinterpret_cast<const char*>(value));
+  return std::string(reinterpret_cast<const char*>(value), this->size);
 }
 
 Byte* BooleanField::stringToBytes(const std::string& value) const {
