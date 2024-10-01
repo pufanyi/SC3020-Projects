@@ -10,6 +10,9 @@ namespace SystemUtils {
 std::size_t __get_system_block_size();
 }
 
+std::vector<std::string> split(const std::string &s, char delimiter);
+std::string trim(std::string line);
+
 const std::size_t BLOCK_SIZE = SystemUtils::__get_system_block_size();
 
 using Byte = char;
