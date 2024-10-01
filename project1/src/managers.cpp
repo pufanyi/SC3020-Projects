@@ -123,7 +123,7 @@ std::vector<Record> DatabaseManager::load_from_txt(
   Schema schema = Schema(schema_name, header);
   std::shared_ptr<Schema> schema_ptr = std::make_shared<Schema>(schema);
   // Get basic info of the schema
-  DataTypes data_types = schema.dtypes();
+  const DataTypes &data_types = schema.dtypes();
   std::vector<std::shared_ptr<Field>> fields = data_types.getFields();
   size_t row_size = schema.row_size();
   size_t num_records_per_block = BLOCK_SIZE / row_size;
