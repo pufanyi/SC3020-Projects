@@ -130,17 +130,12 @@ std::vector<Record> DatabaseManager::load_from_txt(
   size_t record_num = 0;
   size_t record_num_curr = 0;
   BlockPtr block_ptr;
-  BlockData block_data;
   std::vector<Record> records;
-  bool first = true;
 
   while (std::getline(file, str)) {
     size_t num_block = file_manager->num_blocks();
     size_t capacities = num_block * num_records_per_block;
     if (record_num >= capacities) {
-      if (record_num != 0) {
-        block_ptr.store(block_data);
-      }
       block_ptr = file_manager->newPtr();
       record_num_curr = 0;
     }

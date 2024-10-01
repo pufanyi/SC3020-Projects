@@ -42,6 +42,8 @@ class DatabaseManager {
                                     const std::string &delimiter = ",");
 
   std::vector<Record> load_from_db(const std::string &file_name);
+  std::shared_ptr<Schema> get_schema() const { return schema; }
+  std::shared_ptr<FileManager> get_file_manager() const { return file_manager; }
 };
 
 #endif  // MANAGERS_H
