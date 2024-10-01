@@ -153,6 +153,7 @@ class DataTypes {
   void addField(const std::string& field_name, const FieldType type,
                 const std::size_t size = 1);
   void addField(const std::string& field_name, const std::string& type);
+  std::vector<std::shared_ptr<Field>> getFields() const { return fields; };
   std::size_t size() const;
 
   class Iterator {

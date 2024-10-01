@@ -109,9 +109,9 @@ std::string CharField::bytesToString(const Byte* value) const {
 }
 
 Byte* DateField::stringToBytes(const std::string& value) const {
-  if (value.length() != 10 || value[2] != '/' || value[5] != '/') {
-    throw std::invalid_argument("Invalid date format");
-  }
+  // if (value.length() != 10 || value[2] != '/' || value[5] != '/') {
+  // throw std::invalid_argument("Invalid date format");
+  // }
   int d, m, y;
   if (sscanf(value.c_str(), "%d/%d/%d", &d, &m, &y) != 3) {
     throw std::invalid_argument("Failed to parse date");
