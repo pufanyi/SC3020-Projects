@@ -10,6 +10,11 @@
 #include <unistd.h>
 #endif
 
+#include <sstream>
+
+#include "record.h"
+#include "utils.h"
+
 FileManager::FileManager(const std::string &file_name, bool create_new,
                          std::size_t max_blocks_cached)
     : _file_name(file_name),
@@ -81,4 +86,90 @@ BlockPtr FileManager::getPtr(const BlockIndex &offset) {
 }
 BlockPtr FileManager::getPtr(const Byte *bytes) {
   return BlockPtr(file, bytes, buffer);
+}
+
+DatabaseManager::DatabaseManager(const std::string &file_name, bool create_new,
+                                 std::size_t max_blocks_cached)
+    : file_manager(std::make_shared<FileManager>(file_name, create_new,
+                                                 max_blocks_cached)) {}
+
+std::vector<Record> DatabaseManager::load_from_txt(
+    const std::string &file_name, const std::string &schema_name,
+    const std::string &dtypes, const std::string &delimiter) {
+  // Assume that the user pass in a string of dtypes
+  // separated by commas
+  std::vector<std::string> dtypes_vector;
+  std::istringstream iss(dtypes);
+  std::string dtype;
+  while (std::getline(iss, dtype, ',')) {
+    dtypes_vector.push_back(dtype);
+  }
+
+  // Create a stream to read the txt file
+  std::ifstream file(file_name);
+  std::string str;
+  std::string file_contents;
+
+  // Read the header of the file
+  std::getline(file, str);
+  str = trim(str);
+  std::string header = "";
+  std::vector<std::string> header_chunk = split(str, delimiter[0]);
+  // Create a schema from the header_chunk
+  // Combine the field name and dtype
+  for (int i = 0; i < header_chunk.size(); i++) {
+    header += header_chunk[i] + " " + dtypes_vector[i] + ",";
+  }
+  Schema schema = Schema(schema_name, header);
+  std::shared_ptr<Schema> schema_ptr = std::make_shared<Schema>(schema);
+  // Get basic info of the schema
+  DataTypes data_types = schema.dtypes();
+  std::vector<std::shared_ptr<Field>> fields = data_types.getFields();
+  size_t row_size = schema.row_size();
+  size_t num_records_per_block = BLOCK_SIZE / row_size;
+  size_t record_num = 0;
+  size_t record_num_curr = 0;
+  BlockPtr block_ptr;
+  BlockData block_data;
+  std::vector<Record> records;
+  bool first = true;
+
+  while (std::getline(file, str)) {
+    size_t num_block = file_manager->num_blocks();
+    size_t capacities = num_block * num_records_per_block;
+    if (record_num >= capacities) {
+      if (record_num != 0) {
+        block_ptr.store(block_data);
+      }
+      block_ptr = file_manager->newPtr();
+      record_num_curr = 0;
+    }
+
+    str = trim(str);
+    std::vector<std::string> data_chunk = split(str, delimiter[0]);
+    Record record = Record(block_ptr, record_num_curr * row_size, schema_ptr);
+    // Create a record from the data_chunk
+    int begin = 0;
+    for (int i = 0; i < data_chunk.size(); i++) {
+      // A hack here, some value is empty,
+      // fill with 999 because the fields are all int or float
+      if (data_chunk[i].size() == 0) {
+        data_chunk[i] = "999";
+      }
+      Byte *bytes = fields[i]->stringToBytes(data_chunk[i]);
+      record.store(bytes, begin, begin + fields[i]->getSize());
+      begin += fields[i]->getSize();
+    }
+    records.push_back(record);
+    record_num++;
+    record_num_curr++;
+  }
+  this->schema = schema_ptr;
+  return records;
+}
+
+std::vector<Record> DatabaseManager::load_from_db(
+    const std::string &file_name) {
+  std::vector<Record> records;
+  return records;
 }

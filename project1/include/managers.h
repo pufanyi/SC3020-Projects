@@ -30,8 +30,18 @@ class FileManager {
 };
 
 class DatabaseManager {
-  std::vector<Record> load_from_csv(const std::string &file_name,
-                                    FileManager &file_manager);
+  std::shared_ptr<FileManager> file_manager;
+  std::shared_ptr<Schema> schema;
+
+ public:
+  DatabaseManager(const std::string &file_name, bool create_new = false,
+                  std::size_t max_blocks_cached = 100);
+  std::vector<Record> load_from_txt(const std::string &file_name,
+                                    const std::string &schema_name,
+                                    const std::string &dtypes,
+                                    const std::string &delimiter = ",");
+
+  std::vector<Record> load_from_db(const std::string &file_name);
 };
 
 #endif  // MANAGERS_H
