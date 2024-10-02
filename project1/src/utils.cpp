@@ -8,6 +8,8 @@
 #include <unistd.h>
 #endif
 
+#include <sstream>
+
 namespace SystemUtils {
 std::size_t __get_system_block_size() {
 #ifdef _WIN32
@@ -29,3 +31,24 @@ std::size_t __get_system_block_size() {
 #endif
 }
 }  // namespace SystemUtils
+
+std::string trim(std::string line) {
+  std::string newString;
+
+  for (char ch : line) {
+    if (ch == '\n' || ch == '\r') continue;
+    newString += ch;
+  }
+
+  return newString;
+}
+
+std::vector<std::string> split(const std::string &s, char delimiter) {
+  std::vector<std::string> tokens;
+  std::string token;
+  std::istringstream tokenStream(s);
+  while (std::getline(tokenStream, token, delimiter)) {
+    tokens.push_back(token);
+  }
+  return tokens;
+}

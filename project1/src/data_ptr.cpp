@@ -1,16 +1,27 @@
 #include "data_ptr.h"
 
-void DataPtr::store(const std::string& value) {
-  Byte* bytes = _field->stringToBytes(value);
-  memcpy(&_block_ptr.load()[_offset], bytes, _field->getSize());
-}
-
 void DataPtr::store(const Byte* bytes) {
-  memcpy(&_block_ptr.load()[_offset], bytes, _field->getSize());
+  _block_ptr.store(bytes, _offset, _offset + size());
 }
 
-Byte* DataPtr::getBytes() const { return &_block_ptr.load()[_offset]; }
+void DataPtr::store(const Byte* bytes, std::size_t begin, std::size_t end) {
+  _block_ptr.store(bytes, _offset + begin, _offset + end);
+}
 
-std::string DataPtr::load_str() {
-  return _field->bytesToString(&_block_ptr.load()[_offset]);
+void DataPtr::load(Byte* bytes) const {
+  _block_ptr.load(bytes, _offset, _offset + size());
+}
+
+void DataPtr::load(Byte* bytes, std::size_t begin, std::size_t end) const {
+  _block_ptr.load(bytes, _offset + begin, _offset + end);
+}
+
+const Byte* DataPtr::getBytes() const { return &getBlockData()[_offset]; }
+
+Byte& DataPtr::operator[](std::size_t index) {
+  return getBlockData()[_offset + index];
+}
+
+const Byte& DataPtr::operator[](std::size_t index) const {
+  return getBlockData()[_offset + index];
 }

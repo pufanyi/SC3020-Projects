@@ -3,13 +3,13 @@
 #include <iostream>
 #include <stdexcept>
 
-BlockData::BlockData(const std::streamoff offset,
+BlockData::BlockData(const BlockIndex offset,
                      std::shared_ptr<std::fstream> file)
     : data(new Byte[BLOCK_SIZE]), _offset(offset), _file(file) {
   memset(data, 0, BLOCK_SIZE);
 }
 
-BlockData::BlockData(const Byte *data, std::streamoff offset,
+BlockData::BlockData(const Byte *data, BlockIndex offset,
                      std::shared_ptr<std::fstream> file)
     : data(new Byte[BLOCK_SIZE]), _offset(offset), _file(file) {
   memset(this->data, 0, BLOCK_SIZE);

@@ -109,9 +109,9 @@ std::string CharField::bytesToString(const Byte* value) const {
 }
 
 Byte* DateField::stringToBytes(const std::string& value) const {
-  if (value.length() != 10 || value[2] != '/' || value[5] != '/') {
-    throw std::invalid_argument("Invalid date format");
-  }
+  // if (value.length() != 10 || value[2] != '/' || value[5] != '/') {
+  // throw std::invalid_argument("Invalid date format");
+  // }
   int d, m, y;
   if (sscanf(value.c_str(), "%d/%d/%d", &d, &m, &y) != 3) {
     throw std::invalid_argument("Failed to parse date");
@@ -125,7 +125,7 @@ Byte* DateField::stringToBytes(const std::string& value) const {
 }
 
 std::string DateField::bytesToString(const Byte* value) const {
-  return std::string(reinterpret_cast<const char*>(value));
+  return std::string(reinterpret_cast<const char*>(value), this->size);
 }
 
 Byte* BooleanField::stringToBytes(const std::string& value) const {
@@ -200,6 +200,7 @@ std::string Float32Field::bytesToString(const Byte* value) const {
     throw std::runtime_error("Float value out of range");
   }
 }
+
 std::string Float64Field::bytesToString(const Byte* value) const {
   try {
     double result;

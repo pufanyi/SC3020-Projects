@@ -10,13 +10,13 @@
 class BlockData {
  private:
   Byte *data;
-  std::streamoff _offset;
+  BlockIndex _offset;
   std::shared_ptr<std::fstream> _file;
 
  public:
-  BlockData(const std::streamoff offset = 0,
+  BlockData(const BlockIndex offset = 0,
             std::shared_ptr<std::fstream> file = nullptr);
-  BlockData(const Byte *data, std::streamoff offset = 0,
+  BlockData(const Byte *data, BlockIndex offset = 0,
             std::shared_ptr<std::fstream> file = nullptr);
   BlockData(const BlockData &block_data) =
       delete;  // Copy constructor will cause a lot of problems, so we delete it
