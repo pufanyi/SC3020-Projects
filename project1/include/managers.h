@@ -41,7 +41,14 @@ class DatabaseManager {
                                     const std::string &dtypes,
                                     const std::string &delimiter = ",");
 
-  std::vector<Record> load_from_db(const std::string &file_name);
+  // Be cautions here, dtypes is different from load_from_txt
+  // When using load_from_txt, you only need to pass in "INT, FLOAT32, ..."
+  // The field name is read from the header of the txt file
+  // When you load from a .db file, you need to pass in the field name
+  // "field1 INT, field2 FLOAT32, ..."
+  std::vector<Record> load_from_db(const std::string &schema_name,
+                                   const std::string &dtypes,
+                                   const size_t num_records);
   std::shared_ptr<Schema> get_schema() const { return schema; }
   std::shared_ptr<FileManager> get_file_manager() const { return file_manager; }
 };

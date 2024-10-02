@@ -164,7 +164,27 @@ std::vector<Record> DatabaseManager::load_from_txt(
 }
 
 std::vector<Record> DatabaseManager::load_from_db(
-    const std::string &file_name) {
+    const std::string &schema_name, const std::string &dtypes,
+    const size_t num_records) {
+  std::vector<BlockPtr> block_ptrs = file_manager->getPtrs();
+  Schema schema = Schema(schema_name, dtypes);
+  std::shared_ptr<Schema> schema_ptr = std::make_shared<Schema>(schema);
   std::vector<Record> records;
+  size_t row_size = schema.row_size();
+  size_t num_records_per_block = BLOCK_SIZE / row_size;
+  size_t record_num = 0;
+  for (int i = 0; i < block_ptrs.size(); i++) {
+    BlockPtr block_ptr = block_ptrs[i];
+    int begin = 0;
+    for (int j = 0; j < num_records_per_block; j++) {
+      if (record_num >= num_records) {
+        break;
+      }
+      Record record = Record(block_ptr, begin, schema_ptr);
+      records.push_back(record);
+      begin += row_size;
+      record_num++;
+    }
+  }
   return records;
 }
