@@ -188,3 +188,42 @@ std::vector<Record> DatabaseManager::load_from_db(
   }
   return records;
 }
+
+std::vector<Record> DatabaseManager::linear_scan(const std::string &field_name,
+                                                 const std::string &dtypes,
+                                                 const float low,
+                                                 const float high) {
+  std::vector<Record> records;
+  std::shared_ptr<Schema> schema =
+      std::make_shared<Schema>(Schema("schema", dtypes));
+  std::vector<std::string> field_names = schema->dtypes().getFieldNames();
+  std::vector<std::shared_ptr<Field>> fields = schema->dtypes().getFields();
+  size_t row_size = schema->row_size();
+  size_t num_records_per_block = BLOCK_SIZE / row_size;
+  size_t record_num = 0;
+  for (int i = 0; i < file_manager->num_blocks(); i++) {
+    BlockPtr block_ptr = file_manager->getPtr(i * BLOCK_SIZE);
+    for (int j = 0; j < num_records_per_block; j++) {
+      Record record = Record(block_ptr, j * row_size, schema);
+      const Byte *bytes = record.getData();
+      int begin = 0;
+      int field_index = 0;
+      for (auto &field : fields) {
+        if (field_names[field_index] == field_name) {
+          Byte *single_field = new Byte[field->getSize()];
+          std::copy(bytes + begin, bytes + begin + field->getSize(),
+                    single_field);
+          std::string value = field->bytesToString(single_field);
+          float float_value = std::stof(value);
+          if (float_value >= low && float_value <= high) {
+            records.push_back(record);
+          }
+        }
+        begin += field->getSize();
+        field_index++;
+      }
+      record_num++;
+    }
+  }
+  return records;
+}
