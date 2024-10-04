@@ -7,14 +7,13 @@ class Index {
  public:
   Index() = default;
   virtual ~Index() = default;
-  virtual bool operator<(const Index& index) const = 0;
 
+  virtual bool smallerThan(const Index& index) const = 0;
+
+  bool operator<(const Index& index) const { return this->smallerThan(index); }
   bool operator>(const Index& index) const { return index < *this; }
-
   bool operator<=(const Index& index) const { return !(*this > index); }
-
   bool operator>=(const Index& index) const { return !(*this < index); }
-
   bool operator==(const Index& index) const {
     return !(*this < index) && !(index < *this);
   }
