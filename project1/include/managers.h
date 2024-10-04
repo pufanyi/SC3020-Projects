@@ -49,6 +49,10 @@ class DatabaseManager {
   std::vector<Record> load_from_db(const std::string &schema_name,
                                    const std::string &dtypes,
                                    const size_t num_records);
+
+  std::vector<Record> linear_scan(const std::string &field_name,
+                                  const std::string &dtypes, const float low,
+                                  const float high);
   std::shared_ptr<Schema> get_schema() const { return schema; }
   std::shared_ptr<FileManager> get_file_manager() const { return file_manager; }
 };
