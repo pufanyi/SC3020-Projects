@@ -84,6 +84,11 @@ std::vector<BlockPtr> FileManager::getPtrs() const {
 BlockPtr FileManager::getPtr(const BlockIndex &offset) {
   return BlockPtr(file, offset, buffer);
 }
+
 BlockPtr FileManager::getPtr(const Byte *bytes) {
   return BlockPtr(file, bytes, buffer);
+}
+
+BlockPtr FileManager::getFirstPtr() {
+  return BlockPtr(file, BlockIndex(0), buffer);
 }

@@ -58,3 +58,11 @@ const Byte *Record::operator[](const std::string field_name) const {
 const Byte *Record::at(const std::string field_name) const {
   return this->operator[](field_name);
 }
+
+std::shared_ptr<Index> Record::getIndex(const IndexType &index_type,
+                                        const std::string &field_name) const {
+  const Byte *bytes = this->operator[](field_name);
+  std::shared_ptr<Index> index = createIndex(index_type);
+  index->load(bytes);
+  return index;
+}

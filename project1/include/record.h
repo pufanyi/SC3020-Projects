@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "data_ptr.h"
+#include "index.h"
 #include "schema.h"
 
 class Record;
@@ -33,6 +34,9 @@ class Record : public DataPtr {
 
   const Byte *operator[](const std::string) const;
   const Byte *at(const std::string field_name) const;
+
+  std::shared_ptr<Index> getIndex(const IndexType &index_type,
+                                  const std::string &field_name) const;
 };
 
 #endif  // RECORD_H

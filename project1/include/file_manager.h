@@ -21,6 +21,7 @@ class FileManager {
   BlockPtr newPtr();
   BlockPtr getPtr(const BlockIndex &offset);
   BlockPtr getPtr(const Byte *bytes);
+  BlockPtr getFirstPtr();
 
   const std::string &file_name() const { return _file_name; }
   std::size_t num_blocks() const { return _num_blocks; }
