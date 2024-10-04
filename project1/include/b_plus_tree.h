@@ -42,6 +42,7 @@ class BPlusTreeLeafNode : public BPlusTreeNode {
                     const int n = 0);
 
   void load() override;
+  void push_back(const Record &record);
 };
 
 class BPlusTreeInternalNode : public BPlusTreeNode {

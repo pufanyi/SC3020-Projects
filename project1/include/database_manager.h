@@ -7,8 +7,8 @@
 #include "block_ptr.h"
 #include "buffer.h"
 #include "fields.h"
-#include "record.h"
 #include "file_manager.h"
+#include "record.h"
 
 class DatabaseManager {
   std::shared_ptr<FileManager> file_manager;
