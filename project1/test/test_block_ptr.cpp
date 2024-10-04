@@ -58,7 +58,8 @@ TEST(BlockPtrTest, BlockPtrSave) {
     EXPECT_EQ(fileManager.getPtrs().size(), 3);
     EXPECT_EQ(fileManager.getPtrs()[1].load()[0], 'H');
 
-    Byte *bytes = BlockPtr2.getBytes();
+    Byte *bytes = new Byte[BlockPtr2.size()];
+    BlockPtr2.store_ptr(bytes);
     // BlockPtr* BlockPtr4 = BlockPtr::fromBytes(bytes);
 
     // BlockData new_block4 = BlockPtr4->load();

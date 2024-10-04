@@ -70,6 +70,11 @@ void BlockPtr::store(const BlockData &block) const {
   memcpy(block_data.data, block.data, BLOCK_SIZE);
 }
 
+Byte *BlockPtr::getBytes() const {
+  auto &block_data = load();
+  return block_data.data;
+}
+
 void BlockPtr::store(const Byte *bytes, std::size_t begin,
                      std::size_t end) const {
   if (end > BLOCK_SIZE || begin > end) {
@@ -79,10 +84,8 @@ void BlockPtr::store(const Byte *bytes, std::size_t begin,
   memcpy(block_data.data + begin, bytes, end - begin);
 }
 
-Byte *BlockPtr::getBytes() const {
-  Byte *bytes = new Byte[sizeof(_offset)];
+void BlockPtr::store_ptr(Byte *bytes) const {
   std::memcpy(bytes, &_offset, sizeof(_offset));
-  return bytes;
 }
 
 std::size_t BlockPtr::size() { return sizeof(_offset); }
