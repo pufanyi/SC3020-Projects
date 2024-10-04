@@ -7,6 +7,10 @@
 class BPlusTreeNode {
  protected:
   BlockPtr _block_ptr;
+
+  std::size_t n;
+
+ public:
 };
 
 class BPlusTreeLeafNode : public BPlusTreeNode {};

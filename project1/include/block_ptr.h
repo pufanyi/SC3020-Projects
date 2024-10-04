@@ -40,9 +40,10 @@ class BlockPtr {
   void load(Byte *dst, const std::size_t begin, const std::size_t end) const;
   void store(const BlockData &block) const;
   void store(const Byte *bytes, std::size_t begin, std::size_t end) const;
-  Byte *getBytes() const;
+  void store_ptr(Byte *bytes) const;
   static std::size_t size();
   bool is_nullptr() const;
+  Byte *getBytes() const;
 };
 
 #endif  // BLOCK_PTR_H
