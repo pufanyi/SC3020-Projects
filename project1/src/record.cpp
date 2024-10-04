@@ -49,3 +49,12 @@ std::string Record::toString() const {
 
   return result;
 }
+
+const Byte *Record::operator[](const std::string field_name) const {
+  const Byte *bytes = this->getData();
+  return bytes + _schema->dtypes()[field_name];
+}
+
+const Byte *Record::at(const std::string field_name) const {
+  return this->operator[](field_name);
+}

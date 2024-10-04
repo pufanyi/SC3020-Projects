@@ -97,3 +97,54 @@ void BPlusTreeLeafNode::load() {
     now_offset += index->size();
   }
 }
+
+BlockIndex BPlusTreeLeafNode::now_offset() const {
+  if (n == 0) {
+    return header_length();
+  } else {
+    return header_length() + n * (sizeof(BlockIndex) * 2 + _index[0]->size());
+  }
+}
+
+BlockIndex BPlusTreeInternalNode::now_offset() const {
+  auto ans = header_length() + _son.size() * sizeof(BlockIndex);
+  if (!_index.empty()) {
+    ans += _index[0]->size() * _index.size();
+  }
+  return ans;
+}
+
+void BPlusTreeLeafNode::push_back(const Record &record,
+                                  const std::shared_ptr<Index> &index) {
+  _records.push_back(record);
+  _index.push_back(index);
+  Byte *bytes = new Byte[record.size()];
+  record.store_ptr(bytes);
+  _block_ptr.store(bytes, now_offset(), now_offset() + record.size());
+  delete[] bytes;
+  bytes = new Byte[index->size()];
+  index->save(bytes);
+  _block_ptr.store(bytes, now_offset() + record.size(),
+                   now_offset() + record.size() + index->size());
+  delete[] bytes;
+  n++;
+}
+
+void BPlusTreeInternalNode::push_back(const BPlusTreeNode &son) {
+  auto _now_offset = now_offset();
+  _son.push_back(son._block_ptr);
+  const BlockPtr &son_block_ptr = son._block_ptr;
+  Byte *bytes = new Byte[BlockPtr::size()];
+  son_block_ptr.store_ptr(bytes);
+  _block_ptr.store(bytes, _now_offset, _now_offset + BlockPtr::size());
+  delete[] bytes;
+}
+
+void BPlusTreeInternalNode::push_back(const std::shared_ptr<Index> &index) {
+  auto _now_offset = now_offset();
+  _index.push_back(index);
+  Byte *bytes = new Byte[index->size()];
+  index->save(bytes);
+  _block_ptr.store(bytes, _now_offset, _now_offset + index->size());
+  delete[] bytes;
+}

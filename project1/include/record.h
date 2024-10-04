@@ -30,6 +30,9 @@ class Record : public DataPtr {
 
   const Byte *getData() const;
   std::string toString() const;
+
+  const Byte *operator[](const std::string) const;
+  const Byte *at(const std::string field_name) const;
 };
 
 #endif  // RECORD_H

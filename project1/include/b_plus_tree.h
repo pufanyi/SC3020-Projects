@@ -27,6 +27,8 @@ class BPlusTreeNode {
   std::size_t data_length() const;
 
   friend class BPlusTree;
+  friend class BPlusTreeLeafNode;
+  friend class BPlusTreeInternalNode;
 };
 
 class BPlusTreeLeafNode : public BPlusTreeNode {
@@ -41,8 +43,10 @@ class BPlusTreeLeafNode : public BPlusTreeNode {
                     const std::shared_ptr<Schema> &schema = nullptr,
                     const int n = 0);
 
+  BlockIndex now_offset() const;
+
   void load() override;
-  void push_back(const Record &record);
+  void push_back(const Record &record, const std::shared_ptr<Index> &index);
 };
 
 class BPlusTreeInternalNode : public BPlusTreeNode {
@@ -50,11 +54,17 @@ class BPlusTreeInternalNode : public BPlusTreeNode {
   std::vector<BlockPtr> _son;
   std::vector<std::shared_ptr<Index>> _index;
 
+ protected:
+  void push_back(const BPlusTreeNode &son);
+  void push_back(const std::shared_ptr<Index> &index);
+
  public:
   BPlusTreeInternalNode(const IndexType index_type, const bool create_new,
                         const BlockPtr &block_ptr, const int n = 0);
 
   void load() override;
+
+  BlockIndex now_offset() const;
 };
 
 class BPlusTree {

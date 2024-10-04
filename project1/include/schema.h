@@ -26,6 +26,8 @@ class Schema {
 
   const DataTypes &dtypes() const { return data_types; }
   const std::size_t row_size() const { return _row_size; }
+
+  const BlockIndex &operator[](const std::string &field_name) const;
 };
 
 #endif  // SCHEMA_H

@@ -35,3 +35,7 @@ Schema::Schema(const std::string &name, const std::string &dtypes)
   }
   _row_size = data_types.size();
 }
+
+const BlockIndex &Schema::operator[](const std::string &field_name) const {
+  return data_types[field_name];
+}
