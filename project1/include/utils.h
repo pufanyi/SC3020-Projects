@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <fstream>
 #include <vector>
+#define GTEST_COUT std::cerr << "[          ] [ INFO ]"
 
 namespace SystemUtils {
 std::size_t __get_system_block_size();
