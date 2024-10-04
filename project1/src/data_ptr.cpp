@@ -1,6 +1,6 @@
 #include "data_ptr.h"
 
-#include "managers.h"
+#include "file_manager.h"
 
 void DataPtr::store(const Byte* bytes) {
   _block_ptr.store(bytes, _offset, _offset + size());

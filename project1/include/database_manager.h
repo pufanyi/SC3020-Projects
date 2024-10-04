@@ -1,5 +1,5 @@
-#ifndef MANAGERS_H
-#define MANAGERS_H
+#ifndef DATABASE_MANAGER_H
+#define DATABASE_MANAGER_H
 
 #include <fstream>
 #include <vector>
@@ -8,26 +8,7 @@
 #include "buffer.h"
 #include "fields.h"
 #include "record.h"
-
-class FileManager {
-  std::shared_ptr<std::fstream> file;
-  const std::string _file_name;
-  std::size_t _num_blocks;
-  std::shared_ptr<BlockBuffer> buffer;
-
- public:
-  FileManager(const std::string &file_name, bool create_new = false,
-              std::size_t max_blocks_cached = 100);
-
-  BlockPtr newPtr();
-  BlockPtr getPtr(const BlockIndex &offset);
-  BlockPtr getPtr(const Byte *bytes);
-
-  const std::string &file_name() const { return _file_name; }
-  std::size_t num_blocks() const { return _num_blocks; }
-
-  std::vector<BlockPtr> getPtrs() const;
-};
+#include "file_manager.h"
 
 class DatabaseManager {
   std::shared_ptr<FileManager> file_manager;
@@ -57,4 +38,4 @@ class DatabaseManager {
   std::shared_ptr<FileManager> get_file_manager() const { return file_manager; }
 };
 
-#endif  // MANAGERS_H
+#endif  // DATABASE_MANAGER_H

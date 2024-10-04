@@ -4,6 +4,7 @@
 #include "block.h"
 #include "block_ptr.h"
 #include "fields.h"
+#include "file_manager.h"
 
 class DataPtr {
  private:

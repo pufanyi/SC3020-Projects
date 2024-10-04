@@ -2,7 +2,8 @@
 
 #include <chrono>
 
-#include "managers.h"
+#include "database_manager.h"
+#include "file_manager.h"
 
 TEST(ManagerTest, DBManagerLoadFromTxtTest) {
   DatabaseManager db_manager("test.db", true);

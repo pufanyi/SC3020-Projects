@@ -31,7 +31,8 @@ add_executable(
     ${PROJECT_SOURCE_DIR}/src/data_loader.cpp
     ${PROJECT_SOURCE_DIR}/src/block_ptr.cpp
     ${PROJECT_SOURCE_DIR}/src/utils.cpp
-    ${PROJECT_SOURCE_DIR}/src/managers.cpp
+    ${PROJECT_SOURCE_DIR}/src/file_manager.cpp
+    ${PROJECT_SOURCE_DIR}/src/database_manager.cpp
     ${PROJECT_SOURCE_DIR}/src/fields.cpp
     ${PROJECT_SOURCE_DIR}/src/schema.cpp
     ${PROJECT_SOURCE_DIR}/src/buffer.cpp

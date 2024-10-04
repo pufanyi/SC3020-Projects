@@ -4,8 +4,8 @@
 #include "block.h"
 #include "block_ptr.h"
 #include "data_ptr.h"
+#include "file_manager.h"
 #include "index.h"
-#include "managers.h"
 #include "record.h"
 
 class BPlusTreeNode {
@@ -63,7 +63,8 @@ class BPlusTree {
   std::shared_ptr<Schema> _schema;
 
  public:
-  BPlusTree(const std::string &file_name, const bool create_new, const std::shared_ptr<Schema> &schema);
+  BPlusTree(const std::string &file_name, const bool create_new,
+            const std::shared_ptr<Schema> &schema);
 };
 
 #endif  // B_PLUS_TREE_H
