@@ -3,6 +3,8 @@
 
 #include "utils.h"
 
+enum class IndexType { INT, STRING, FLOAT32, FLOAT64 };
+
 class Index {
  public:
   Index() = default;
@@ -106,5 +108,20 @@ class Float64Index : public Index {
     memcpy(&_value, bytes, sizeof(double));
   }
 };
+
+std::shared_ptr<Index> createIndex(const IndexType& type) {
+  switch (type) {
+    case IndexType::INT:
+      return std::make_shared<IntIndex>();
+    case IndexType::STRING:
+      return std::make_shared<StringIndex>();
+    case IndexType::FLOAT32:
+      return std::make_shared<Float32Index>();
+    case IndexType::FLOAT64:
+      return std::make_shared<Float64Index>();
+    default:
+      throw std::runtime_error("Invalid index type");
+  }
+}
 
 #endif  // INDEX_H

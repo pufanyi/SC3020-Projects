@@ -1,8 +1,14 @@
 #ifndef RECORD_H
 #define RECORD_H
 
+#include <iostream>
+
 #include "data_ptr.h"
 #include "schema.h"
+
+class Record;
+
+std::ostream &operator<<(std::ostream &os, const Record &record);
 
 class Record : public DataPtr {
  private:
@@ -12,6 +18,9 @@ class Record : public DataPtr {
   Record(const BlockPtr &block_ptr, off_t offset,
          std::shared_ptr<Schema> schema)
       : DataPtr(block_ptr, offset), _schema(schema) {}
+
+  Record(const DataPtr &data_ptr, std::shared_ptr<Schema> schema)
+      : DataPtr(data_ptr), _schema(schema) {}
 
   Record(const Record &record) = default;
 
