@@ -230,6 +230,8 @@ BPlusTree::BPlusTree(const IndexType index_type, const std::string &index_name,
       _index_type(index_type),
       _min_degree(calc_min_degree()) {
   info_block_ptr = _index_file_manager->newPtr();
+  _root = bulk_load(records);
+  save_info();
 }
 
 std::shared_ptr<BPlusTreeNode> BPlusTree::bulk_load(
