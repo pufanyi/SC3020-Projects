@@ -4,27 +4,34 @@
 #include <cstddef>
 
 void BPlusTreeNode::save_header() const {
-  _block_ptr.store(reinterpret_cast<const Byte *>(&n), 0, sizeof(n));
+  bool _is_leaf = is_leaf();
+  _block_ptr.store(reinterpret_cast<const Byte *>(&_is_leaf), 0,
+                   sizeof(_is_leaf));
+  _block_ptr.store(reinterpret_cast<const Byte *>(&n), sizeof(_is_leaf),
+                   sizeof(n) + sizeof(_is_leaf));
 }
 
 void BPlusTreeNode::load_header() {
   Byte *bytes = new Byte[sizeof(n)];
-  _block_ptr.load(bytes, 0, sizeof(n));
+  _block_ptr.load(bytes, sizeof(bool), sizeof(n) + sizeof(bool));
   n = *reinterpret_cast<std::size_t *>(bytes);
   delete[] bytes;
 }
 
-std::size_t BPlusTreeNode::header_length() const { return sizeof(n); }
+std::size_t BPlusTreeNode::header_length() const {
+  return sizeof(n) + sizeof(bool);
+}
 
 std::size_t BPlusTreeNode::data_length() const {
   return _block_ptr.size() - header_length();
 }
 
-BPlusTreeInternalNode::BPlusTreeInternalNode(const IndexType index_type,
+BPlusTreeInternalNode::BPlusTreeInternalNode(const BPlusTree *b_plus_tree,
+                                             const IndexType index_type,
                                              const bool create_new,
                                              const BlockPtr &block_ptr,
                                              const int n)
-    : BPlusTreeNode(index_type, block_ptr, n) {
+    : BPlusTreeNode(index_type, block_ptr, n), _b_plus_tree(b_plus_tree) {
   if (create_new) {
     save_header();
   } else {
@@ -42,7 +49,8 @@ void BPlusTreeInternalNode::load() {
   for (decltype(n) i = 0; i <= 2 * n; ++i) {
     if (i % 2 == 0) {  // son
       BlockPtr son = _block_ptr.get_other(now_offset);
-      _son.push_back(son);
+      std::shared_ptr<BPlusTreeNode> _now_son = _b_plus_tree->get_node(son);
+      _son.push_back(_now_son);
       now_offset += sizeof(BlockIndex);
     } else {  // index
       std::shared_ptr<Index> index = createIndex(_index_type);
@@ -56,12 +64,15 @@ void BPlusTreeInternalNode::load() {
   }
 }
 
-BPlusTreeLeafNode::BPlusTreeLeafNode(const IndexType index_type,
+BPlusTreeLeafNode::BPlusTreeLeafNode(const BPlusTree *b_plus_tree,
+                                     const IndexType index_type,
                                      const bool create_new,
                                      const BlockPtr &block_ptr,
                                      const std::shared_ptr<Schema> &schema,
                                      const int n)
-    : BPlusTreeNode(index_type, block_ptr, n), _schema(schema) {
+    : BPlusTreeNode(index_type, block_ptr, n),
+      _schema(schema),
+      _b_plus_tree(b_plus_tree) {
   if (create_new) {
     save_header();
   } else {
@@ -131,10 +142,11 @@ void BPlusTreeLeafNode::push_back(const Record &record,
   n++;
 }
 
-void BPlusTreeInternalNode::push_back(const BPlusTreeNode &son) {
+void BPlusTreeInternalNode::push_back(
+    const std::shared_ptr<BPlusTreeNode> &son) {
   auto _now_offset = now_offset();
-  _son.push_back(son._block_ptr);
-  const BlockPtr &son_block_ptr = son._block_ptr;
+  _son.push_back(son);
+  const BlockPtr &son_block_ptr = son->_block_ptr;
   Byte *bytes = new Byte[BlockPtr::size()];
   son_block_ptr.store_ptr(bytes);
   _block_ptr.store(bytes, _now_offset, _now_offset + BlockPtr::size());
@@ -165,8 +177,8 @@ BPlusTree::BPlusTree(const bool create_new, const IndexType index_type,
   if (create_new) {
     info_block_ptr = _index_file_manager->newPtr();
     auto root_ptr = _index_file_manager->newPtr();
-    _root =
-        std::make_shared<BPlusTreeLeafNode>(index_type, true, root_ptr, schema);
+    _root = std::make_shared<BPlusTreeLeafNode>(this, index_type, true,
+                                                root_ptr, schema);
     _min_degree = calc_min_degree();
     save_info();
   } else {
@@ -198,11 +210,11 @@ void BPlusTree::load_root() {
   BlockPtr root_ptr = _index_file_manager->getPtr(bytes);
   bool is_leaf = *reinterpret_cast<bool *>(bytes + BlockPtr::size());
   if (is_leaf) {
-    _root = std::make_shared<BPlusTreeLeafNode>(_index_type, false, root_ptr,
-                                                _schema);
+    _root = std::make_shared<BPlusTreeLeafNode>(this, _index_type, false,
+                                                root_ptr, _schema);
   } else {
-    _root =
-        std::make_shared<BPlusTreeInternalNode>(_index_type, false, root_ptr);
+    _root = std::make_shared<BPlusTreeInternalNode>(this, _index_type, false,
+                                                    root_ptr);
   }
   memcpy(&_min_degree, bytes + BlockPtr::size() + sizeof(bool),
          sizeof(std::size_t));
@@ -212,9 +224,10 @@ void BPlusTree::load_root() {
 std::size_t BPlusTree::calc_min_degree() const {
   auto index_size = getIndexSize(_index_type);
   auto record_size = 2 * sizeof(BlockIndex);
-  auto block_size = sizeof(BlockPtr);
+  auto block_size = sizeof(BlockIndex);
   auto remain_size = BLOCK_SIZE - sizeof(std::size_t);
-  auto min_n = std::min(remain_size / (index_size + record_size),
+  std::cerr << "Remain size: " << remain_size << std::endl;
+  auto min_n = std::min((remain_size - block_size) / (index_size + record_size),
                         (remain_size - block_size) / (block_size + index_size));
   return min_n / 2;
 }
@@ -264,17 +277,25 @@ std::shared_ptr<BPlusTreeNode> BPlusTree::bulk_load(
   std::vector<std::shared_ptr<BPlusTreeNode>> nodes;
   std::shared_ptr<BPlusTreeLeafNode> now_node = nullptr;
   std::size_t remain = records.size();
+  std::shared_ptr<BPlusTreeLeafNode> last_node = nullptr;
   for (const auto &record : records) {
     if (now_node == nullptr) {
       auto block_ptr = _index_file_manager->newPtr();
-      now_node = std::make_shared<BPlusTreeLeafNode>(_index_type, true,
+      now_node = std::make_shared<BPlusTreeLeafNode>(this, _index_type, true,
                                                      block_ptr, _schema);
+      if (last_node != nullptr) {
+        last_node->set_next(now_node);
+      }
       nodes.push_back(now_node);
     }
     now_node->push_back(record, record.getIndex(_index_type, _index_name));
     if (now_node->n == _min_degree && remain >= _min_degree) {
+      last_node = now_node;
       now_node = nullptr;
     }
+  }
+  if (last_node != nullptr) {
+    last_node->set_next(nullptr);
   }
   return bulk_load(nodes);
 }
@@ -298,12 +319,12 @@ std::shared_ptr<BPlusTreeNode> BPlusTree::bulk_load(
   for (const auto &node : nodes) {
     if (now_node == nullptr) {
       auto block_ptr = _index_file_manager->newPtr();
-      now_node =
-          std::make_shared<BPlusTreeInternalNode>(_index_type, true, block_ptr);
-      now_node->push_back(*node);
+      now_node = std::make_shared<BPlusTreeInternalNode>(this, _index_type,
+                                                         true, block_ptr);
+      now_node->push_back(node);
     } else {
       now_node->push_back(node->min_index());
-      now_node->push_back(*node);
+      now_node->push_back(node);
     }
     // #if DEBUG
     // std::cerr << "Now node size: " << now_node->n << std::endl;
@@ -317,4 +338,72 @@ std::shared_ptr<BPlusTreeNode> BPlusTree::bulk_load(
     new_nodes.push_back(now_node);
   }
   return bulk_load(new_nodes);
+}
+
+void BPlusTreeLeafNode::range_query(const std::shared_ptr<Index> &begin,
+                                    const std::shared_ptr<Index> &end,
+                                    std::vector<Record> &result) const {
+  if (*end <= *min_index() || *begin >= *max_index()) {
+    return;
+  }
+  for (decltype(n) i = 0; i < n; ++i) {
+    if (*_index[i] >= *begin && *_index[i] <= *end) {
+      result.push_back(_records[i]);
+    }
+  }
+}
+
+void BPlusTreeInternalNode::range_query(const std::shared_ptr<Index> &begin,
+                                        const std::shared_ptr<Index> &end,
+                                        std::vector<Record> &result) const {
+  for (decltype(n) i = 0; i < n; ++i) {
+    if (*begin < *_index[i]) {
+      _son[i]->range_query(begin, end, result);
+    }
+  }
+}
+
+std::shared_ptr<BPlusTreeNode> BPlusTree::get_node(
+    const BlockPtr &block_ptr) const {
+  Byte *bytes = new Byte[sizeof(bool)];
+  block_ptr.load(bytes, 0, sizeof(bool));
+  bool is_leaf = *reinterpret_cast<bool *>(bytes);
+  delete[] bytes;
+  if (is_leaf) {
+    return std::make_shared<BPlusTreeLeafNode>(this, _index_type, false,
+                                               block_ptr, _schema);
+  } else {
+    return std::make_shared<BPlusTreeInternalNode>(this, _index_type, false,
+                                                   block_ptr);
+  }
+}
+
+void BPlusTreeLeafNode::set_next(
+    const std::shared_ptr<BPlusTreeLeafNode> &next) {
+  _next = next;
+  Byte *bytes = new Byte[BlockPtr::size()];
+  if (next == nullptr) {
+    memset(bytes, 0, BlockPtr::size());
+  } else {
+    next->_block_ptr.store_ptr(bytes);
+  }
+  _block_ptr.store(bytes, BLOCK_SIZE - BlockPtr::size(), BLOCK_SIZE);
+}
+
+std::shared_ptr<BPlusTreeLeafNode> BPlusTreeLeafNode::next() const {
+  return _next;
+}
+
+void BPlusTreeLeafNode::load_next() {
+  Byte *bytes = new Byte[BlockPtr::size()];
+  _block_ptr.load(bytes, BLOCK_SIZE - BlockPtr::size(), BLOCK_SIZE);
+  BlockIndex next_offset;
+  memcpy(&next_offset, bytes, sizeof(BlockIndex));
+  if (next_offset == 0) {
+    _next = nullptr;
+  } else {
+    _next = std::make_shared<BPlusTreeLeafNode>(
+        _b_plus_tree, _index_type, false, _block_ptr.get_other(next_offset),
+        _schema);
+  }
 }

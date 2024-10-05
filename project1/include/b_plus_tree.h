@@ -8,6 +8,8 @@
 #include "index.h"
 #include "record.h"
 
+class BPlusTree;
+
 class BPlusTreeNode {
  protected:
   BlockPtr _block_ptr;
@@ -31,6 +33,10 @@ class BPlusTreeNode {
 
   std::size_t data_length() const;
 
+  virtual void range_query(const std::shared_ptr<Index> &begin,
+                           const std::shared_ptr<Index> &end,
+                           std::vector<Record> &result) const = 0;
+
   friend class BPlusTree;
   friend class BPlusTreeLeafNode;
   friend class BPlusTreeInternalNode;
@@ -41,12 +47,18 @@ class BPlusTreeLeafNode : public BPlusTreeNode {
   std::shared_ptr<Schema> _schema;
   std::vector<Record> _records;
   std::vector<std::shared_ptr<Index>> _index;
+  const BPlusTree *_b_plus_tree;
+  std::shared_ptr<BPlusTreeLeafNode> _next;
 
  public:
-  BPlusTreeLeafNode(const IndexType index_type, const bool create_new,
-                    const BlockPtr &block_ptr,
+  BPlusTreeLeafNode(const BPlusTree *b_plus_tree, const IndexType index_type,
+                    const bool create_new, const BlockPtr &block_ptr,
                     const std::shared_ptr<Schema> &schema = nullptr,
                     const int n = 0);
+
+  void set_next(const std::shared_ptr<BPlusTreeLeafNode> &next);
+  std::shared_ptr<BPlusTreeLeafNode> next() const;
+  void load_next();
 
   BlockIndex now_offset() const;
 
@@ -68,19 +80,25 @@ class BPlusTreeLeafNode : public BPlusTreeNode {
     }
     return _index.back();
   }
+
+  void range_query(const std::shared_ptr<Index> &begin,
+                   const std::shared_ptr<Index> &end,
+                   std::vector<Record> &result) const;
 };
 
 class BPlusTreeInternalNode : public BPlusTreeNode {
  private:
-  std::vector<BlockPtr> _son;
+  std::vector<std::shared_ptr<BPlusTreeNode>> _son;
   std::vector<std::shared_ptr<Index>> _index;
+  const BPlusTree *_b_plus_tree;
 
  protected:
-  void push_back(const BPlusTreeNode &son);
+  void push_back(const std::shared_ptr<BPlusTreeNode> &son);
   void push_back(const std::shared_ptr<Index> &index);
 
  public:
-  BPlusTreeInternalNode(const IndexType index_type, const bool create_new,
+  BPlusTreeInternalNode(const BPlusTree *b_plus_tree,
+                        const IndexType index_type, const bool create_new,
                         const BlockPtr &block_ptr, const int n = 0);
 
   void load() override;
@@ -102,6 +120,10 @@ class BPlusTreeInternalNode : public BPlusTreeNode {
     }
     return _index.back();
   }
+
+  void range_query(const std::shared_ptr<Index> &begin,
+                   const std::shared_ptr<Index> &end,
+                   std::vector<Record> &result) const;
 
   friend class BPlusTree;
 };
@@ -136,6 +158,11 @@ class BPlusTree {
   BPlusTree(const bool create_new, const IndexType index_type,
             const std::string &index_name, const std::string &index_file_name,
             const std::shared_ptr<Schema> &schema);
+
+  std::vector<Record> range_query(const std::shared_ptr<Index> &begin,
+                                  const std::shared_ptr<Index> &end) const;
+
+  std::shared_ptr<BPlusTreeNode> get_node(const BlockPtr &block_ptr) const;
 };
 
 #endif  // B_PLUS_TREE_H
