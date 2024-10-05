@@ -13,8 +13,10 @@ int main() {
   // std::cout << db.get_records()[0].toString() << std::endl;
   std::string index_name = "FG_PCT_home.idx";
   auto b_tree = db.build_index(index_name, "FG_PCT_home", IndexType::FLOAT32);
-  std::shared_ptr<Index> lower_bound_index = std::make_shared<Float32Index>(0.5 - 1e-6);
-  std::shared_ptr<Index> upper_bound_index = std::make_shared<Float32Index>(0.8 + 1e-6);
+  std::shared_ptr<Index> lower_bound_index =
+      std::make_shared<Float32Index>(0.5 - 1e-6);
+  std::shared_ptr<Index> upper_bound_index =
+      std::make_shared<Float32Index>(0.8 + 1e-6);
   auto result = b_tree->range_query(lower_bound_index, upper_bound_index);
   std::cout << "Result size: " << result.size() << std::endl;
   // for (const auto &record : result) {

@@ -274,7 +274,7 @@ std::shared_ptr<BPlusTreeNode> BPlusTree::bulk_load(
                 const std::pair<std::size_t, std::shared_ptr<Index>> &b) {
               return *a.second < *b.second;
             });
-  
+
   std::vector<Record> new_records;
   for (const auto &index : indexes) {
     new_records.push_back(records[index.first]);

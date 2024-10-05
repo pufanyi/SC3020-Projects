@@ -2,8 +2,8 @@
 #define BLOCK_PTR_H
 
 #include <fstream>
-#include <memory>
 #include <iostream>
+#include <memory>
 
 #include "block.h"
 #include "buffer.h"
@@ -15,18 +15,18 @@ class BlockPtr {
   std::shared_ptr<std::fstream> _file;
   std::shared_ptr<BlockBuffer> _buffer;
   mutable std::weak_ptr<BlockData> _block_data;
-  #if DEBUG
+#if DEBUG
   std::size_t __tag;
-  #endif
+#endif
 
  public:
   BlockPtr() : _offset(0), _file(nullptr), _buffer(nullptr) {
-    #if DEBUG
+#if DEBUG
     static std::size_t cnt = 0;
     std::cerr << "BlockPtr default constructor " << cnt << std::endl;
     __tag = cnt;
     cnt++;
-    #endif
+#endif
   }
 
   BlockPtr(const std::shared_ptr<std::fstream> &file, const BlockIndex &offset,
