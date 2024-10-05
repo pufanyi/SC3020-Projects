@@ -359,11 +359,11 @@ void BPlusTreeLeafNode::range_query(const std::shared_ptr<Index> &begin,
 void BPlusTreeInternalNode::range_query(const std::shared_ptr<Index> &begin,
                                         const std::shared_ptr<Index> &end,
                                         std::vector<Record> &result) const {
-  auto it = std::lower_bound(_index.begin(), _index.end(), begin,
-                             [=](const std::shared_ptr<Index> &a,
-                                 const std::shared_ptr<Index> &b) {
-                               return *a < *b;
-                             });
+  auto it = std::lower_bound(
+      _index.begin(), _index.end(), begin,
+      [=](const std::shared_ptr<Index> &a, const std::shared_ptr<Index> &b) {
+        return *a < *b;
+      });
   if (it == _index.end()) {
     _son.back()->range_query(begin, end, result);
   } else {
@@ -415,4 +415,12 @@ void BPlusTreeLeafNode::load_next() {
         _b_plus_tree, _index_type, false, _block_ptr.get_other(next_offset),
         _schema);
   }
+}
+
+std::vector<Record> BPlusTree::range_query(
+    const std::shared_ptr<Index> &begin,
+    const std::shared_ptr<Index> &end) const {
+  std::vector<Record> result;
+  _root->range_query(begin, end, result);
+  return result;
 }
