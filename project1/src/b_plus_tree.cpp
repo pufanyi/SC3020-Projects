@@ -343,23 +343,32 @@ std::shared_ptr<BPlusTreeNode> BPlusTree::bulk_load(
 void BPlusTreeLeafNode::range_query(const std::shared_ptr<Index> &begin,
                                     const std::shared_ptr<Index> &end,
                                     std::vector<Record> &result) const {
-  if (*end <= *min_index() || *begin >= *max_index()) {
-    return;
-  }
   for (decltype(n) i = 0; i < n; ++i) {
-    if (*_index[i] >= *begin && *_index[i] <= *end) {
+    if (*_index[i] >= *begin) {
+      if (*_index[i] > *end) {
+        return;
+      }
       result.push_back(_records[i]);
     }
+  }
+  if (_next != nullptr) {
+    _next->range_query(begin, end, result);
   }
 }
 
 void BPlusTreeInternalNode::range_query(const std::shared_ptr<Index> &begin,
                                         const std::shared_ptr<Index> &end,
                                         std::vector<Record> &result) const {
-  for (decltype(n) i = 0; i < n; ++i) {
-    if (*begin < *_index[i]) {
-      _son[i]->range_query(begin, end, result);
-    }
+  auto it = std::lower_bound(_index.begin(), _index.end(), begin,
+                             [=](const std::shared_ptr<Index> &a,
+                                 const std::shared_ptr<Index> &b) {
+                               return *a < *b;
+                             });
+  if (it == _index.end()) {
+    _son.back()->range_query(begin, end, result);
+  } else {
+    auto son_it = _son.begin() + (it - _index.begin());
+    (*son_it)->range_query(begin, end, result);
   }
 }
 
