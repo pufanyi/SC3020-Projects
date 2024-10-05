@@ -5,7 +5,7 @@ DatabaseManager::DatabaseManager(const std::string &file_name, bool create_new,
     : file_manager(std::make_shared<FileManager>(file_name, create_new,
                                                  max_blocks_cached)) {}
 
-std::vector<Record> DatabaseManager::load_from_txt(
+const std::vector<Record> &DatabaseManager::load_from_txt(
     const std::string &file_name, const std::string &schema_name,
     const std::string &dtypes, const std::string &delimiter) {
   // Assume that the user pass in a string of dtypes
@@ -34,6 +34,7 @@ std::vector<Record> DatabaseManager::load_from_txt(
   }
   Schema schema = Schema(schema_name, header);
   std::shared_ptr<Schema> schema_ptr = std::make_shared<Schema>(schema);
+  this->schema = schema_ptr;
   // Get basic info of the schema
   const DataTypes &data_types = schema.dtypes();
   std::vector<std::shared_ptr<Field>> fields = data_types.getFields();
@@ -42,7 +43,8 @@ std::vector<Record> DatabaseManager::load_from_txt(
   size_t record_num = 0;
   size_t record_num_curr = 0;
   BlockPtr block_ptr;
-  std::vector<Record> records;
+  // std::vector<Record> records;
+  records = std::make_shared<std::vector<Record>>();
 
   while (std::getline(file, str)) {
     size_t num_block = file_manager->num_blocks();
@@ -67,21 +69,23 @@ std::vector<Record> DatabaseManager::load_from_txt(
       record.store(bytes, begin, begin + fields[i]->getSize());
       begin += fields[i]->getSize();
     }
-    records.push_back(record);
+    records->push_back(record);
     record_num++;
     record_num_curr++;
   }
   this->schema = schema_ptr;
-  return records;
+  return *this->records;
 }
 
-std::vector<Record> DatabaseManager::load_from_db(
+const std::vector<Record> &DatabaseManager::load_from_db(
     const std::string &schema_name, const std::string &dtypes,
     const size_t num_records) {
   std::vector<BlockPtr> block_ptrs = file_manager->getPtrs();
   Schema schema = Schema(schema_name, dtypes);
   std::shared_ptr<Schema> schema_ptr = std::make_shared<Schema>(schema);
-  std::vector<Record> records;
+  this->schema = schema_ptr;
+  this->records = std::make_shared<std::vector<Record>>();
+  // std::vector<Record> records;
   size_t row_size = schema.row_size();
   size_t num_records_per_block = BLOCK_SIZE / row_size;
   size_t record_num = 0;
@@ -93,12 +97,12 @@ std::vector<Record> DatabaseManager::load_from_db(
         break;
       }
       Record record = Record(block_ptr, begin, schema_ptr);
-      records.push_back(record);
+      records->push_back(record);
       begin += row_size;
       record_num++;
     }
   }
-  return records;
+  return *this->records;
 }
 
 std::vector<Record> DatabaseManager::linear_scan(const std::string &field_name,
@@ -138,4 +142,24 @@ std::vector<Record> DatabaseManager::linear_scan(const std::string &field_name,
     }
   }
   return records;
+}
+
+std::shared_ptr<BPlusTree> DatabaseManager::build_index(
+    const std::string &file_name, const std::string &index_name,
+    const IndexType index_type) {
+  if (this->records == nullptr) {
+    throw std::runtime_error("No records loaded");
+  }
+  std::cerr << "Building index" << std::endl;
+  std::shared_ptr<BPlusTree> b_plus_tree = std::make_shared<BPlusTree>(
+      index_type, index_name, file_name, schema, *records);
+  return b_plus_tree;
+}
+
+std::shared_ptr<BPlusTree> DatabaseManager::load_index(
+    const std::string &file_name, const std::string &index_name,
+    const IndexType index_type) {
+  std::shared_ptr<BPlusTree> b_plus_tree = std::make_shared<BPlusTree>(
+      true, index_type, index_name, file_name, schema);
+  return b_plus_tree;
 }

@@ -22,4 +22,6 @@ using BlockIndex = std::streamoff;
 constexpr std::size_t MAX_FILE_NAME_SIZE = 255;
 constexpr std::size_t BLOCK_FILE_NAME_SIZE = MAX_FILE_NAME_SIZE + 1;
 
+#define DEBUG 1
+
 #endif  // UTILS_H

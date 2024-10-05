@@ -154,11 +154,10 @@ void BPlusTreeInternalNode::push_back(const std::shared_ptr<Index> &index) {
 BPlusTree::BPlusTree(const bool create_new, const IndexType index_type,
                      const std::string &index_name,
                      const std::string &index_file_name,
-                     const std::shared_ptr<FileManager> &data_file_manager,
                      const std::shared_ptr<Schema> &schema)
     : _index_file_manager(
           std::make_shared<FileManager>(index_file_name, create_new)),
-      _data_file_manager(data_file_manager),
+      // _data_file_manager(data_file_manager),
       _schema(schema),
       _root(nullptr),
       _index_name(index_name),
@@ -174,6 +173,9 @@ BPlusTree::BPlusTree(const bool create_new, const IndexType index_type,
     info_block_ptr = _index_file_manager->getFirstPtr();
     load_root();
   }
+#if DEBUG
+  std::cerr << "t = " << _min_degree << std::endl;
+#endif
 }
 
 void BPlusTree::save_info() const {
@@ -219,11 +221,10 @@ std::size_t BPlusTree::calc_min_degree() const {
 
 BPlusTree::BPlusTree(const IndexType index_type, const std::string &index_name,
                      const std::string &index_file_name,
-                     const std::shared_ptr<FileManager> &data_file_manager,
                      const std::shared_ptr<Schema> &schema,
                      const std::vector<Record> &records)
     : _index_file_manager(std::make_shared<FileManager>(index_file_name, true)),
-      _data_file_manager(data_file_manager),
+      // _data_file_manager(data_file_manager),
       _schema(schema),
       _root(nullptr),
       _index_name(index_name),
@@ -232,10 +233,15 @@ BPlusTree::BPlusTree(const IndexType index_type, const std::string &index_name,
   info_block_ptr = _index_file_manager->newPtr();
   _root = bulk_load(records);
   save_info();
+#if DEBUG
+  std::cerr << "t = " << _min_degree << std::endl;
+#endif
 }
 
 std::shared_ptr<BPlusTreeNode> BPlusTree::bulk_load(
     std::vector<Record> records) {
+  std::cerr << "Bulk loading" << std::endl;
+  std::cerr << "Number of records: " << records.size() << std::endl;
   std::sort(records.begin(), records.end(),
             [&](const Record &a, const Record &b) {
               return a.getIndex(_index_type, _index_name) <
@@ -261,10 +267,15 @@ std::shared_ptr<BPlusTreeNode> BPlusTree::bulk_load(
 
 std::shared_ptr<BPlusTreeNode> BPlusTree::bulk_load(
     const std::vector<std::shared_ptr<BPlusTreeNode>> &nodes) {
+  std::cerr << "Bulk loading" << std::endl;
+  std::cerr << "Number of nodes: " << nodes.size() << std::endl;
   if (nodes.empty()) {
     return nullptr;
   }
   if (nodes.size() == 1) {
+#if DEBUG
+    std::cerr << "Root size: " << nodes[0]->n << std::endl;
+#endif
     return nodes[0];
   }
   std::vector<std::shared_ptr<BPlusTreeNode>> new_nodes;
@@ -280,12 +291,16 @@ std::shared_ptr<BPlusTreeNode> BPlusTree::bulk_load(
       now_node->push_back(node->min_index());
       now_node->push_back(*node);
     }
+    // #if DEBUG
+    // std::cerr << "Now node size: " << now_node->n << std::endl;
+    // #endif
     if (now_node->n == _min_degree && remain >= _min_degree) {
-      if (!now_node->_son.empty()) {
-        now_node->push_back(*node);
-      }
+      new_nodes.push_back(now_node);
       now_node = nullptr;
     }
+  }
+  if (now_node != nullptr) {
+    new_nodes.push_back(now_node);
   }
   return bulk_load(new_nodes);
 }
