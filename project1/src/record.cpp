@@ -61,22 +61,8 @@ const Byte *Record::at(const std::string field_name) const {
 
 std::shared_ptr<Index> Record::getIndex(const IndexType &index_type,
                                         const std::string &field_name) const {
-  if (!this->test()) {
-    std::cerr << this->offset() << std::endl;
-    throw std::runtime_error("Record test failed 1");
-  }
   const Byte *bytes = this->operator[](field_name);
-  if (!this->test()) {
-    throw std::runtime_error("Record test failed 2");
-  }
   std::shared_ptr<Index> index = createIndex(index_type);
-  if (!this->test()) {
-    throw std::runtime_error("Record test failed 3");
-  }
   index->load(bytes);
-
-  if (!this->test()) {
-    throw std::runtime_error("Record test failed 4");
-  }
   return index;
 }
