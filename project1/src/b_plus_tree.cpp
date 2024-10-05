@@ -263,16 +263,31 @@ std::shared_ptr<BPlusTreeNode> BPlusTree::bulk_load(
   }
 #endif
 
-  std::vector<std::pair<std::shared_ptr<Index>, std::size_t>> indexes;
+  std::vector<std::pair<std::size_t, std::shared_ptr<Index>>> indexes;
   for (decltype(records.size()) i = 0; i < records.size(); ++i) {
-    indexes.emplace_back(records[i].getIndex(_index_type, _index_name), i);
+    indexes.push_back(
+        std::make_pair(i, records[i].getIndex(_index_type, _index_name)));
   }
 
-  std::sort(records.begin(), records.end(),
-            [=](const Record &a, const Record &b) {
-              return a.getIndex(_index_type, _index_name) <
-                     b.getIndex(_index_type, _index_name);
+  std::sort(indexes.begin(), indexes.end(),
+            [=](const std::pair<std::size_t, std::shared_ptr<Index>> &a,
+                const std::pair<std::size_t, std::shared_ptr<Index>> &b) {
+              return *a.second < *b.second;
             });
+  
+  std::vector<Record> new_records;
+  for (const auto &index : indexes) {
+    new_records.push_back(records[index.first]);
+    // std::cerr << "Index: " << records[index.first] << std::endl;
+  }
+
+  new_records.swap(records);
+
+  // std::sort(records.begin(), records.end(),
+  //           [=](const Record &a, const Record &b) {
+  //             return a.getIndex(_index_type, _index_name) <
+  //                    b.getIndex(_index_type, _index_name);
+  //           });
 
   std::vector<std::shared_ptr<BPlusTreeNode>> nodes;
   std::shared_ptr<BPlusTreeLeafNode> now_node = nullptr;
