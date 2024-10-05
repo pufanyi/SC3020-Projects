@@ -25,6 +25,12 @@ class DataPtr {
   off_t offset() const { return _offset; }
 
  public:
+#if DEBUG
+  bool test() const {
+    return _block_ptr.buffer() != nullptr;
+  }
+#endif
+
   DataPtr(const BlockPtr& block_ptr, off_t offset)
       : _block_ptr(block_ptr), _offset(offset) {}
 

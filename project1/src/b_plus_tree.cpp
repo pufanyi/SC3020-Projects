@@ -240,13 +240,27 @@ BPlusTree::BPlusTree(const IndexType index_type, const std::string &index_name,
 
 std::shared_ptr<BPlusTreeNode> BPlusTree::bulk_load(
     std::vector<Record> records) {
+#if DEBUG
   std::cerr << "Bulk loading" << std::endl;
   std::cerr << "Number of records: " << records.size() << std::endl;
+  for (const auto &record : records) {
+    if (!record.test()) {
+      throw std::runtime_error("Record test failed");
+    }
+  }
+#endif
+
+  std::vector<std::pair<std::shared_ptr<Index>, std::size_t>> indexes;
+  for (decltype(records.size()) i = 0; i < records.size(); ++i) {
+    indexes.emplace_back(records[i].getIndex(_index_type, _index_name), i);
+  }
+
   std::sort(records.begin(), records.end(),
-            [&](const Record &a, const Record &b) {
+            [=](const Record &a, const Record &b) {
               return a.getIndex(_index_type, _index_name) <
                      b.getIndex(_index_type, _index_name);
             });
+
   std::vector<std::shared_ptr<BPlusTreeNode>> nodes;
   std::shared_ptr<BPlusTreeLeafNode> now_node = nullptr;
   std::size_t remain = records.size();

@@ -1,9 +1,16 @@
 #include "buffer.h"
 
+#include <iostream>
+
 std::shared_ptr<BlockData> BlockBuffer::from_buffer(const BlockIndex &offset) {
-  auto it = _blocks.find(offset);
-  if (it != _blocks.end()) {
-    return it->second;
+  try {
+    // std::cerr << offset << ' ' << _blocks.size() << std::endl;
+    auto it = _blocks.find(offset);
+    if (it != _blocks.end()) {
+      return it->second;
+    }
+  } catch (const std::exception &e) {
+    std::cerr << e.what() << std::endl;
   }
   return nullptr;
 }
@@ -11,6 +18,7 @@ std::shared_ptr<BlockData> BlockBuffer::from_buffer(const BlockIndex &offset) {
 void BlockBuffer::to_buffer(const BlockIndex &offset,
                             const std::shared_ptr<BlockData> &block) {
   if (_blocks.size() >= MAX_BLOCKS_CACHED) {
+    // std::cerr << "Erase " <<  _blocks.size() << std::endl;
     BlockIndex offset = _block_queue.front();
     _block_queue.pop();
     auto ref_count_it = _block_ref_count.find(offset);
@@ -23,16 +31,19 @@ void BlockBuffer::to_buffer(const BlockIndex &offset,
         it->second->save();
       }
       _blocks.erase(it);
+      // std::cerr << "Erase " << _blocks.size() << ' ' << offset << std::endl;
     }
   }
 
   _blocks[offset] = block;
+  // std::cerr << "Insert " << _blocks.size() << std::endl;
   _block_queue.push(offset);
   _block_ref_count[offset]++;
 }
 
 void BlockBuffer::update_buffer(const BlockIndex &offset,
                                 const BlockData &block) {
+  std::cerr << "Update " << _blocks.size() << std::endl;
   auto it = _blocks.find(offset);
   if (it != _blocks.end()) {
     std::memcpy(it->second->data, block.data, BLOCK_SIZE);
