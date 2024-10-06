@@ -58,9 +58,9 @@ int main() {
 
   // To get the value of duration use the count()
   // member function on the duration object
-  std::cout << "Linear Scan time in Milliseconds : " << duration.count()
+  std::cout << "Range Query time in Milliseconds : " << duration.count()
             << std::endl;
-  std::cout << "Linear Scan time in Milliseconds : " << micro_duration.count()
+  std::cout << "Range Query time in Milliseconds : " << micro_duration.count()
             << std::endl;
 
   // for (const auto &record : result) {
