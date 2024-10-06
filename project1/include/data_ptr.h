@@ -4,6 +4,7 @@
 #include "block.h"
 #include "block_ptr.h"
 #include "fields.h"
+#include "file_manager.h"
 
 class DataPtr {
  private:
@@ -24,6 +25,10 @@ class DataPtr {
   off_t offset() const { return _offset; }
 
  public:
+#if DEBUG
+  bool test() const { return _block_ptr.buffer() != nullptr; }
+#endif
+
   DataPtr(const BlockPtr& block_ptr, off_t offset)
       : _block_ptr(block_ptr), _offset(offset) {}
 
@@ -39,6 +44,11 @@ class DataPtr {
 
   Byte& operator[](std::size_t index);
   const Byte& operator[](std::size_t index) const;
+
+  virtual ~DataPtr() = default;
+
+  void store_ptr(Byte* bytes) const;
+  void load_ptr(std::shared_ptr<FileManager> file_manager, Byte* bytes);
 };
 
 #endif  // DATA_PTR_H

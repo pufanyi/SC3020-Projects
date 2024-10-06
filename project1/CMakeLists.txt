@@ -5,6 +5,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+set(CMAKE_BUILD_TYPE Debug)
+add_compile_options(-g)
+
 # Add your source files here
 aux_source_directory(src SOURCES)
 
@@ -31,13 +34,16 @@ add_executable(
     ${PROJECT_SOURCE_DIR}/src/data_loader.cpp
     ${PROJECT_SOURCE_DIR}/src/block_ptr.cpp
     ${PROJECT_SOURCE_DIR}/src/utils.cpp
-    ${PROJECT_SOURCE_DIR}/src/managers.cpp
+    ${PROJECT_SOURCE_DIR}/src/file_manager.cpp
+    ${PROJECT_SOURCE_DIR}/src/database_manager.cpp
     ${PROJECT_SOURCE_DIR}/src/fields.cpp
     ${PROJECT_SOURCE_DIR}/src/schema.cpp
     ${PROJECT_SOURCE_DIR}/src/buffer.cpp
     ${PROJECT_SOURCE_DIR}/src/data_ptr.cpp
     ${PROJECT_SOURCE_DIR}/src/record.cpp
     ${PROJECT_SOURCE_DIR}/src/block_list.cpp
+    ${PROJECT_SOURCE_DIR}/src/b_plus_tree.cpp
+    ${PROJECT_SOURCE_DIR}/src/index.cpp
     # Note: it is possible to use file(GLOB ...) to add all files in a directory
     # but it is not recommended by CMake and the suggested way is to list all files
     # Add your source files here

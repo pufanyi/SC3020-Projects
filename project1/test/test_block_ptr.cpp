@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "block_ptr.h"
-#include "managers.h"
+#include "file_manager.h"
 
 TEST(BlockPtrTest, BlockPtrConstructor) {
   EXPECT_NO_THROW({

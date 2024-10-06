@@ -1,5 +1,7 @@
 #include "data_ptr.h"
 
+#include "file_manager.h"
+
 void DataPtr::store(const Byte* bytes) {
   _block_ptr.store(bytes, _offset, _offset + size());
 }
@@ -24,4 +26,16 @@ Byte& DataPtr::operator[](std::size_t index) {
 
 const Byte& DataPtr::operator[](std::size_t index) const {
   return getBlockData()[_offset + index];
+}
+
+void DataPtr::store_ptr(Byte* bytes) const {
+  _block_ptr.store_ptr(bytes);
+  memcpy(bytes + _block_ptr.size(), &_offset, sizeof(BlockIndex));
+}
+
+void DataPtr::load_ptr(std::shared_ptr<FileManager> file_manager, Byte* bytes) {
+  BlockIndex block_offset;
+  memcpy(&block_offset, bytes, sizeof(BlockIndex));
+  _block_ptr = file_manager->getPtr(block_offset);
+  memcpy(&_offset, bytes + sizeof(BlockIndex), sizeof(off_t));
 }

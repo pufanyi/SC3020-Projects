@@ -7,6 +7,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "utils.h"
@@ -141,11 +142,11 @@ class DataTypes {
  private:
   std::vector<std::string> field_names;
   std::vector<std::shared_ptr<Field>> fields;
+  std::unordered_map<std::string, BlockIndex> _offsets;
+  std::size_t _size;
 
  public:
-  DataTypes() = default;
-  DataTypes(std::vector<std::shared_ptr<Field>> fields)
-      : fields(std::move(fields)) {}
+  DataTypes() : _size(0) {}
   virtual ~DataTypes() = default;
 
   void addField(const std::string& field_name,
@@ -156,6 +157,8 @@ class DataTypes {
   std::vector<std::shared_ptr<Field>> getFields() const { return fields; };
   std::vector<std::string> getFieldNames() const { return field_names; }
   std::size_t size() const;
+
+  const BlockIndex& operator[](const std::string& field_name) const;
 
   class Iterator {
    private:

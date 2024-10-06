@@ -240,6 +240,8 @@ void DataTypes::addField(const std::string& field_name,
                          const std::shared_ptr<Field>& field) {
   field_names.push_back(field_name);
   fields.push_back(field);
+  _offsets[field_name] = _size;
+  _size += field->getSize();
 }
 
 void DataTypes::addField(const std::string& field_name, const FieldType type,
@@ -247,6 +249,8 @@ void DataTypes::addField(const std::string& field_name, const FieldType type,
   field_names.push_back(field_name);
   auto field = FieldCreator::createField(type, size);
   fields.push_back(field);
+  _offsets[field_name] = _size;
+  _size += field->getSize();
 }
 
 void DataTypes::addField(const std::string& field_name,
@@ -254,6 +258,8 @@ void DataTypes::addField(const std::string& field_name,
   field_names.push_back(field_name);
   auto field = FieldCreator::createField(type);
   fields.push_back(field);
+  _offsets[field_name] = _size;
+  _size += field->getSize();
 }
 
 DataTypes::Iterator DataTypes::begin() const {
@@ -341,10 +347,8 @@ std::ostream& operator<<(std::ostream& os, const DataTypes& data_types) {
   return os;
 }
 
-std::size_t DataTypes::size() const {
-  std::size_t size = 0;
-  for (const auto& [name, field] : *this) {
-    size += field->getSize();
-  }
-  return size;
+std::size_t DataTypes::size() const { return _size; }
+
+const BlockIndex& DataTypes::operator[](const std::string& field_name) const {
+  return _offsets.at(field_name);
 }
