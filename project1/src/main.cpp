@@ -1,3 +1,4 @@
+#include <chrono>
 #include <iostream>
 
 #include "database_manager.h"
@@ -25,12 +26,42 @@ int main() {
       std::make_shared<Float32Index>(0.5 - 1e-6);
   std::shared_ptr<Index> upper_bound_index =
       std::make_shared<Float32Index>(0.8 + 1e-6);
+
+  auto start = std::chrono::high_resolution_clock::now();
   auto result = b_tree->range_query(lower_bound_index, upper_bound_index);
+  auto stop = std::chrono::high_resolution_clock::now();
+  auto duration =
+      std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+  auto micro_duration =
+      std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
 
   std::cout << "IO Times After Range Query: " << IO_TIMES << std::endl;
   std::cout << "Load PTR Times After Range Query: " << LOAD_PTR_TIMES
             << std::endl;
   std::cout << "Result size: " << result.size() << std::endl;
+
+  float sum = 0;
+  float FG3_PCT_home_sum = 0;
+  for (auto record : result) {
+    std::string value = record.toString();
+    std::vector<std::string> splitted_values = split(value, ' ');
+    // 4th value is FG_PCT_home
+    float float_value = std::stof(splitted_values[3]);
+    sum += float_value;
+    float FG3_PCT_home_value = std::stof(splitted_values[5]);
+    FG3_PCT_home_sum += FG3_PCT_home_value;
+  }
+
+  std::cout << "Average FG_PCT_home: " << sum / result.size() << std::endl;
+  std::cout << "Average FG3_PCT_home: " << FG3_PCT_home_sum / result.size()
+            << std::endl;
+
+  // To get the value of duration use the count()
+  // member function on the duration object
+  std::cout << "Linear Scan time in Milliseconds : " << duration.count()
+            << std::endl;
+  std::cout << "Linear Scan time in Milliseconds : " << micro_duration.count()
+            << std::endl;
 
   // for (const auto &record : result) {
   //   std::cout << record.toString() << std::endl;
