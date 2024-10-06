@@ -10,6 +10,7 @@
 namespace SystemUtils {
 std::size_t __get_system_block_size();
 }
+extern size_t IO_TIMES;
 
 std::vector<std::string> split(const std::string &s, char delimiter);
 std::string trim(std::string line);
