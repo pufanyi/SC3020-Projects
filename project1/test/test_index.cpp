@@ -1,8 +1,8 @@
-#include "index.h"
-
 #include <gtest/gtest.h>
 
 #include <memory>
+
+#include "index.h"
 
 TEST(IndexTest, IntIndex) {
   IntIndex index(123);
