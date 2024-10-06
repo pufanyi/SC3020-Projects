@@ -13,13 +13,16 @@ int main() {
                    "\t");
   // std::cout << db.get_records()[0].toString() << std::endl;
   std::string index_name = "FG_PCT_home.idx";
-  std::cout << "IO Times Before Building Index: " << IO_TIMES << std::endl;
-  std::cout << "Load PTR Times Before Building Index: " << LOAD_PTR_TIMES
-            << std::endl;
-  auto b_tree = db.build_index(index_name, "FG_PCT_home", IndexType::FLOAT32);
-  std::cout << "IO Times After Building Index: " << IO_TIMES << std::endl;
-  std::cout << "Load PTR Times After Building Index: " << LOAD_PTR_TIMES
-            << std::endl;
+//   std::cout << "IO Times Before Building Index: " << IO_TIMES << std::endl;
+//   std::cout << "Load PTR Times Before Building Index: " << LOAD_PTR_TIMES
+//             << std::endl;
+//   auto b_tree = db.build_index(index_name, "FG_PCT_home", IndexType::FLOAT32);
+//   std::cout << "IO Times After Building Index: " << IO_TIMES << std::endl;
+//   std::cout << "Load PTR Times After Building Index: " << LOAD_PTR_TIMES
+//             << std::endl;
+
+  auto b_tree = db.load_index(index_name, "FG_PCT_home", IndexType::FLOAT32);
+
   std::shared_ptr<Index> lower_bound_index =
       std::make_shared<Float32Index>(0.5 - 1e-6);
   std::shared_ptr<Index> upper_bound_index =
@@ -29,6 +32,9 @@ int main() {
   std::cout << "Load PTR Times After Range Query: " << LOAD_PTR_TIMES
             << std::endl;
   std::cout << "Result size: " << result.size() << std::endl;
+
+
+
   // for (const auto &record : result) {
   //   std::cout << record.toString() << std::endl;
   // }

@@ -88,7 +88,7 @@ class BPlusTreeLeafNode : public BPlusTreeNode {
 
 class BPlusTreeInternalNode : public BPlusTreeNode {
  private:
-  std::vector<std::shared_ptr<BPlusTreeNode>> _son;
+  std::vector<BlockPtr> _son;
   std::vector<std::shared_ptr<Index>> _index;
   const BPlusTree *_b_plus_tree;
 

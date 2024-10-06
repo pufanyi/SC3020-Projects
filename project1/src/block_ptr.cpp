@@ -27,6 +27,10 @@ std::weak_ptr<BlockData> BlockPtr::load_ptr() const {
   if (_buffer == nullptr) {
     throw std::runtime_error("Error loading block, buffer is null");
   }
+
+  if (_buffer == nullptr || _file == nullptr) {
+    throw std::runtime_error("Error loading block, buffer is null");
+  }
   auto ptr = _buffer->from_buffer(_offset);
 
   if (ptr != nullptr) {

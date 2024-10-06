@@ -4,7 +4,9 @@
 
 std::shared_ptr<BlockData> BlockBuffer::from_buffer(const BlockIndex &offset) {
   try {
-    // std::cerr << offset << ' ' << _blocks.size() << std::endl;
+    static std::size_t num = 0;
+    std::cerr << ++num << std::endl;
+    std::cerr << "lalala " << offset << ' ' << _blocks.size() << std::endl;
     auto it = _blocks.find(offset);
     if (it != _blocks.end()) {
       return it->second;
