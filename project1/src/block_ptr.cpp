@@ -47,6 +47,8 @@ std::weak_ptr<BlockData> BlockPtr::load_ptr() const {
   }
 
   _buffer->to_buffer(_offset, block);
+  // Reading block from disk
+  IO_TIMES++;
 
   return _block_data = block;
 }
