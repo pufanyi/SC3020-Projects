@@ -152,7 +152,7 @@ std::shared_ptr<BPlusTree> DatabaseManager::build_index(
   }
   std::cerr << "Building index" << std::endl;
   std::shared_ptr<BPlusTree> b_plus_tree = std::make_shared<BPlusTree>(
-      index_type, index_name, file_name, schema, *records);
+      index_type, index_name, file_name, file_manager, schema, *records);
   return b_plus_tree;
 }
 
@@ -160,6 +160,6 @@ std::shared_ptr<BPlusTree> DatabaseManager::load_index(
     const std::string &file_name, const std::string &index_name,
     const IndexType index_type) {
   std::shared_ptr<BPlusTree> b_plus_tree = std::make_shared<BPlusTree>(
-      false, index_type, index_name, file_name, schema);
+      false, index_type, index_name, file_name, file_manager, schema);
   return b_plus_tree;
 }

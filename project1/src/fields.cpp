@@ -95,7 +95,8 @@ Byte* IntField::stringToBytes(const std::string& value) const {
 
 std::string IntField::bytesToString(const Byte* value) const {
   int int_value;
-  std::memcpy(&int_value, value, sizeof(int));
+  // std::memcpy(&int_value, value, sizeof(int));
+  std::copy(value, value + sizeof(int), reinterpret_cast<Byte*>(&int_value));
   return std::to_string(int_value);
 }
 

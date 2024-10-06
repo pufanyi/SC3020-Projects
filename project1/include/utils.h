@@ -19,7 +19,7 @@ std::string trim(std::string line);
 const std::size_t BLOCK_SIZE = SystemUtils::__get_system_block_size();
 
 using Byte = char;
-using BlockIndex = std::streamoff;
+using BlockIndex = std::size_t;
 
 constexpr std::size_t MAX_FILE_NAME_SIZE = 255;
 constexpr std::size_t BLOCK_FILE_NAME_SIZE = MAX_FILE_NAME_SIZE + 1;

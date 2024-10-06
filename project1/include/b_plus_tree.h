@@ -131,6 +131,7 @@ class BPlusTreeInternalNode : public BPlusTreeNode {
 class BPlusTree {
  private:
   std::shared_ptr<FileManager> _index_file_manager;
+  std::shared_ptr<FileManager> _data_file_manager;
   std::shared_ptr<BPlusTreeNode> _root;
   std::shared_ptr<Schema> _schema;
   BlockPtr info_block_ptr;
@@ -152,17 +153,23 @@ class BPlusTree {
 
   BPlusTree(const IndexType index_type, const std::string &index_name,
             const std::string &index_file_name,
+            const std::shared_ptr<FileManager> &data_file_manager,
             const std::shared_ptr<Schema> &schema,
             const std::vector<Record> &records);  // bulk loading
 
   BPlusTree(const bool create_new, const IndexType index_type,
             const std::string &index_name, const std::string &index_file_name,
+            const std::shared_ptr<FileManager> &data_file_manager,
             const std::shared_ptr<Schema> &schema);
 
   std::vector<Record> range_query(const std::shared_ptr<Index> &begin,
                                   const std::shared_ptr<Index> &end) const;
 
   std::shared_ptr<BPlusTreeNode> get_node(const BlockPtr &block_ptr) const;
+
+  friend class BPlusTreeNode;
+  friend class BPlusTreeLeafNode;
+  friend class BPlusTreeInternalNode;
 };
 
 #endif  // B_PLUS_TREE_H
