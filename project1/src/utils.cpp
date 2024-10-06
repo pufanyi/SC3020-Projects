@@ -52,3 +52,6 @@ std::vector<std::string> split(const std::string &s, char delimiter) {
   }
   return tokens;
 }
+
+size_t IO_TIMES = 0;
+size_t LOAD_PTR_TIMES = 0;

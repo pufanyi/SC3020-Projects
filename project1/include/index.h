@@ -26,6 +26,12 @@ class Index {
   virtual std::size_t size() const = 0;
   virtual void save(Byte* bytes) const = 0;
   virtual void load(const Byte* bytes) = 0;
+
+  virtual std::ostream& output(std::ostream& out) const = 0;
+
+  friend std::ostream& operator<<(std::ostream& out, const Index& index) {
+    return index.output(out);
+  }
 };
 
 class IntIndex : public Index {
@@ -42,8 +48,18 @@ class IntIndex : public Index {
   }
 
   std::size_t size() const override { return sizeof(int); }
-  void save(Byte* bytes) const override { memcpy(bytes, &_value, sizeof(int)); }
-  void load(const Byte* bytes) override { memcpy(&_value, bytes, sizeof(int)); }
+  void save(Byte* bytes) const override {
+    // memcpy(bytes, &_value, sizeof(int));
+    std::copy(reinterpret_cast<const Byte*>(&_value),
+              reinterpret_cast<const Byte*>(&_value) + sizeof(int), bytes);
+  }
+  void load(const Byte* bytes) override {
+    std::copy(bytes, bytes + sizeof(int), reinterpret_cast<Byte*>(&_value));
+  }
+
+  std::ostream& output(std::ostream& out) const override {
+    return out << _value;
+  }
 };
 
 class StringIndex : public Index {
@@ -61,10 +77,15 @@ class StringIndex : public Index {
 
   std::size_t size() const override { return _value.size(); }
   void save(Byte* bytes) const override {
-    memcpy(bytes, _value.c_str(), _value.size());
+    // memcpy(bytes, _value.c_str(), _value.size());
+    std::copy(_value.c_str(), _value.c_str() + _value.size(), bytes);
   }
   void load(const Byte* bytes) override {
     _value = std::string(reinterpret_cast<const char*>(bytes));
+  }
+
+  std::ostream& output(std::ostream& out) const override {
+    return out << _value;
   }
 };
 
@@ -83,10 +104,17 @@ class Float32Index : public Index {
 
   std::size_t size() const override { return sizeof(float); }
   void save(Byte* bytes) const override {
-    memcpy(bytes, &_value, sizeof(float));
+    // memcpy(bytes, &_value, sizeof(float));
+    std::copy(reinterpret_cast<const Byte*>(&_value),
+              reinterpret_cast<const Byte*>(&_value) + sizeof(float), bytes);
   }
   void load(const Byte* bytes) override {
-    memcpy(&_value, bytes, sizeof(float));
+    // memcpy(&_value, bytes, sizeof(float));
+    std::copy(bytes, bytes + sizeof(float), reinterpret_cast<Byte*>(&_value));
+  }
+
+  std::ostream& output(std::ostream& out) const override {
+    return out << _value;
   }
 };
 
@@ -105,10 +133,17 @@ class Float64Index : public Index {
 
   std::size_t size() const override { return sizeof(double); }
   void save(Byte* bytes) const override {
-    memcpy(bytes, &_value, sizeof(double));
+    // memcpy(bytes, &_value, sizeof(double));
+    std::copy(reinterpret_cast<const Byte*>(&_value),
+              reinterpret_cast<const Byte*>(&_value) + sizeof(double), bytes);
   }
   void load(const Byte* bytes) override {
-    memcpy(&_value, bytes, sizeof(double));
+    // memcpy(&_value, bytes, sizeof(double));
+    std::copy(bytes, bytes + sizeof(double), reinterpret_cast<Byte*>(&_value));
+  }
+
+  std::ostream& output(std::ostream& out) const override {
+    return out << _value;
   }
 };
 

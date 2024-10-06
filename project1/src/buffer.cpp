@@ -4,7 +4,7 @@
 
 std::shared_ptr<BlockData> BlockBuffer::from_buffer(const BlockIndex &offset) {
   try {
-    // std::cerr << offset << ' ' << _blocks.size() << std::endl;
+    static std::size_t num = 0;
     auto it = _blocks.find(offset);
     if (it != _blocks.end()) {
       return it->second;
@@ -46,6 +46,7 @@ void BlockBuffer::update_buffer(const BlockIndex &offset,
   std::cerr << "Update " << _blocks.size() << std::endl;
   auto it = _blocks.find(offset);
   if (it != _blocks.end()) {
-    std::memcpy(it->second->data, block.data, BLOCK_SIZE);
+    // std::memcpy(it->second->data, block.data, BLOCK_SIZE);
+    std::copy(block.data, block.data + BLOCK_SIZE, it->second->data);
   }
 }

@@ -14,7 +14,8 @@ BlockData::BlockData(const Byte *data, BlockIndex offset,
     : data(new Byte[BLOCK_SIZE]), _offset(offset), _file(file) {
   memset(this->data, 0, BLOCK_SIZE);
   if (data != nullptr) {
-    memcpy(this->data, data, BLOCK_SIZE * sizeof(Byte));
+    // memcpy(this->data, data, BLOCK_SIZE * sizeof(Byte));
+    std::copy(data, data + BLOCK_SIZE, this->data);
   }
 }
 

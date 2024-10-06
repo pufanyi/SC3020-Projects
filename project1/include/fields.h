@@ -48,7 +48,9 @@ class Field {
     } else {
       data = new Byte[size];
       assert(size == sizeof(T));
-      memcpy(data, &value, size);
+      // memcpy(data, &value, size);
+      std::copy(reinterpret_cast<const Byte*>(&value),
+                reinterpret_cast<const Byte*>(&value) + size, data);
     }
     return data;
   }
@@ -59,7 +61,8 @@ class Field {
       result = bytesToString(value);
     } else {
       assert(size == sizeof(T));
-      memcpy(&result, value, sizeof(T));
+      // memcpy(&result, value, sizeof(T));
+      std::copy(value, value + size, reinterpret_cast<Byte*>(&result));
     }
   }
 
