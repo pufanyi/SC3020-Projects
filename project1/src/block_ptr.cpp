@@ -19,6 +19,7 @@ BlockPtr::BlockPtr(const std::shared_ptr<std::fstream> &file, const Byte *bytes,
 }
 
 std::weak_ptr<BlockData> BlockPtr::load_ptr() const {
+  LOAD_PTR_TIMES++;
   if (!_block_data.expired()) {
     return _block_data;
   }
