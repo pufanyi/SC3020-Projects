@@ -11,3 +11,4 @@ class TestQueryResult(unittest.TestCase):
         data = self.df.loc[(self.df["FG_PCT_home"] >= 0.5) & (self.df["FG_PCT_home"] <= 0.8)]
         self.assertEqual(len(data), 6902)
         self.assertEqual(data["FG_PCT_home"].mean().round(2), 0.53)
+        self.assertEqual(data["FG3_PCT_home"].mean().round(2), 0.42)
