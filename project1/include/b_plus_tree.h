@@ -83,7 +83,7 @@ class BPlusTreeLeafNode : public BPlusTreeNode {
 
   void range_query(const std::shared_ptr<Index> &begin,
                    const std::shared_ptr<Index> &end,
-                   std::vector<Record> &result) const;
+                   std::vector<Record> &result) const override;
 };
 
 class BPlusTreeInternalNode : public BPlusTreeNode {
@@ -123,7 +123,7 @@ class BPlusTreeInternalNode : public BPlusTreeNode {
 
   void range_query(const std::shared_ptr<Index> &begin,
                    const std::shared_ptr<Index> &end,
-                   std::vector<Record> &result) const;
+                   std::vector<Record> &result) const override;
 
   friend class BPlusTree;
 };
