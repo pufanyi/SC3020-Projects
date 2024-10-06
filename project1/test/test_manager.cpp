@@ -42,6 +42,7 @@ TEST(ManagerTest, DBManagerLoadFromDbTest) {
 TEST(ManagerTest, LinearScan) {
   DatabaseManager db_manager("test.db", false);
   auto start = std::chrono::high_resolution_clock::now();
+  GTEST_COUT << "IO Times BEFORE Linear Scan: " << IO_TIMES << std::endl;
   std::vector<Record> records = db_manager.linear_scan(
       "FG_PCT_home",
       "GAME_DATE_EST DATE, TEAM_ID_home VARCHAR(10), PTS_home INT,"
@@ -49,18 +50,25 @@ TEST(ManagerTest, LinearScan) {
       "FG3_PCT_home FLOAT32, AST_home INT, REB_home INT, HOME_TEAM_WINS "
       "BOOLEAN",
       0.5, 0.8);
+  GTEST_COUT << "IO Times After Linear Scan: " << IO_TIMES << std::endl;
   auto stop = std::chrono::high_resolution_clock::now();
   EXPECT_EQ(records.size(), 6902);
   float sum = 0;
+  float FG3_PCT_home_sum = 0;
   for (auto record : records) {
     std::string value = record.toString();
     std::vector<std::string> splitted_values = split(value, ' ');
     // 4th value is FG_PCT_home
     float float_value = std::stof(splitted_values[3]);
     sum += float_value;
+    float FG3_PCT_home_value = std::stof(splitted_values[5]);
+    FG3_PCT_home_sum += FG3_PCT_home_value;
   }
   EXPECT_NEAR(sum / records.size(), 0.53, 0.01);
+  EXPECT_NEAR(FG3_PCT_home_sum / records.size(), 0.42, 0.01);
   GTEST_COUT << "Average FG_PCT_home: " << sum / records.size() << std::endl;
+  GTEST_COUT << "Average FG3_PCT_home: " << FG3_PCT_home_sum / records.size()
+             << std::endl;
   auto duration =
       std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
   auto micro_duration =
