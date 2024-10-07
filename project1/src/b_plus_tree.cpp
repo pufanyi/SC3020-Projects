@@ -99,14 +99,12 @@ void BPlusTreeLeafNode::load() {
     BlockIndex ptr_offset;
     _block_ptr.load(reinterpret_cast<Byte *>(&ptr_offset), now_offset,
                     now_offset + sizeof(ptr_offset));
-    BlockPtr _now_block_ptr =
-        _b_plus_tree->_data_file_manager->getPtr(ptr_offset);
     now_offset += sizeof(ptr_offset);
 
     BlockIndex record_offset;
     _block_ptr.load(reinterpret_cast<Byte *>(&record_offset), now_offset,
                     now_offset + sizeof(record_offset));
-    _records.emplace_back(_now_block_ptr, record_offset, _schema);
+    _records.emplace_back(ptr_offset, record_offset);
     now_offset += sizeof(record_offset);
 
     // index
@@ -136,12 +134,20 @@ BlockIndex BPlusTreeInternalNode::now_offset() const {
   return ans;
 }
 
-void BPlusTreeLeafNode::push_back(const Record &record,
+void BPlusTreeLeafNode::push_back(const BlockIndex block_id, const BlockIndex record_offset,
                                   const std::shared_ptr<Index> &index) {
-  _records.push_back(record);
+  // _records.push_back(record);
+  _records.emplace_back(block_id, record_offset);
   _index.push_back(index);
   Byte *bytes = new Byte[sizeof(BlockIndex) * 2];
-  record.store_ptr(bytes);
+  // record.store_ptr(bytes);
+  std::copy(reinterpret_cast<const Byte *>(&block_id),
+            reinterpret_cast<const Byte *>(&block_id) + sizeof(BlockIndex),
+            bytes);
+  std::copy(reinterpret_cast<const Byte *>(&record_offset),
+            reinterpret_cast<const Byte *>(&record_offset) + sizeof(BlockIndex),
+            bytes + sizeof(BlockIndex));
+
   auto _now_offset = now_offset();
   _block_ptr.store(bytes, _now_offset, _now_offset + sizeof(BlockIndex) * 2);
   // std::cerr << "========> " << record.size() << std::endl;
@@ -329,7 +335,7 @@ std::shared_ptr<BPlusTreeNode> BPlusTree::bulk_load(
       }
       nodes.push_back(now_node);
     }
-    now_node->push_back(record, record.getIndex(_index_type, _index_name));
+    now_node->push_back(record.block_id(), record.offset(), record.getIndex(_index_type, _index_name));
     if (now_node->n == _min_degree && remain >= _min_degree) {
       last_node = now_node;
       now_node = nullptr;
@@ -392,7 +398,10 @@ void BPlusTreeLeafNode::range_query(const std::shared_ptr<Index> &begin,
       if (*_index[i] > *end) {
         return;
       }
-      result.push_back(_records[i]);
+      const auto [block_id, record_offset] = _records[i];
+      BlockPtr block_ptr = _b_plus_tree->_data_file_manager->getPtr(
+          block_id);
+      result.emplace_back(block_ptr, record_offset, _schema);
     }
   }
   if (_next != nullptr) {

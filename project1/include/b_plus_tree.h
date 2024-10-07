@@ -45,7 +45,7 @@ class BPlusTreeNode {
 class BPlusTreeLeafNode : public BPlusTreeNode {
  private:
   std::shared_ptr<Schema> _schema;
-  std::vector<Record> _records;
+  std::vector<std::pair<BlockIndex, BlockIndex>> _records;
   std::vector<std::shared_ptr<Index>> _index;
   const BPlusTree *_b_plus_tree;
   std::shared_ptr<BPlusTreeLeafNode> _next;
@@ -63,7 +63,8 @@ class BPlusTreeLeafNode : public BPlusTreeNode {
   BlockIndex now_offset() const;
 
   void load() override;
-  void push_back(const Record &record, const std::shared_ptr<Index> &index);
+  void push_back(const BlockIndex block_id, const BlockIndex record_offset,
+                                  const std::shared_ptr<Index> &index);
 
   bool is_leaf() const override { return true; }
 

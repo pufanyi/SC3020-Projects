@@ -18,13 +18,13 @@ class DataPtr {
 
   std::shared_ptr<BlockBuffer> buffer() const { return _block_ptr.buffer(); }
 
-  BlockIndex block_id() const { return _block_ptr.offset(); }
-
   const BlockPtr& block() const { return _block_ptr; }
 
+ public:
   off_t offset() const { return _offset; }
 
- public:
+  BlockIndex block_id() const { return _block_ptr.offset(); }
+
 #if DEBUG
   bool test() const { return _block_ptr.buffer() != nullptr; }
 #endif
