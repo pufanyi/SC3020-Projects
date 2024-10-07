@@ -2,3 +2,4 @@ project1
 unittest
 __pycache__
 *.png
+*.pdf
