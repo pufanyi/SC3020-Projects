@@ -21,7 +21,10 @@ cd project1
 mkdir build
 cd build
 cmake ..
+
+# Complie
 make
+
 # Run main program
 ./project
 
