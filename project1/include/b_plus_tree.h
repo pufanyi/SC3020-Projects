@@ -64,7 +64,7 @@ class BPlusTreeLeafNode : public BPlusTreeNode {
 
   void load() override;
   void push_back(const BlockIndex block_id, const BlockIndex record_offset,
-                                  const std::shared_ptr<Index> &index);
+                 const std::shared_ptr<Index> &index);
 
   bool is_leaf() const override { return true; }
 

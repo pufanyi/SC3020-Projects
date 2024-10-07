@@ -134,7 +134,8 @@ BlockIndex BPlusTreeInternalNode::now_offset() const {
   return ans;
 }
 
-void BPlusTreeLeafNode::push_back(const BlockIndex block_id, const BlockIndex record_offset,
+void BPlusTreeLeafNode::push_back(const BlockIndex block_id,
+                                  const BlockIndex record_offset,
                                   const std::shared_ptr<Index> &index) {
   // _records.push_back(record);
   _records.emplace_back(block_id, record_offset);
@@ -335,7 +336,8 @@ std::shared_ptr<BPlusTreeNode> BPlusTree::bulk_load(
       }
       nodes.push_back(now_node);
     }
-    now_node->push_back(record.block_id(), record.offset(), record.getIndex(_index_type, _index_name));
+    now_node->push_back(record.block_id(), record.offset(),
+                        record.getIndex(_index_type, _index_name));
     if (now_node->n == _min_degree && remain >= _min_degree) {
       last_node = now_node;
       now_node = nullptr;
@@ -399,8 +401,7 @@ void BPlusTreeLeafNode::range_query(const std::shared_ptr<Index> &begin,
         return;
       }
       const auto [block_id, record_offset] = _records[i];
-      BlockPtr block_ptr = _b_plus_tree->_data_file_manager->getPtr(
-          block_id);
+      BlockPtr block_ptr = _b_plus_tree->_data_file_manager->getPtr(block_id);
       result.emplace_back(block_ptr, record_offset, _schema);
     }
   }
