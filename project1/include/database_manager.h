@@ -18,7 +18,7 @@ class DatabaseManager {
 
  public:
   DatabaseManager(const std::string &file_name, bool create_new = false,
-                  std::size_t max_blocks_cached = 500);
+                  std::size_t max_blocks_cached = BUFFER_SIZE);
   const std::vector<Record> &load_from_txt(const std::string &file_name,
                                            const std::string &schema_name,
                                            const std::string &dtypes,

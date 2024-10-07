@@ -16,7 +16,7 @@ class BlockBuffer {
  public:
   const std::size_t MAX_BLOCKS_CACHED;
 
-  BlockBuffer(std::size_t max_blocks_cached = 500)
+  BlockBuffer(std::size_t max_blocks_cached = BUFFER_SIZE)
       : MAX_BLOCKS_CACHED(max_blocks_cached) {}
 
   std::shared_ptr<BlockData> from_buffer(const BlockIndex &offset);

@@ -16,7 +16,7 @@ class FileManager {
 
  public:
   FileManager(const std::string &file_name, bool create_new = false,
-              std::size_t max_blocks_cached = 500);
+              std::size_t max_blocks_cached = BUFFER_SIZE);
 
   BlockPtr newPtr();
   BlockPtr getPtr(const BlockIndex &offset);

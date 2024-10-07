@@ -26,4 +26,6 @@ constexpr std::size_t BLOCK_FILE_NAME_SIZE = MAX_FILE_NAME_SIZE + 1;
 
 #define DEBUG 1
 
+constexpr std::size_t BUFFER_SIZE = 1;
+
 #endif  // UTILS_H
