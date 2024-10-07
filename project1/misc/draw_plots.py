@@ -2,9 +2,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Data for plotting
-buffer_size = [1, 10, 50, 100, 250, 500]
-time_ms = [39, 39, 34, 29, 13, 9]
-io = [6878, 6352, 5214, 4060, 879, 0]
+buffer_size = [1, 100, 250, 500]
+time_ms = [39, 27, 13, 9]
+index_io = [66, 57, 41, 0]
+data_block_io = [6812, 4003, 838, 0]
 
 # Lineplot for Time (ms) vs Buffer Size
 plt.figure(figsize=(10, 6))
@@ -17,13 +18,25 @@ plt.legend()
 plt.grid(True)
 plt.savefig("time_vs_buffer_size.pdf")
 
-# Lineplot for IO vs Buffer Size
+# Lineplot for Index IO vs Buffer Size
 plt.figure(figsize=(10, 6))
-sns.lineplot(x=buffer_size, y=io, marker='o', label="B+ Tree")
-plt.axhline(y=293, color='r', linestyle='--', label="Linear scan (293 IO)")
-plt.title("IO vs Buffer Size")
-plt.xlabel("Buffer Size")
-plt.ylabel("IO")
+sns.lineplot(x=buffer_size, y=index_io, marker='o', label="B+ Tree")
+# plt.axhline(y=293, color='r', linestyle='--', label="Linear scan (293 IO)")
+plt.title("IO (Index) vs Buffer Size", fontsize=15)
+plt.xlabel("Buffer Size", fontsize=12)
+plt.ylabel("IO (Index)", fontsize=12)
 plt.legend()
 plt.grid(True)
-plt.savefig("io_vs_buffer_size.pdf")
+plt.savefig("index_io_vs_buffer_size.pdf")
+
+
+# Lineplot for BLock IO vs Buffer Size
+plt.figure(figsize=(10, 6))
+sns.lineplot(x=buffer_size, y=data_block_io, marker='o', label="B+ Tree")
+plt.axhline(y=293, color='r', linestyle='--', label="Linear scan (293 IO)")
+plt.title("IO (Block) vs Buffer Size", fontsize=15)
+plt.xlabel("Buffer Size", fontsize=15)
+plt.ylabel("IO (Block)", fontsize=15)
+plt.legend()
+plt.grid(True)
+plt.savefig("block_io_vs_buffer_size.pdf")
