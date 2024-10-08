@@ -1,0 +1,84 @@
+\section{Index Components}
+\label{sec:index}
+
+\subsection{B-Tree Structures}
+
+We use a \bplustree as the implementation of the B-tree. Instead of using $n$ as a constraint, we adopted $t$ as the minimum degree of the \bplustree. So every node can have $n=2t - 1$ values and $2t$ pointers. The formal definition of our \bplustree is presented in Appendix~\ref{appendix:bplustreearch}.
+
+In the code, we created an abstract class \texttt{BPlusTreeNode}, with the classes \texttt{BPlusTreeLeafNode} and \texttt{BPlusTreeInternalNode} inheriting from it. This abstract class can have various abstract functions such as insert, search, delete, and more. The root of the \bplustree is a \texttt{BPlusTreeNode}.
+
+\subsection{The Bulk Loading Algorithm}
+
+The bulk loading algorithm for constructing a \bplustree with a sorted sequence of records requires $\mathcal{O}(n)$ memory and $\mathcal{O}(n)$ disk operations, where $n$ is the number of records. If the record sequence is unsorted, an additional $\mathcal{O}(n\log n)$ memory time is needed for sorting.
+
+We build the \bplustree layer-by-layer recursively. The \textsc{BulkLoading} function takes in a vector of pointers to records stored on disk, denoted as $\mathcal{R}$. It returns a \texttt{BPlusTreeNode} object.
+
+\begin{algorithm}
+	\caption{\textsc{BulkLoading}}
+	\begin{algorithmic}
+        \State $\mathcal{R} \leftarrow $ input vector
+        \State $n\leftarrow$ number of records
+        \State \textsc{Sort} $\mathcal{R}$ by its index
+        \State $\mathcal{L} \leftarrow $ vector of \texttt{BPlusTreeLeafNode}, means the leaf layer
+        \State $\ell \leftarrow\emptyset$ as the new leaf node
+		\For {$r$ in $\mathcal{R}$}
+        \If{$n_\ell\ge t$ and $\text{number of records remains}\ge t$}
+            \State $\ell_{\mathrm{new}}\leftarrow\emptyset$ as a new leaf node
+            \State $\textsc{Next}(\ell)\leftarrow\ell_{\mathrm{new}}$
+            \State Append $\ell$ to $\mathcal{L}$
+            \State $\ell\leftarrow\ell_{\mathrm{new}}$
+        \EndIf
+        \EndFor
+        \State \Return \textsc{BulkLoadingUpperLayer($\mathcal{L}$)}
+	\end{algorithmic} 
+\end{algorithm}
+
+Function \textsc{BulkLoadingUpperLayer} is a helper method for \textsc{BulkLoading}, which takes in a vector layer of \texttt{BPlusTreeNode}, and returns the root of the \bplustree.
+
+\begin{algorithm}
+	\caption{\textsc{BulkLoadingUpperLayer}}
+	\begin{algorithmic}
+        \State $\mathcal{O} \leftarrow $ input vector
+        \State $n\leftarrow$ number of nodes
+        \If{n = 1}
+        \State\Return \textsc{First($\mathcal{L}$)}
+        \EndIf
+        \State $\mathcal{U} \leftarrow $ vector of \texttt{BPlusTreeInternalNode}, means the leaf layer
+        \State $u \leftarrow\emptyset$ as the new internal node of the upper layer
+		\For {$o$ in $\mathcal{O}$}
+        \If{$n_\ell\ge t$ and $\text{number of nodes remains}\ge t$}
+            \State Append $u$ to $\mathcal{U}$
+            \State $u\leftarrow\emptyset$ as a new internal node of the upper layer
+        \EndIf
+        \EndFor
+        \State \Return \textsc{BulkLoadingUpperLayer($\mathcal{U}$)}
+	\end{algorithmic} 
+\end{algorithm}
+
+\subsection{Range Query on B-Tree}
+
+\textsc{RangeQuery} is an abstract method for \texttt{BPlusTreeNode}. \textsc{RangeQuery($o, \ell, r, \mathcal{R}$)} means that the currently we are in node $o$, we want to query the records between $[\ell, r]$, and the results should be saved in $\mathcal{R}$. In real coding situations, we use dynamically to implement it. Algorithm \ref{algo:range_query} shows how the algorithm works.
+
+\begin{algorithm}
+\caption{\textsc{RangeQuery($o, \ell, r, \mathcal{R}$)}}\label{algo:range_query}
+	\begin{algorithmic}
+        \If{\textsc{IsLeaf($o$)}}
+        \For{$i\in[0, n)$}
+        \If{$k_{o}^{(i)}\ge\ell$}
+        \State \textbf{continue}
+        \EndIf
+        \If{$k_o^{(i)}>r$}
+        \State\Return
+        \EndIf
+        \EndFor
+            \State\textsc{RangeQuery$\left(\textsc{Next($o$)}, \ell, r, \mathcal{R}\right)$}
+        \Else
+        \State \textsc{BinarySearch} to find the first $i$ with $k_o^{(i)}\ge \ell$
+        \If {cannot find $i$}
+            \State \textsc{RangeQuery$\left(s_{o}^{\left(n_s+1\right)}, \ell, r, \mathcal{R}\right)$}
+        \Else
+            \State \textsc{RangeQuery$\left(s_{o}^{\left(i\right)}, \ell, r, \mathcal{R}\right)$}
+        \EndIf
+        \EndIf
+    \end{algorithmic} 
+\end{algorithm}

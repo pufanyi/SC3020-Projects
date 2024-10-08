@@ -1,0 +1,121 @@
+\documentclass{article}
+
+\usepackage{xcolor}
+\usepackage{hyperref}
+\definecolor{COLOR_MEAN}{HTML}{f0f0f0}
+\definecolor{LINK_COLOR}{HTML}{636EFA}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=LINK_COLOR,
+	urlcolor=LINK_COLOR,
+	citecolor=LINK_COLOR,
+}
+
+% if you need to pass options to natbib, use, e.g.:
+%     \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2024
+
+
+% ready for submission
+%\usepackage{neurips_2024}
+
+
+% to compile a preprint version, e.g., for submission to arXiv, add add the
+% [preprint] option:
+% \usepackage[preprint]{neurips_2024}
+
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+\usepackage[final]{neurips_2024}
+
+
+% to avoid loading the natbib package, add option nonatbib:
+%    \usepackage[nonatbib]{neurips_2024}
+
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+% \usepackage{url}            % simple URL typesetting
+\usepackage{xurl}
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{xcolor}         % colors
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{xspace}
+\usepackage{cleveref}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{subcaption}
+
+\usepackage{algorithm} 
+\usepackage{algpseudocode}
+\usepackage{mathrsfs}
+\usepackage{tikz}
+
+\usepackage[symbol]{footmisc}
+\definecolor{ntured}{HTML}{D71440}
+\hypersetup{
+    colorlinks=true,     
+    urlcolor=ntured,
+}
+
+
+
+\newcommand{\bplustree}{B+ tree\xspace}
+
+
+% \title{SC3020 Project 1}
+
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to LaTeX to determine where to break the
+% lines. Using \AND forces a line break at that point. So, if LaTeX puts 3 of 4
+% authors names on the first line, and the last on the second line, try using
+% \AND instead of \And before the third author name.
+
+
+% \author{
+% }
+
+\usepackage{graphicx}
+
+\begin{document}
+	
+\include{title/titlepage}
+	
+% \maketitle
+
+% \begin{abstract}
+%     lalala
+% \end{abstract}
+
+
+\input{sections/1.Introduction}
+
+\input{sections/2.Storage_design}
+
+\input{sections/3.Index_design}
+
+\input{sections/4.Experiments}
+
+\section{Conclusion}
+In this report, we present our design of our storage and index components for the database system in \Cref{sec:storage,sec:index}. We then report all of our statistics and experiment results in \Cref{sec:exp} that is required from the manual.
+
+
+\bibliographystyle{plain} % or another style like apalike, abbrvnat, etc.
+\bibliography{references/ref} % assumes you have a references.bib file
+
+\newpage
+\appendix
+
+\include{sections/BTreeArch}
+
+\end{document}
