@@ -1,6 +1,6 @@
 # Project 1
 
-[Video](docs/presentation/presentation.mp4) | [Report](docs/report/SC3020.pdf)
+[Video](docs/presentation/presentation.mp4) | [Report](docs/report/SC3020_Project1.pdf)
 
 This project is done by
 
