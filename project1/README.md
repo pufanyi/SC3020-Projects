@@ -1,5 +1,7 @@
 # Project 1
 
+[Video](docs/presentation/presentation.mp4) | [Report](docs/report/SC3020.pdf)
+
 This project is done by
 
 | Name | Matric Num |
