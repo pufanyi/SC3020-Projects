@@ -1,7 +1,7 @@
 \section{Formal Definition of Our B Plus Tree}
 \label{appendix:bplustreearch}
 
-Our \bplustree is constructed following the foundational definition of B-trees as given in \cite{cormen2022introduction}, with key modifications to accommodate the structure and search needs of our data storage and indexing system. 
+Our \bplustree is constructed following the foundational definition of B-trees as given in \cite{cormen2022introduction}, with key modifications to accommodate the structure and search needs of our data storage and indexing system.
 
 The primary difference between our \bplustree and the one in \cite{cormen2022introduction} is that in our implementation is that only the leaf nodes store the actual data records, while internal nodes store only the keys.
 
@@ -26,7 +26,7 @@ where $s^{(i)}_x$ leads to the subtree containing all keys in the range defined 
         \end{itemize}
 
 \subsection{Leaf Nodes}
-    
+
 Each leaf node $x$ contains $n_x + 1$ pointers, denoted $s^{(1)}_x,s^{(2)}_x,\cdots,s^{(n_x + 1)}_x$, which are structured differently from the internal node pointers:
 
         \begin{enumerate}
@@ -34,10 +34,10 @@ Each leaf node $x$ contains $n_x + 1$ pointers, denoted $s^{(1)}_x,s^{(2)}_x,\cd
             \item The last pointer, $s^{(n_x+1)}_x$ points to the \textbf{next leaf node} in the \bplustree's depth-first search (DFS) order. This allows for efficient range queries by following the chain of leaf nodes:\begin{itemize}
             \item If $x$ is the last leaf node, then $s^{(n_x+1)}$ is $\emptyset$, indicating the end of the tree.\end{itemize}
         \end{enumerate}
-            
+
 
 \subsection{Key Separation in Subtrees}
-    
+
 The keys $k_x^{(i)}$ separate the ranges of keys stored in each subtree. For any key subtree, $k_i$ is stored in the subtree with root $s_x^{(i)}$, the following relationship holds:  $$k_1<k_x^{(1)}\le k_2<k_x^{(2)}\le \cdots <k_x^{(n_x)}\le k_{n_x+1}$$
 
 This property ensures that a search operation is guided down the correct subtree by comparing the key against the keys in the parent node.
@@ -60,7 +60,7 @@ Each node in the \bplustree has lower and upper bounds on the number of keys it 
         \item Any node can hold a maximum of $2t-1$.
         \item An internal node can have up to $2t$ children, allowing for balanced growth as new records are inserted.
     \end{itemize}
-    
+
 \end{enumerate}
 
 \subsection{Operations on the B+ Tree}

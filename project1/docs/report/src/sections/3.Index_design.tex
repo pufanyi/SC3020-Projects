@@ -30,7 +30,7 @@ We build the \bplustree layer-by-layer recursively. The \textsc{BulkLoading} fun
         \EndIf
         \EndFor
         \State \Return \textsc{BulkLoadingUpperLayer($\mathcal{L}$)}
-	\end{algorithmic} 
+	\end{algorithmic}
 \end{algorithm}
 
 Function \textsc{BulkLoadingUpperLayer} is a helper method for \textsc{BulkLoading}, which takes in a vector layer of \texttt{BPlusTreeNode}, and returns the root of the \bplustree.
@@ -52,7 +52,7 @@ Function \textsc{BulkLoadingUpperLayer} is a helper method for \textsc{BulkLoadi
         \EndIf
         \EndFor
         \State \Return \textsc{BulkLoadingUpperLayer($\mathcal{U}$)}
-	\end{algorithmic} 
+	\end{algorithmic}
 \end{algorithm}
 
 \subsection{Range Query on B-Tree}
@@ -80,5 +80,5 @@ Function \textsc{BulkLoadingUpperLayer} is a helper method for \textsc{BulkLoadi
             \State \textsc{RangeQuery$\left(s_{o}^{\left(i\right)}, \ell, r, \mathcal{R}\right)$}
         \EndIf
         \EndIf
-    \end{algorithmic} 
+    \end{algorithmic}
 \end{algorithm}

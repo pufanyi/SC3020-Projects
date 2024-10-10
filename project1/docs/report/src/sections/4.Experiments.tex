@@ -17,7 +17,7 @@ This project is implemented in pure C++ using minimum version 17. The block size
         \resizebox{0.95\textwidth}{!}{
         \begin{tabular}{@{}lll@{}}
             \toprule
-            \textbf{Column Name} & \textbf{Data Type} & \textbf{Row Size} (Bytes)\\ 
+            \textbf{Column Name} & \textbf{Data Type} & \textbf{Row Size} (Bytes)\\
             \midrule
             \texttt{GAME\_DATE\_EST}       & \texttt{DATE}             & 10   \\
             \texttt{TEAM\_ID\_home}        & \texttt{VARCHAR(10)}      & 10  \\
@@ -36,7 +36,7 @@ This project is implemented in pure C++ using minimum version 17. The block size
         \vspace{2mm}
         \caption{Fields statistics inside a record}
         \label{tab:field-stats}
-    \end{minipage} 
+    \end{minipage}
     \hfill
     \begin{minipage}{.4\textwidth}
         \centering
@@ -73,7 +73,7 @@ for storing the data}
 
 \paragraph{Degree $t$} In our \bplustree structure, degree (t) is the minimum number of subtrees of an internal node. In our \bplustree, the degree is $102$.
 
-\begin{table}[h] 
+\begin{table}[h]
     \hfill
     \begin{minipage}{.99\textwidth}
         \centering
@@ -86,7 +86,7 @@ for storing the data}
 
         \midrule
         \multirow{1}{*}{Total number of nodes} & 266  \\
-  
+
         \midrule
         \multirow{1}{*}{Number of levels} & 3 \\
 
@@ -101,9 +101,9 @@ number of nodes of the \bplustree; the number of levels of the \bplustree; the c
     \end{minipage}
 \end{table}
 
-\paragraph{Parameter $n$} The parameter $n$ is restricted to be an odd integer, which refers to the maximum number of keys that can be stored in a node; and it is equal to two times degree minus $1$, which is $2\times 102-1=203$. 
+\paragraph{Parameter $n$} The parameter $n$ is restricted to be an odd integer, which refers to the maximum number of keys that can be stored in a node; and it is equal to two times degree minus $1$, which is $2\times 102-1=203$.
 
-\paragraph{Number of Nodes} There are $26,651$ records. Since each leaf node must store at least $102$ keys, the minimum number of leaf nodes is $\left\lceil\frac{26651}{102}\right\rceil = 262$, So there will be $262$ leaf nodes in this case. Each internal node can have at least $102$ pointers (since internal nodes must have at least 
+\paragraph{Number of Nodes} There are $26,651$ records. Since each leaf node must store at least $102$ keys, the minimum number of leaf nodes is $\left\lceil\frac{26651}{102}\right\rceil = 262$, So there will be $262$ leaf nodes in this case. Each internal node can have at least $102$ pointers (since internal nodes must have at least
 $t=102$ children). Therefore, the number of internal nodes at the first level is $\left\lceil \frac{262}{102} \right\rceil = 3$. Since there are only $3$ internal nodes in the first level, the second level will contain $1$ root node (because the root can store at least $101$ keys and have up to $102$ children). Therefore, totally there are $262 + 3 + 1 = 266$ nodes.
 
 \paragraph{Number of levels in the \bplustree} For leaf level there are 262 leaf nodes; at first internal level there are 3 internal nodes; at root Level there are 1 root node. Therefore, the \bplustree has \textbf{3 levels}.
@@ -177,7 +177,7 @@ Linear Scan      & 0          & 293       & 22        \\
 \vspace{2mm}
 \caption{Comparison with different methods: Linear Scan, B+ tree, B+ tree with cache. The cache of the B+ tree is set to be 250 pages.}
 \label{tab:comparison}
-    
+
 \end{minipage}
 
 \end{table}
