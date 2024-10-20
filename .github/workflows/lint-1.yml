@@ -18,6 +18,7 @@ jobs:
           pre-commit install
       - name: Linting
         run: |
+          cd project1
           pre-commit run --files src/*
           pre-commit run --files test/*
           pre-commit run --files include/*
