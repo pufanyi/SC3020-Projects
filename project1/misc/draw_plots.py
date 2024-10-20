@@ -9,8 +9,8 @@ data_block_io = [6812, 4003, 838, 0]
 
 # Lineplot for Time (ms) vs Buffer Size
 plt.figure(figsize=(10, 6))
-sns.lineplot(x=buffer_size, y=time_ms, marker='o', label="B+ Tree")
-plt.axhline(y=23, color='r', linestyle='--', label="Linear scan (23 ms)")
+sns.lineplot(x=buffer_size, y=time_ms, marker="o", label="B+ Tree")
+plt.axhline(y=23, color="r", linestyle="--", label="Linear scan (23 ms)")
 plt.title("Time (ms) vs Buffer Size", fontsize=25)
 plt.xlabel("Buffer Size", fontsize=20)
 plt.ylabel("Time (ms)", fontsize=20)
@@ -20,7 +20,7 @@ plt.savefig("time_vs_buffer_size.pdf")
 
 # Lineplot for Index IO vs Buffer Size
 plt.figure(figsize=(10, 6))
-sns.lineplot(x=buffer_size, y=index_io, marker='o', label="B+ Tree")
+sns.lineplot(x=buffer_size, y=index_io, marker="o", label="B+ Tree")
 # plt.axhline(y=293, color='r', linestyle='--', label="Linear scan (293 IO)")
 plt.title("IO (Index) vs Buffer Size", fontsize=25)
 plt.xlabel("Buffer Size", fontsize=20)
@@ -32,8 +32,8 @@ plt.savefig("index_io_vs_buffer_size.pdf")
 
 # Lineplot for BLock IO vs Buffer Size
 plt.figure(figsize=(10, 6))
-sns.lineplot(x=buffer_size, y=data_block_io, marker='o', label="B+ Tree")
-plt.axhline(y=293, color='r', linestyle='--', label="Linear scan (293 IO)")
+sns.lineplot(x=buffer_size, y=data_block_io, marker="o", label="B+ Tree")
+plt.axhline(y=293, color="r", linestyle="--", label="Linear scan (293 IO)")
 plt.title("IO (Data) vs Buffer Size", fontsize=25)
 plt.xlabel("Buffer Size", fontsize=20)
 plt.ylabel("IO (Data)", fontsize=20)

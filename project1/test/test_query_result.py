@@ -1,5 +1,7 @@
-import pandas as pd
 import unittest
+
+import pandas as pd
+
 
 class TestQueryResult(unittest.TestCase):
     @classmethod
