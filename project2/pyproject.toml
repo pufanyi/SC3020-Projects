@@ -1,0 +1,51 @@
+[tool.black]
+line-length = 240
+
+[build-system]
+requires = ["setuptools>=42", "wheel", "setuptools_scm[tomli]>=6.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sc3020-project2"
+version = "0.1.0"
+authors = [
+    { name = "xxx", email = "xxx@e.ntu.edu.sg" },
+]
+description = "SC3020 Project-2"
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.8"
+license = { text = "MIT" }
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "jinja2",
+]
+
+[project.optional-dependencies]
+opt = [
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["*"]
+exclude = [
+    "static",
+    "templates",
+]
+
+[tool.wheel]
+exclude = [
+    "static",
+    "templates"
+]
+
+[project.scripts]
+
+[project.urls]
+Homepage = "https://pufanyi.github.io/SC4002-Project/"
+Repository = "https://github.com/pufanyi/SC4002-Project"
