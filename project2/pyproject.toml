@@ -24,6 +24,7 @@ dependencies = [
     "fastapi",
     "uvicorn",
     "jinja2",
+    "gradio",
 ]
 
 [project.optional-dependencies]
