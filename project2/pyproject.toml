@@ -6,7 +6,7 @@ requires = ["setuptools>=42", "wheel", "setuptools_scm[tomli]>=6.3"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "sc3020-project2"
+name = "sc3020"
 version = "0.1.0"
 authors = [
     { name = "xxx", email = "xxx@e.ntu.edu.sg" },
@@ -36,12 +36,14 @@ include = ["*"]
 exclude = [
     "static",
     "templates",
+    "assets",
 ]
 
 [tool.wheel]
 exclude = [
     "static",
-    "templates"
+    "templates",
+    "assets",
 ]
 
 [project.scripts]
