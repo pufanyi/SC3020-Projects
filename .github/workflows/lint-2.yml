@@ -1,4 +1,4 @@
-name: Lint
+name: Lint-project-2
 
 on: [push, pull_request]
 
@@ -13,7 +13,11 @@ jobs:
           python-version: 3.8
       - name: Install pre-commit hook
         run: |
+          cd project2
           python -m pip install pre-commit
           pre-commit install
       - name: Linting
-        run: pre-commit run --all-files
+        run: |
+          cd project2
+          pre-commit run --files src/*
+          pre-commit run --files test/*
