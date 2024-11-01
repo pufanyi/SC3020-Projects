@@ -5,6 +5,7 @@ import sys
 
 from sc3020.main import launch_server, prepare_server_args
 
+
 def main():
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     server_args = prepare_server_args(sys.argv[1:])
@@ -13,6 +14,7 @@ def main():
         launch_server(server_args)
     except Exception as e:
         raise e
+
 
 if __name__ == "__main__":
     main()
