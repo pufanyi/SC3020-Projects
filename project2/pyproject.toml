@@ -14,7 +14,7 @@ authors = [
 description = "SC3020 Project-2"
 readme = "README.md"
 classifiers = [
-    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3", 
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
@@ -22,10 +22,13 @@ requires-python = ">=3.8"
 license = { text = "MIT" }
 dependencies = [
     "fastapi",
-    "uvicorn",
+    "uvicorn", 
     "jinja2",
     "gradio",
 ]
+
+[project.scripts]
+sc3020 = "sc3020.__main__:main"
 
 [project.optional-dependencies]
 opt = [
@@ -46,8 +49,6 @@ exclude = [
     "templates",
     "assets",
 ]
-
-[project.scripts]
 
 [project.urls]
 Homepage = "https://pufanyi.github.io/SC4002-Project/"
