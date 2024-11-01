@@ -11,7 +11,6 @@ conda activate sc3020
 python -m pip install -e .
 ```
 
-
 ## Test
 
 ```bash

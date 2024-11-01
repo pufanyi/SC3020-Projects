@@ -3,23 +3,31 @@
 import os
 import subprocess
 import time
+from pathlib import Path
 from typing import List
 
 
-def run_unittest_files(files: List[str]):
+def run_unittest_files(files: List[Path]):
     tic = time.time()
     success = True
 
     for filename in files:
 
-        def run_one_file(filename):
-            filename = os.path.join(os.getcwd(), filename)
-            print(f"\n\nRun:\npython3 {filename}\n\n", flush=True)
-            process = subprocess.Popen(
-                ["python3", filename], stdout=None, stderr=None, env=os.environ
-            )
-            process.wait()
-            return process.returncode
+        def run_one_file(filename: Path):
+            filename = filename.resolve().absolute()
+            print(f"\n\nRun:\npython -m unittest {filename}\n\n", flush=True)
+
+            try:
+                # Use check_output to capture output and handle errors
+                subprocess.check_output(
+                    ["python", "-m", "unittest", "-v", str(filename)],
+                    stderr=subprocess.STDOUT,
+                    env=os.environ.copy(),
+                )
+                return 0
+            except subprocess.CalledProcessError as e:
+                print(e.output.decode())
+                return e.returncode
 
         try:
             ret_code = run_one_file(filename)
