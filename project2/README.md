@@ -11,6 +11,10 @@ conda activate sc3020
 python -m pip install -e .
 ```
 
+## Download PostgreSQL
+
+PostgreSQL is required to run the project. You can download it from [here](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads).
+
 ## Run
 
 ```bash

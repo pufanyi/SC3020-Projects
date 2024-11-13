@@ -22,13 +22,13 @@ requires-python = ">=3.8"
 license = { text = "MIT" }
 dependencies = [
     "fastapi",
-    "uvicorn", 
+    "uvicorn",
     "jinja2",
     "gradio",
 ]
 
 [project.scripts]
-sc3020 = "sc3020.__main__:main"
+sc3020 = "sc3020.project:main"
 
 [project.optional-dependencies]
 opt = [

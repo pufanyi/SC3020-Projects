@@ -2,6 +2,8 @@ import argparse
 from dataclasses import dataclass, fields
 from typing import List
 
+import os
+import sys
 import uvicorn
 from sc3020.interface import app
 
@@ -41,3 +43,13 @@ def launch_server(
         port=server_args.port,
         log_level=server_args.log_level,
     )
+
+
+def main():
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    server_args = prepare_server_args(sys.argv[1:])
+
+    launch_server(server_args)
+
+if __name__ == "__main__":
+    main()
