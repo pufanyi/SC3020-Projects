@@ -5,8 +5,7 @@ import json
 
 
 if __name__ == "__main__":
-    folder = Path(__file__).parents(2) / "assets" / "data"
-    print(folder)
+    folder = Path(__file__).parents[1] / "assets" / "data"
     with open("headers.json") as f:
         headers = json.load(f)
     for file in folder.glob("*.tbl"):
