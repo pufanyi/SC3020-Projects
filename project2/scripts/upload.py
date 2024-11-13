@@ -5,7 +5,7 @@ import json
 
 
 if __name__ == "__main__":
-    folder = Path(__file__).parent.parent / "assets" / "data"
+    folder = Path(__file__).parents(2) / "assets" / "data"
     print(folder)
     with open("headers.json") as f:
         headers = json.load(f)
@@ -13,4 +13,4 @@ if __name__ == "__main__":
         header = headers[file.stem]
         data = pd.read_table(file, sep="|", names=header)
         hf_data = Dataset.from_pandas(data, preserve_index=False)
-        hf_data.push_to_hub(f"pufanyi/TPC-H", "3.0.1", split=file.stem)
+        hf_data.push_to_hub(f"pufanyi/TPC-H", file.stem)
