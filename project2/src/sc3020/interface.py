@@ -1,6 +1,7 @@
 import os
 
 import gradio as gr
+import psycopg
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -23,11 +24,29 @@ async def main(request: Request):
 
 
 with gr.Blocks() as demo:
-    gr.Markdown("## Demo")
+    gr.Markdown("## Connect to TPC-H Database")
     with gr.Row(equal_height=True) as row:
-        text_input = gr.Textbox(
-            lines=5, label="Input Text", placeholder="Enter some text here"
-        )
-        button = gr.Button("Submit", variant="primary")
+        url = gr.Textbox(lines=1, label="URL", value="localhost")
+        port = gr.Number(label="Port", value=5432)
+        username = gr.Textbox(lines=1, label="Username", value="postgres")
+        password = gr.Textbox(label="Password", type="password")
+        database = gr.Textbox(lines=1, label="Database", value="tpch")
+
+    def connect_db():
+        try:
+            conn = psycopg.connect(
+                host=url.value,
+                port=port.value,
+                user=username.value,
+                password=password.value,
+                dbname=database.value,
+            )
+            return "Successfully connected to database!"
+        except Exception as e:
+            return f"Failed to connect: {str(e)}"
+
+    connect_btn = gr.Button("Connect")
+    result = gr.Textbox(label="Connection Status")
+    connect_btn.click(fn=connect_db, outputs=result)
 
 app = gr.mount_gradio_app(app, demo, path=CUSTOM_PATH)
