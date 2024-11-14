@@ -8,7 +8,6 @@ import psycopg.crdb
 from huggingface_hub import snapshot_download
 from tqdm import tqdm
 
-# Get the full path of current file
 PATH_FILE = os.path.dirname(os.path.abspath(__file__))
 SETUP_SQL = Path(PATH_FILE) / "setup.sql"
 DEFAULT_CACHE_DIR = Path(PATH_FILE).parent / "assets" / "cache"
