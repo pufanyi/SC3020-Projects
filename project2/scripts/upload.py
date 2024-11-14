@@ -1,8 +1,8 @@
+import json
 from pathlib import Path
+
 import pandas as pd
 from datasets import Dataset
-import json
-
 
 if __name__ == "__main__":
     folder = Path(__file__).parents[1] / "assets" / "data"

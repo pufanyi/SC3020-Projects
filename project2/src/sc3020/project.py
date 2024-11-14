@@ -1,9 +1,9 @@
 import argparse
+import os
+import sys
 from dataclasses import dataclass, fields
 from typing import List
 
-import os
-import sys
 import uvicorn
 from sc3020.interface import app
 
@@ -50,6 +50,7 @@ def main():
     server_args = prepare_server_args(sys.argv[1:])
 
     launch_server(server_args)
+
 
 if __name__ == "__main__":
     main()
