@@ -32,21 +32,4 @@ with gr.Blocks() as demo:
         password = gr.Textbox(label="Password", type="password")
         database = gr.Textbox(lines=1, label="Database", value="tpch")
 
-    def connect_db():
-        try:
-            conn = psycopg.connect(
-                host=url.value,
-                port=port.value,
-                user=username.value,
-                password=password.value,
-                dbname=database.value,
-            )
-            return "Successfully connected to database!"
-        except Exception as e:
-            return f"Failed to connect: {str(e)}"
-
-    connect_btn = gr.Button("Connect")
-    result = gr.Textbox(label="Connection Status")
-    connect_btn.click(fn=connect_db, outputs=result)
-
 app = gr.mount_gradio_app(app, demo, path=CUSTOM_PATH)
