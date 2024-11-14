@@ -9,12 +9,16 @@ build-backend = "setuptools.build_meta"
 name = "sc3020"
 version = "0.1.0"
 authors = [
-    { name = "xxx", email = "xxx@e.ntu.edu.sg" },
+    { name = "Pu Fanyi", email = "FPU001@e.ntu.edu.sg" },
+    { name = "Zhang Kaichen", email = "ZHAN0564@e.ntu.edu.sg" },
+    { name = "Cui Nan", email = "C220133@e.ntu.edu.sg" },
+    { name = "Shan Yi", email = "SH0005YI@e.ntu.edu.sg" },
+    { name = "Tian Yidong", email = "YTIAN006@e.ntu.edu.sg" },
 ]
 description = "SC3020 Project-2"
 readme = "README.md"
 classifiers = [
-    "Programming Language :: Python :: 3", 
+    "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
@@ -25,7 +29,8 @@ dependencies = [
     "uvicorn",
     "jinja2",
     "gradio",
-    "datasets==3.1.0",
+    "datasets",
+    "psycopg==3.2.3",
 ]
 
 [project.scripts]
