@@ -100,6 +100,15 @@ class TPCHDataset(object):
         try:
             self.cursor.execute(query)
             results = self.cursor.fetchall()
+            self.cursor.execute(f"EXPLAIN {query}")
+            explain = self.cursor.fetchall()
+            # Explain is a list of tuples
+            explain_str = ""
+            # Each tuple is a level
+            for level in explain:
+                # We combine the operations in each level
+                for operation in level:
+                    explain_str += operation + "\n"
             if len(results) > self.max_output_rows:
                 messages = {
                     "status": "Success",
@@ -111,10 +120,10 @@ class TPCHDataset(object):
                     "status": "Success",
                     "message": f"Returned {len(results)} rows",
                 }
-            return results, messages
+            return results, messages, explain_str
         except Exception as e:
             self.host(**self.db_info)
-            return [], {"status": "Error", "message": str(e)}
+            return [], {"status": "Error", "message": str(e)}, "Wrong execution"
 
 
 if __name__ == "__main__":

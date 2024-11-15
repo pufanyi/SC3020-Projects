@@ -91,12 +91,17 @@ def query_console(db: tcph.TPCHDataset):
         result = gr.DataFrame(value=[], label="Result")
 
     with gr.Row():
+        explain = gr.Textbox(lines=10, label="Explain")
+
+    with gr.Row():
         query_btn = gr.Button("Execute", visible=True)
 
     with gr.Row():
         query_logs = gr.JSON({}, label="Logs")
 
-    query_btn.click(fn=db.execute, inputs=[query_input], outputs=[result, query_logs])
+    query_btn.click(
+        fn=db.execute, inputs=[query_input], outputs=[result, query_logs, explain]
+    )
 
 
 with gr.Blocks() as demo:
