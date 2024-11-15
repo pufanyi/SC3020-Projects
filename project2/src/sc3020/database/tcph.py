@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 from typing import Dict, List, Union
 
+import gradio as gr
 import psycopg
 import psycopg.crdb
 from huggingface_hub import snapshot_download
@@ -17,7 +18,10 @@ class TPCHDataset(object):
     def __init__(
         self,
         hf_path: str = "pufanyi/TPC-H",
+        query_time_out: int = 60,
+        max_output_rows: int = 20,
     ):
+        super().__init__()
         self.data_path = (
             Path(
                 snapshot_download(
@@ -26,8 +30,10 @@ class TPCHDataset(object):
             )
             / "raw_data"
         )
+        self.query_time_out = query_time_out
         self.subsets = [x.stem for x in self.data_path.glob("*.tbl")]
         self.host_status = False
+        self.max_output_rows = max_output_rows
 
     def __enter__(self):
         return self
@@ -50,18 +56,32 @@ class TPCHDataset(object):
         user: str = "postgres",
         password,
     ):
-        self.host_status = True
+        self.db_info = dict(
+            host=host, port=port, dbname=dbname, user=user, password=password
+        )
+
+        if self.host_status:
+            self.close()
 
         self.conn = psycopg.connect(
             dbname=dbname, user=user, password=password, host=host, port=port
         )
         self.cursor = self.conn.cursor()
+        self.host_status = True
+        self.cursor.execute(f"SET statement_timeout = {self.query_time_out * 1000};")
 
         return self
 
-    def setup(self):
-        if self.host_status is False:
-            raise ValueError("Please host the database first")
+    def setup(self, **kwargs):
+        if not self.host_status:
+            self.db_info.update(kwargs)
+            self.host(**self.db_info)
+            print("Connected to database")
+
+        print(self.host_status)
+
+        for subset in self.subsets:
+            self.cursor.execute(f"DROP TABLE IF EXISTS {subset};")
 
         with open(SETUP_SQL, "r") as f:
             setup_sql = f.read()
@@ -77,8 +97,24 @@ class TPCHDataset(object):
         self.conn.commit()
 
     def execute(self, query: str):
-        self.cursor.execute(query)
-        return self.cursor.fetchall()
+        try:
+            self.cursor.execute(query)
+            results = self.cursor.fetchall()
+            if len(results) > self.max_output_rows:
+                messages = {
+                    "status": "Success",
+                    "message": f"Returned {len(results)} rows, only showing first {self.max_output_rows}",
+                }
+                results = results[: self.max_output_rows]
+            else:
+                messages = {
+                    "status": "Success",
+                    "message": f"Returned {len(results)} rows",
+                }
+            return results, messages
+        except Exception as e:
+            self.host(**self.db_info)
+            return [], {"status": "Error", "message": str(e)}
 
 
 if __name__ == "__main__":

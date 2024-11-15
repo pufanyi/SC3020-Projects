@@ -1,4 +1,3 @@
-import p
 from sc3020.database.tcph import TPCHDataset
 
 
