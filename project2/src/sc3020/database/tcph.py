@@ -83,11 +83,12 @@ class TPCHDataset(object):
 
 if __name__ == "__main__":
     tpch = TPCHDataset()
+    password = os.getenv("POSTGRES_PASSWORD")
     with tpch.host(
         host="localhost",
         port=5432,
         dbname="tpch",
         user="postgres",
-        password="hjSD2BZ",
+        password=password,
     ):
         tpch.setup()
