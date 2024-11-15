@@ -1,5 +1,6 @@
 import io
 import os
+import traceback
 from pathlib import Path
 from typing import Dict, List, Union
 
@@ -8,6 +9,12 @@ import psycopg
 import psycopg.crdb
 from huggingface_hub import snapshot_download
 from tqdm import tqdm
+
+from .ExecutionTree import (
+    ExecutionTree,
+    ExecutionTreeNode,
+    parse_query_explanation_to_tree,
+)
 
 PATH_FILE = os.path.dirname(os.path.abspath(__file__))
 SETUP_SQL = Path(PATH_FILE) / "setup.sql"
@@ -102,13 +109,12 @@ class TPCHDataset(object):
             results = self.cursor.fetchall()
             self.cursor.execute(f"EXPLAIN {query}")
             explain = self.cursor.fetchall()
-            # Explain is a list of tuples
+            tree = parse_query_explanation_to_tree(explain)
+            traverse_node = tree.traversal()
             explain_str = ""
-            # Each tuple is a level
-            for level in explain:
-                # We combine the operations in each level
-                for operation in level:
-                    explain_str += operation + "\n"
+            for idx, node in enumerate(traverse_node, 1):
+                explain_str += f"Step {idx} : {node.natural_language()}\n"
+
             if len(results) > self.max_output_rows:
                 messages = {
                     "status": "Success",
@@ -123,7 +129,11 @@ class TPCHDataset(object):
             return results, messages, explain_str
         except Exception as e:
             self.host(**self.db_info)
-            return [], {"status": "Error", "message": str(e)}, "Wrong execution"
+            return (
+                [],
+                {"status": "Error", "message": str(traceback.format_exc())},
+                "Wrong execution",
+            )
 
 
 if __name__ == "__main__":
