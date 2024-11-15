@@ -164,3 +164,6 @@ cython_debug/
 # Dataset
 *.tbl
 *.csv
+
+# bash scripts
+src/sc3020/scripts/*.sh
