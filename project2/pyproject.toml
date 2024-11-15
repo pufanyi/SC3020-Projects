@@ -30,7 +30,7 @@ dependencies = [
     "jinja2",
     "gradio",
     "datasets",
-    "psycopg[binary]==3.2.3",
+    "psycopg[binary]==3.1.8",
     "sqlalchemy",
 ]
 
