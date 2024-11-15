@@ -83,10 +83,28 @@ def connect_db(db: tcph.TPCHDataset):
     return db
 
 
+def query_console(db: tcph.TPCHDataset):
+    with gr.Row(equal_height=True):
+        query_input = gr.Code(
+            lines=20, label="Query", interactive=True, language="sql-pgSQL"
+        )
+        result = gr.DataFrame(value=[], label="Result")
+
+    with gr.Row():
+        query_btn = gr.Button("Execute", visible=True)
+
+    with gr.Row():
+        query_logs = gr.JSON({}, label="Logs")
+
+    query_btn.click(fn=db.execute, inputs=[query_input], outputs=[result, query_logs])
+
+
 with gr.Blocks() as demo:
     gr.Markdown("## Connect to TPC-H Database")
 
     db = tcph.TPCHDataset()
     db = connect_db(db)
+
+    query_console(db)
 
 app = gr.mount_gradio_app(app, demo, path=CUSTOM_PATH)
