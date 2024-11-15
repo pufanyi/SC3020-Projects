@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 from typing import Dict, List, Union
 
+import gradio as gr
 import psycopg
 import psycopg.crdb
 from huggingface_hub import snapshot_download
@@ -18,6 +19,7 @@ class TPCHDataset(object):
         self,
         hf_path: str = "pufanyi/TPC-H",
     ):
+        super().__init__()
         self.data_path = (
             Path(
                 snapshot_download(
@@ -50,18 +52,26 @@ class TPCHDataset(object):
         user: str = "postgres",
         password,
     ):
-        self.host_status = True
+        if self.host_status:
+            self.close()
 
         self.conn = psycopg.connect(
             dbname=dbname, user=user, password=password, host=host, port=port
         )
         self.cursor = self.conn.cursor()
+        self.host_status = True
 
         return self
 
-    def setup(self):
-        if self.host_status is False:
-            raise ValueError("Please host the database first")
+    def setup(self, **kwargs):
+        if not self.host_status:
+            self.host(**kwargs)
+            print("Connected to database")
+
+        print(self.host_status)
+
+        for subset in self.subsets:
+            self.cursor.execute(f"DROP TABLE IF EXISTS {subset};")
 
         with open(SETUP_SQL, "r") as f:
             setup_sql = f.read()
@@ -77,8 +87,12 @@ class TPCHDataset(object):
         self.conn.commit()
 
     def execute(self, query: str):
-        self.cursor.execute(query)
-        return self.cursor.fetchall()
+        try:
+            self.cursor.execute(query)
+            results = self.cursor.fetchall()
+            return results
+        except psycopg.errors.SyntaxError as e:
+            return f"Syntax Error: {e}"
 
 
 if __name__ == "__main__":

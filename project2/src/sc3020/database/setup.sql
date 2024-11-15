@@ -1,5 +1,5 @@
 -- nation
-CREATE TABLE IF NOT EXISTS nation (
+CREATE TABLE nation (
   "n_nationkey"  INT,
   "n_name"       CHAR(25),
   "n_regionkey"  INT,
@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS nation (
   PRIMARY KEY ("n_nationkey"));
 
 -- region
-CREATE TABLE IF NOT EXISTS region (
+CREATE TABLE region (
   "r_regionkey"  INT,
   "r_name"       CHAR(25),
   "r_comment"    VARCHAR(152),
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS region (
   PRIMARY KEY ("r_regionkey"));
 
 -- supplier
-CREATE TABLE IF NOT EXISTS supplier (
+CREATE TABLE supplier (
   "s_suppkey"     INT,
   "s_name"        CHAR(25),
   "s_address"     VARCHAR(40),
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS supplier (
   PRIMARY KEY ("s_suppkey"));
 
 -- customer
-CREATE TABLE IF NOT EXISTS customer (
+CREATE TABLE customer (
   "c_custkey"     INT,
   "c_name"        VARCHAR(25),
   "c_address"     VARCHAR(40),
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS customer (
   PRIMARY KEY ("c_custkey"));
 
 -- part
-CREATE TABLE IF NOT EXISTS part (
+CREATE TABLE part (
   "p_partkey"     INT,
   "p_name"        VARCHAR(55),
   "p_mfgr"        CHAR(25),
@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS part (
   PRIMARY KEY ("p_partkey"));
 
 -- partsupp
-CREATE TABLE IF NOT EXISTS partsupp (
+CREATE TABLE partsupp (
   "ps_partkey"     INT,
   "ps_suppkey"     INT,
   "ps_availqty"    INT,
@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS partsupp (
   "ps_dummy"       VARCHAR(10));
 
 -- orders
-CREATE TABLE IF NOT EXISTS orders (
+CREATE TABLE orders (
   "o_orderkey"       INT,
   "o_custkey"        INT,
   "o_orderstatus"    CHAR(1),
@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS orders (
   PRIMARY KEY ("o_orderkey"));
 
 -- lineitem
-CREATE TABLE IF NOT EXISTS lineitem (
+CREATE TABLE lineitem (
   "l_orderkey"    INT,
   "l_partkey"     INT,
   "l_suppkey"     INT,
