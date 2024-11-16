@@ -8,6 +8,7 @@ import gradio as gr
 import psycopg
 import psycopg.crdb
 from huggingface_hub import snapshot_download
+from sc3020.whatif import prepare_join_command, prepare_scan_command
 from tqdm import tqdm
 
 from .ExecutionTree import (
@@ -134,6 +135,30 @@ class TPCHDataset(object):
                 {"status": "Error", "message": str(traceback.format_exc())},
                 "Wrong execution",
             )
+
+    def set_query_config(self, query_config: str):
+        try:
+            self.cursor.execute(query_config)
+        except Exception as e:
+            self.host(**self.db_info)
+            return {"status": "Error", "message": str(traceback.format_exc())}
+
+    def execute_with_what_if(self, query_input: str, scan_type: str, join_type: str):
+        if scan_type != "No Changing":
+            scan_command = prepare_scan_command(scan_type)
+            self.set_query_config(scan_command)
+        else:
+            scan_command = ""
+
+        if join_type != "No Changing":
+            join_command = prepare_join_command(join_type)
+            self.set_query_config(join_command)
+        else:
+            join_command = ""
+
+        result, query_logs, explain = self.execute(query_input)
+
+        return result, query_logs, explain
 
 
 if __name__ == "__main__":
