@@ -1,4 +1,5 @@
-from typing import List, Tuple
+import queue
+from typing import List, Optional, Tuple
 
 
 class ExecutionTreeNode:
@@ -55,6 +56,19 @@ class ExecutionTree:
 
     def set_root(self, root: ExecutionTreeNode):
         self.root = root
+
+    def bfs(self) -> List[List[ExecutionTreeNode]]:
+        q = queue.Queue()
+        q.put(self.root)
+        result = []
+        while not q.empty():
+            level = []
+            for _ in range(q.qsize()):
+                node = q.get()
+                level.append(node)
+                for child in node.children:
+                    q.put(child)
+            result.append(level)
 
     def traversal(self):
         return self._traversal(self.root)
