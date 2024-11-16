@@ -110,10 +110,8 @@ class TPCHDataset(object):
 
         self.conn.commit()
 
-    def execute(self, query: str):
+    def explain(self, query: str):
         try:
-            self.cursor.execute(query)
-            results = self.cursor.fetchall()
             self.cursor.execute(f"EXPLAIN {query}")
             explain = self.cursor.fetchall()
             tree = parse_query_explanation_to_tree(explain)
@@ -123,6 +121,16 @@ class TPCHDataset(object):
             for idx, node in enumerate(traverse_node, 1):
                 explain_str += f"Step {idx} : {node.natural_language()}\n"
             fig = self.visualizer.visualize(tree)
+            print("output", explain_str, total_cost, startup_cost, fig)
+            return explain_str, total_cost, startup_cost, fig
+        except Exception as e:
+            self.host(**self.db_info)
+            return (f"Wrong execution: {str(e)}", 0, 0, None)
+
+    def execute(self, query: str):
+        try:
+            self.cursor.execute(query)
+            results = self.cursor.fetchall()
             if len(results) > self.max_output_rows:
                 messages = {
                     "status": "Success",
@@ -134,7 +142,7 @@ class TPCHDataset(object):
                     "status": "Success",
                     "message": f"Returned {len(results)} rows",
                 }
-            return results, messages, explain_str, total_cost, startup_cost, fig
+            return results, messages
         except Exception as e:
             self.host(**self.db_info)
             return (
@@ -150,7 +158,7 @@ class TPCHDataset(object):
             self.host(**self.db_info)
             return {"status": "Error", "message": str(traceback.format_exc())}
 
-    def execute_with_what_if(self, query_input: str, scan_type: str, join_type: str):
+    def explain_with_what_if(self, query_input: str, scan_type: str, join_type: str):
         if scan_type == "Default":
             scan_command = ""
             for scan in SCAN_REGISTRY:
@@ -169,7 +177,7 @@ class TPCHDataset(object):
             join_command = prepare_join_command(join_type)
             self.set_query_config(join_command)
 
-        return self.execute(query_input)
+        return self.explain(query_input)
 
 
 if __name__ == "__main__":

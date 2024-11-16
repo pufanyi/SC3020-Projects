@@ -92,8 +92,6 @@ def query_console(db: tcph.TPCHDataset):
         query_plan_fig = gr.Plot(label="Query Plan")
 
     with gr.Row():
-        result = gr.DataFrame(value=[], label="Result")
-    with gr.Row():
         estimate_startup_cost = gr.Textbox(label="Estimate Startup Cost")
         estimate_total_cost = gr.Textbox(label="Estimate Total Cost")
 
@@ -113,11 +111,20 @@ def query_console(db: tcph.TPCHDataset):
         explain = gr.Textbox(lines=10, label="Explain")
 
     with gr.Row():
+        result = gr.DataFrame(value=[], label="Result")
+
+    with gr.Row():
         query_btn = gr.Button("Execute", visible=True)
         whatif_btn = gr.Button("Execute with What If...", visible=True)
 
     with gr.Row():
         query_logs = gr.JSON({}, label="Logs")
+
+    query_input.change(
+        fn=db.explain,
+        outputs=[explain, estimate_total_cost, estimate_startup_cost, query_plan_fig],
+        inputs=[query_input],
+    )
 
     query_btn.click(
         fn=db.execute,
@@ -125,14 +132,14 @@ def query_console(db: tcph.TPCHDataset):
         outputs=[
             result,
             query_logs,
-            explain,
-            estimate_total_cost,
-            estimate_startup_cost,
-            query_plan_fig,
+            # explain,
+            # estimate_total_cost,
+            # estimate_startup_cost,
+            # query_plan_fig,
         ],
     )
     whatif_btn.click(
-        fn=db.execute_with_what_if,
+        fn=db.explain_with_what_if,
         inputs=[query_input, scan_dropdown, join_dropdown],
         outputs=[
             result,
