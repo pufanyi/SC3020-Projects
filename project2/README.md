@@ -19,8 +19,10 @@ After installing PostgreSQL, you need to login to the user and create a database
 
 ```bash
 psql -U postgres
+```
 
-postgres=# CREATE DATABASE tpch;
+```sql
+CREATE DATABASE tpch;
 ```
 
 You don't need to load the data into the database (or if you have done, it is better), because the project will download the data and load it into the database automatically.
