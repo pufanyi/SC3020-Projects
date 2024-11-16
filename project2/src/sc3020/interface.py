@@ -92,13 +92,19 @@ def query_console(db: tcph.TPCHDataset):
         result = gr.DataFrame(value=[], label="Result")
 
     with gr.Row():
+        estimate_startup_cost = gr.Textbox(label="Estimate Startup Cost")
+        estimate_total_cost = gr.Textbox(label="Estimate Total Cost")
+
+    with gr.Row():
         scan_dropdown = gr.Dropdown(
-            choices=[k for k in SCAN_REGISTRY.keys()] + ["No Changing"],
+            choices=[k for k in SCAN_REGISTRY.keys()] + ["Default"],
             label="What if change scan to ...",
+            value="Default",
         )
         join_dropdown = gr.Dropdown(
-            choices=[k for k in JOIN_REGISTRY.keys()] + ["No Changing"],
+            choices=[k for k in JOIN_REGISTRY.keys()] + ["Default"],
             label="What if change join to ...",
+            value="Default",
         )
 
     with gr.Row():
@@ -120,12 +126,26 @@ def query_console(db: tcph.TPCHDataset):
     query_btn.click(
         fn=db.execute,
         inputs=[query_input],
-        outputs=[result, query_logs, explain, query_plan_fig],
+        outputs=[
+            result,
+            query_logs,
+            explain,
+            estimate_total_cost,
+            estimate_startup_cost,
+            query_plan_fig,
+        ],
     )
     whatif_btn.click(
         fn=db.execute_with_what_if,
         inputs=[query_input, scan_dropdown, join_dropdown],
-        outputs=[result, query_logs, explain, query_plan_fig],
+        outputs=[
+            result,
+            query_logs,
+            explain,
+            estimate_total_cost,
+            estimate_startup_cost,
+            query_plan_fig,
+        ],
     )
 
 

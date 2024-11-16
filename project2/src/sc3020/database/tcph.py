@@ -12,6 +12,13 @@ from sc3020.database.visualizer import Visualizer
 from sc3020.whatif import prepare_join_command, prepare_scan_command
 from tqdm import tqdm
 
+from ..whatif import (
+    JOIN_REGISTRY,
+    SCAN_REGISTRY,
+    format_set_str,
+    prepare_join_command,
+    prepare_scan_command,
+)
 from .ExecutionTree import (
     ExecutionTree,
     ExecutionTreeNode,
@@ -114,6 +121,7 @@ class TPCHDataset(object):
             explain = self.cursor.fetchall()
             tree = parse_query_explanation_to_tree(explain)
             traverse_node = tree.traversal()
+            total_cost, startup_cost = tree.get_cost()
             explain_str = ""
             for idx, node in enumerate(traverse_node, 1):
                 explain_str += f"Step {idx} : {node.natural_language()}\n"
@@ -129,7 +137,7 @@ class TPCHDataset(object):
                     "status": "Success",
                     "message": f"Returned {len(results)} rows",
                 }
-            return results, messages, explain_str, fig
+            return results, messages, explain_str, total_cost, startup_cost, fig
         except Exception as e:
             self.host(**self.db_info)
             return (
@@ -146,17 +154,23 @@ class TPCHDataset(object):
             return {"status": "Error", "message": str(traceback.format_exc())}
 
     def execute_with_what_if(self, query_input: str, scan_type: str, join_type: str):
-        if scan_type != "No Changing":
-            scan_command = prepare_scan_command(scan_type)
+        if scan_type == "Default":
+            scan_command = ""
+            for scan in SCAN_REGISTRY:
+                scan_command += format_set_str(SCAN_REGISTRY[scan], "on")
             self.set_query_config(scan_command)
         else:
-            scan_command = ""
+            scan_command = prepare_scan_command(scan_type)
+            self.set_query_config(scan_command)
 
-        if join_type != "No Changing":
-            join_command = prepare_join_command(join_type)
+        if join_type == "Default":
+            join_command = ""
+            for join in JOIN_REGISTRY:
+                join_command += format_set_str(JOIN_REGISTRY[join], "on")
             self.set_query_config(join_command)
         else:
-            join_command = ""
+            join_command = prepare_join_command(join_type)
+            self.set_query_config(join_command)
 
         return self.execute(query_input)
 
