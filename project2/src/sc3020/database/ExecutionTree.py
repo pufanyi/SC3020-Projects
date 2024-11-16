@@ -72,7 +72,7 @@ class ExecutionTreeNode:
         elif "Sort" in self.operation:
             return "$\\tau$"
         elif "Hash" in self.operation:
-            return "$\mathcal{{H}}$"
+            return "$\\mathcal{{H}}$"
         elif "Gather Merge" in self.operation:
             return "$\\gamma_M$"
         elif "Materialize" in self.operation:

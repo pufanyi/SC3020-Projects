@@ -145,10 +145,10 @@ def query_console(db: tcph.TPCHDataset):
         outputs=[
             result,
             query_logs,
-            explain,
-            estimate_total_cost,
-            estimate_startup_cost,
-            query_plan_fig,
+            # explain,
+            # estimate_total_cost,
+            # estimate_startup_cost,
+            # query_plan_fig,
         ],
     )
 
