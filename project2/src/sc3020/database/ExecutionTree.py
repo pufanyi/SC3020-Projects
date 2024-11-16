@@ -25,6 +25,20 @@ class ExecutionTreeNode:
 
     def set_operation(self, operation: str):
         self.operation, self.info = operation.split("  ")
+        self.parse_info(self.info)
+
+    def parse_info(self, info: str):
+        # Info looks like this
+        # (cost=0.00..0.00 rows=0 width=0)
+        # for cost, first is the startup cost, second is the total cost
+        # for rows, it is the estimated number of rows output
+        # for width, it is estimated average width of rows output
+        info = info.replace("(", "").replace(")", "")
+        cost, rows, width = info.split(" ")
+        self.startup_cost = float(cost.split("..")[0].split("=")[1])
+        self.total_cost = float(cost.split("..")[1])
+        self.rows = float(rows.split("=")[1])
+        self.width = float(width.split("=")[1])
 
     def __repr__(self):
         operation = self.operation.split("  ")[0].strip()
@@ -66,6 +80,15 @@ class ExecutionTree:
         # Traverse child then parent
         result.append(node)
         return result
+
+    def get_cost(self):
+        nodes = self.traversal()
+        total_cost = 0
+        startup_cost = 0
+        for node in nodes:
+            total_cost += node.total_cost
+            startup_cost += node.startup_cost
+        return total_cost, startup_cost
 
 
 def parse_query_explanation_to_tree(explanation: List[Tuple[str]]) -> ExecutionTree:

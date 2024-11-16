@@ -118,6 +118,7 @@ class TPCHDataset(object):
             explain = self.cursor.fetchall()
             tree = parse_query_explanation_to_tree(explain)
             traverse_node = tree.traversal()
+            total_cost, startup_cost = tree.get_cost()
             explain_str = ""
             for idx, node in enumerate(traverse_node, 1):
                 explain_str += f"Step {idx} : {node.natural_language()}\n"
@@ -133,7 +134,7 @@ class TPCHDataset(object):
                     "status": "Success",
                     "message": f"Returned {len(results)} rows",
                 }
-            return results, messages, explain_str
+            return results, messages, explain_str, total_cost, startup_cost
         except Exception as e:
             self.host(**self.db_info)
             return (
@@ -168,9 +169,11 @@ class TPCHDataset(object):
             join_command = prepare_join_command(join_type)
             self.set_query_config(join_command)
 
-        result, query_logs, explain = self.execute(query_input)
+        result, query_logs, explain, total_cost, startup_cost = self.execute(
+            query_input
+        )
 
-        return result, query_logs, explain
+        return result, query_logs, explain, total_cost, startup_cost
 
 
 if __name__ == "__main__":
