@@ -20,6 +20,7 @@ CUSTOM_PATH = "/sc3020"
 templates = Jinja2Templates(directory="templates")
 
 TEMPLATE_PATH = Path(__file__).parent / "templates"
+EXAMPLE_PATH = Path(__file__).parent / "examples"
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -96,11 +97,20 @@ def connect_db(db: tcph.TPCHDataset):
 
 
 def query_console(db: tcph.TPCHDataset):
+    examples = EXAMPLE_PATH.glob("example*.sql")
+
     with gr.Row(equal_height=True):
         query_input = gr.Code(
             lines=20, label="Query", interactive=True, language="sql-pgSQL"
         )
         query_plan_fig = gr.Plot(label="Query Plan")
+
+    with gr.Row():
+        for id, example in enumerate(examples, 1):
+            with open(example, "r") as f:
+                query = f.read()
+            button = gr.Button(f"Example {id}")
+            button.click(fn=lambda: query, outputs=[query_input])
 
     with gr.Row():
         estimate_startup_cost = gr.Number(label="Estimate Startup Cost", precision=2)
@@ -183,7 +193,12 @@ def query_console(db: tcph.TPCHDataset):
 with open(TEMPLATE_PATH / "header.html", "r") as f:
     header = f.read()
 
-with gr.Blocks(head=header) as demo:
+with open(TEMPLATE_PATH / "title.html", "r") as f:
+    title = f.read()
+
+with gr.Blocks(head=header, theme=gr.themes.Default(text_size="lg")) as demo:
+    gr.HTML(title)
+
     db = tcph.TPCHDataset()
     db = connect_db(db)
 
