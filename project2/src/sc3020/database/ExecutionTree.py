@@ -1,12 +1,14 @@
-from typing import List, Tuple
+import queue
+from typing import List, Optional, Tuple
 
 
 class ExecutionTreeNode:
-    def __init__(self):
+    def __init__(self, id=0):
         self.children: List[ExecutionTreeNode] = []
         self.parent = None
         self.condition: List[str] = []
         self.operation: str = None
+        self.id = id
 
     def add_child(self, child):
         self.children.append(child)
@@ -19,6 +21,9 @@ class ExecutionTreeNode:
 
     def set_condition(self, condition: List[str]):
         self.condition = condition
+
+    def symbol(self):
+        return "circle"
 
     def add_condition(self, condition: str):
         self.condition.append(condition.strip())
@@ -49,16 +54,62 @@ class ExecutionTreeNode:
         else:
             return f"{' ' * level * 2}{operation}"
 
+    def get_text(self):
+        if "Aggregate" in self.operation:
+            return "$\\gamma$"
+        elif "Hash Join" in self.operation:
+            return "$\\bowtie_H$"
+        elif "Merge Join" in self.operation:
+            return "$\\bowtie_M$"
+        elif "Nested Loop" in self.operation:
+            return "$\\bowtie_N$"
+        elif "Seq Scan" in self.operation:
+            return "$\\sigma$"
+        elif "Index Scan" in self.operation:
+            return "$\\sigma_I$"
+        elif "Bitmap Heap Scan" in self.operation:
+            return "$\\sigma_B$"
+        elif "Sort" in self.operation:
+            return "$\\tau$"
+        elif "Hash" in self.operation:
+            return "$\\mathcal{{H}}$"
+        elif "Gather Merge" in self.operation:
+            return "$\\gamma_M$"
+        elif "Materialize" in self.operation:
+            return "$\\mu$"
+        elif "Append" in self.operation:
+            return "$\\cup$"
+        elif "Unique" in self.operation:
+            return "$\\delta$"
+        elif "Group" in self.operation:
+            return "$\\gamma_G$"
+        elif "Window" in self.operation:
+            return "$\\omega$"
+        elif "Limit" in self.operation:
+            return "$\\lambda$"
+        else:
+            return "$o$"
+
+    def explain(self):
+        dict_info = {
+            "operation": self.operation,
+            "level": self.level,
+            "condition": self.condition,
+            "cost": self.total_cost,
+            "rows": self.rows,
+            "width": self.width,
+        }
+        return "<br>".join([f"{key} : {value}" for key, value in dict_info.items()])
+
     def natural_language(self):
         operation = self.operation
         condition = self.condition
-        level = self.level
-        natural_language_str = f"Perform {operation}"
+        natural_language_str = f"Perform `{operation}`"
         for cond in condition:
             total_split = cond.split(":")
             key = total_split[0].strip()
             value = ":".join(total_split[1:])
-            natural_language_str += f" with condition {key} on {value}"
+            natural_language_str += f" with condition `{key}` on `{value}`"
 
         return natural_language_str
 
@@ -70,7 +121,40 @@ class ExecutionTree:
     def set_root(self, root: ExecutionTreeNode):
         self.root = root
 
-    def traversal(self):
+    def finalize_id(
+        self, node: Optional[ExecutionTreeNode] = None, curr_id: int = 0
+    ) -> int:
+        if node is None:
+            node = self.root
+        node.id = curr_id
+        for child in node.children:
+            curr_id = self.finalize_id(child, curr_id + 1)
+        return curr_id
+
+    def bfs(self) -> List[List[ExecutionTreeNode]]:
+        q = queue.Queue()
+        q.put(self.root)
+        result = []
+        while not q.empty():
+            level = []
+            for _ in range(q.qsize()):
+                node = q.get()
+                level.append(node)
+                for child in node.children:
+                    q.put(child)
+            result.append(level)
+
+    def dfs(self) -> List[ExecutionTreeNode]:
+        result = []
+        self._dfs(self.root, result)
+        return result
+
+    def _dfs(self, node: ExecutionTreeNode, result: List[ExecutionTreeNode]):
+        result.append(node)
+        for child in node.children:
+            self._dfs(child, result)
+
+    def traversal(self) -> List[ExecutionTreeNode]:
         return self._traversal(self.root)
 
     def _traversal(self, node: ExecutionTreeNode) -> List[ExecutionTreeNode]:
@@ -106,6 +190,7 @@ def parse_query_explanation_to_tree(explanation: List[Tuple[str]]) -> ExecutionT
     # The first line must be the root node
     for idx, (query_plan) in enumerate(explanation[1:]):
         query_plan = query_plan[0]  # The query plan is a tuple
+        print(query_plan)
         if is_cond(query_plan):
             current_node.add_condition(query_plan)
         elif is_query(query_plan):
@@ -138,8 +223,8 @@ def parse_query_explanation_to_tree(explanation: List[Tuple[str]]) -> ExecutionT
 
                 new_node.set_level(level)
                 new_node.set_operation(query_plan.split("->")[-1].strip())
-                new_node.set_parent(all_nodes[-1].parent)
-                all_nodes[-1].parent.add_child(new_node)
+                new_node.set_parent(all_nodes[-1])
+                all_nodes[-1].add_child(new_node)
                 all_nodes.append(new_node)
                 current_level = level
                 current_node = new_node
