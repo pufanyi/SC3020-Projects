@@ -19,6 +19,8 @@ app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 CUSTOM_PATH = "/sc3020"
 templates = Jinja2Templates(directory="templates")
 
+TEMPLATE_PATH = Path(__file__).parent / "templates"
+
 
 @app.get("/", response_class=HTMLResponse)
 async def main(request: Request):
@@ -26,61 +28,69 @@ async def main(request: Request):
 
 
 def connect_db(db: tcph.TPCHDataset):
-    with gr.Row(equal_height=True):
-        db_info = [
-            gr.Textbox(lines=1, label="Host", value="localhost", interactive=True),
-            gr.Number(label="Port", value=5432, interactive=True),
-            gr.Textbox(lines=1, label="Database", value="tpch", interactive=True),
-            gr.Textbox(lines=1, label="Username", value="postgres", interactive=True),
-            gr.Textbox(label="Password", type="password", interactive=True),
-        ]
+    with gr.Accordion("Connect to Database", open=True):
+        with open(TEMPLATE_PATH / "connection_guide.md", "r") as f:
+            connection_guide = f.read()
 
-    with gr.Row(equal_height=True):
-        connect_btn = gr.Button("Connect", visible=True)
-        reload_data = gr.Button("Load Data", visible=True)
+        gr.Markdown(connection_guide)
 
-    with gr.Row():
-        status = gr.JSON({"status": "Not Connected"}, label="Status")
+        with gr.Row(equal_height=True):
+            db_info = [
+                gr.Textbox(lines=1, label="Host", value="localhost", interactive=True),
+                gr.Number(label="Port", value=5432, interactive=True),
+                gr.Textbox(lines=1, label="Database", value="tpch", interactive=True),
+                gr.Textbox(
+                    lines=1, label="Username", value="postgres", interactive=True
+                ),
+                gr.Textbox(label="Password", type="password", interactive=True),
+            ]
 
-        def host(host_url, port, dbname, user, password):
-            try:
-                db.host(
-                    host=host_url,
-                    port=port,
-                    dbname=dbname,
-                    user=user,
-                    password=password,
-                )
-                return {
-                    "status": "Connected",
-                    "host": f"{host_url}:{port}",
-                    "dbname": dbname,
-                    "user": user,
-                }
-            except Exception as e:
-                return {"status": "Not Connected", "error": str(e)}
+        with gr.Row(equal_height=True):
+            connect_btn = gr.Button("Connect", visible=True)
+            reload_data = gr.Button("Load Data", visible=True)
 
-        def setup(host_url, port, dbname, user, password):
-            try:
-                db.setup(
-                    host=host_url,
-                    port=port,
-                    dbname=dbname,
-                    user=user,
-                    password=password,
-                )
-                return {
-                    "status": "Connected",
-                    "message": "Data loaded",
-                    "host": f"{host_url}:{port}",
-                    "dbname": dbname,
-                    "user": user,
-                }
-            except Exception as e:
-                return {"status": "Not Connected", "error": str(e)}
+        with gr.Row():
+            status = gr.JSON({"status": "Not Connected"}, label="Status")
 
-        connect_btn.click(fn=host, inputs=db_info, outputs=[status])
-        reload_data.click(fn=setup, inputs=db_info, outputs=[status])
+            def host(host_url, port, dbname, user, password):
+                try:
+                    db.host(
+                        host=host_url,
+                        port=port,
+                        dbname=dbname,
+                        user=user,
+                        password=password,
+                    )
+                    return {
+                        "status": "Connected",
+                        "host": f"{host_url}:{port}",
+                        "dbname": dbname,
+                        "user": user,
+                    }
+                except Exception as e:
+                    return {"status": "Not Connected", "error": str(e)}
+
+            def setup(host_url, port, dbname, user, password):
+                try:
+                    db.setup(
+                        host=host_url,
+                        port=port,
+                        dbname=dbname,
+                        user=user,
+                        password=password,
+                    )
+                    return {
+                        "status": "Connected",
+                        "message": "Data loaded",
+                        "host": f"{host_url}:{port}",
+                        "dbname": dbname,
+                        "user": user,
+                    }
+                except Exception as e:
+                    return {"status": "Not Connected", "error": str(e)}
+
+            connect_btn.click(fn=host, inputs=db_info, outputs=[status])
+            reload_data.click(fn=setup, inputs=db_info, outputs=[status])
 
     return db
 
@@ -88,13 +98,13 @@ def connect_db(db: tcph.TPCHDataset):
 def query_console(db: tcph.TPCHDataset):
     with gr.Row(equal_height=True):
         query_input = gr.Code(
-            lines=30, label="Query", interactive=True, language="sql-pgSQL"
+            lines=1, label="Query", interactive=True, language="sql-pgSQL"
         )
         query_plan_fig = gr.Plot(label="Query Plan")
 
     with gr.Row():
-        estimate_startup_cost = gr.Textbox(label="Estimate Startup Cost")
-        estimate_total_cost = gr.Textbox(label="Estimate Total Cost")
+        estimate_startup_cost = gr.Number(label="Estimate Startup Cost", precision=2)
+        estimate_total_cost = gr.Number(label="Estimate Total Cost", precision=2)
 
     with gr.Row():
         scan_dropdown = gr.Dropdown(
@@ -109,17 +119,30 @@ def query_console(db: tcph.TPCHDataset):
         )
 
     with gr.Row():
-        explain = gr.Textbox(lines=10, label="Explain")
+        with gr.Accordion("Explain", open=False):
+            explain = gr.Markdown()
+
+    with gr.Row():
+        refresh_estimation = gr.Button("Refresh Estimation", visible=True)
+        query_btn = gr.Button("Execute", visible=True)
+        # whatif_btn = gr.Button("Execute with What If...", visible=True)
 
     with gr.Row():
         result = gr.DataFrame(value=[], label="Result")
 
     with gr.Row():
-        query_btn = gr.Button("Execute", visible=True)
-        whatif_btn = gr.Button("Execute with What If...", visible=True)
-
-    with gr.Row():
         query_logs = gr.JSON({}, label="Logs")
+
+    refresh_estimation.click(
+        fn=db.explain,
+        inputs=[query_input],
+        outputs=[
+            explain,
+            estimate_total_cost,
+            estimate_startup_cost,
+            query_plan_fig,
+        ],
+    )
 
     query_input.change(
         fn=db.explain,
@@ -133,34 +156,34 @@ def query_console(db: tcph.TPCHDataset):
         outputs=[
             result,
             query_logs,
-            # explain,
-            # estimate_total_cost,
-            # estimate_startup_cost,
-            # query_plan_fig,
         ],
     )
-    whatif_btn.click(
+    scan_dropdown.change(
         fn=db.explain_with_what_if,
         inputs=[query_input, scan_dropdown, join_dropdown],
         outputs=[
-            result,
-            query_logs,
-            # explain,
-            # estimate_total_cost,
-            # estimate_startup_cost,
-            # query_plan_fig,
+            explain,
+            estimate_total_cost,
+            estimate_startup_cost,
+            query_plan_fig,
+        ],
+    )
+    join_dropdown.change(
+        fn=db.explain_with_what_if,
+        inputs=[query_input, scan_dropdown, join_dropdown],
+        outputs=[
+            explain,
+            estimate_total_cost,
+            estimate_startup_cost,
+            query_plan_fig,
         ],
     )
 
-
-TEMPLATE_PATH = Path(__file__).parent / "templates"
 
 with open(TEMPLATE_PATH / "header.html", "r") as f:
     header = f.read()
 
 with gr.Blocks(head=header) as demo:
-    gr.Markdown("## Connect to TPC-H Database")
-
     db = tcph.TPCHDataset()
     db = connect_db(db)
 

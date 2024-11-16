@@ -45,7 +45,7 @@ class Visualizer(object):
                 showlegend=False,
                 marker=dict(
                     symbol=[node.symbol() for node in nodes],
-                    size=30,
+                    size=35,
                     opacity=1,
                     color="#6175c1",
                     line=dict(color="rgb(50,50,50)", width=1),
@@ -57,6 +57,8 @@ class Visualizer(object):
                 hovertext=[node.explain() for node in nodes],
             )
         )
+        layer = max([pos[1] for pos in node_layout]) + 1
+        height = max(300, 55 * layer)
         fig.update_layout(
             showlegend=False,
             margin=dict(l=0, r=0, t=0, b=0),
@@ -64,5 +66,6 @@ class Visualizer(object):
             paper_bgcolor="rgba(0,0,0,0)",
             xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
             yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            height=height,
         )
         return fig

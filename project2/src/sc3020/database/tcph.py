@@ -1,10 +1,12 @@
 import io
 import os
+import time
 import traceback
 from pathlib import Path
 from typing import Dict, List, Union
 
 import gradio as gr
+import pandas as pd
 import psycopg
 import psycopg.crdb
 from huggingface_hub import snapshot_download
@@ -37,18 +39,29 @@ class TPCHDataset(object):
         max_output_rows: int = 20,
     ):
         super().__init__()
-        self.data_path = (
-            Path(
-                snapshot_download(
-                    repo_id=hf_path, allow_patterns="*.tbl", repo_type="dataset"
-                )
-            )
-            / "raw_data"
-        )
-        self.subsets = [x.stem for x in self.data_path.glob("*.tbl")]
+        self.hf_path = hf_path
         self.host_status = False
         self.max_output_rows = max_output_rows
         self.visualizer = Visualizer()
+
+    @property
+    def data_path(self):
+        if not hasattr(self, "_data_path"):
+            self._data_path = (
+                Path(
+                    snapshot_download(
+                        repo_id=self.hf_path,
+                        allow_patterns="*.tbl",
+                        repo_type="dataset",
+                    )
+                )
+                / "raw_data"
+            )
+        return self._data_path
+
+    @property
+    def subsets(self):
+        return [x.stem for x in self.data_path.glob("*.tbl")]
 
     def __enter__(self):
         return self
@@ -71,7 +84,7 @@ class TPCHDataset(object):
         user: str = "postgres",
         password,
     ):
-        self.db_info = dict(
+        self._db_info = dict(
             host=host, port=port, dbname=dbname, user=user, password=password
         )
 
@@ -86,8 +99,16 @@ class TPCHDataset(object):
 
         return self
 
+    @property
+    def db_info(self):
+        if not hasattr(self, "_db_info"):
+            raise ValueError("Please connect to database first")
+        return self._db_info
+
     def setup(self, **kwargs):
         if not self.host_status:
+            if not hasattr(self, "_db_info"):
+                self._db_info = {}
             self.db_info.update(kwargs)
             self.host(**self.db_info)
             print("Connected to database")
@@ -111,15 +132,18 @@ class TPCHDataset(object):
         self.conn.commit()
 
     def explain(self, query: str):
+        if not query:
+            return None, None, None, None
         try:
             self.cursor.execute(f"EXPLAIN {query}")
             explain = self.cursor.fetchall()
             tree = parse_query_explanation_to_tree(explain)
             traverse_node = tree.traversal()
             total_cost, startup_cost = tree.get_cost()
-            explain_str = ""
+            explain_list = []
             for idx, node in enumerate(traverse_node, 1):
-                explain_str += f"Step {idx} : {node.natural_language()}\n"
+                explain_list.append(f"**Step {idx}**: {node.natural_language()}")
+            explain_str = "\n\n".join(explain_list)
             fig = self.visualizer.visualize(tree)
             return explain_str, total_cost, startup_cost, fig
         except Exception as e:
@@ -128,24 +152,37 @@ class TPCHDataset(object):
 
     def execute(self, query: str):
         try:
+            # Get column names from cursor description
+            self.cursor.execute(query)
+            headers = [desc[0] for desc in self.cursor.description]
+
+            # Execute query and time it
+            start_time = time.time()
             self.cursor.execute(query)
             results = self.cursor.fetchall()
-            if len(results) > self.max_output_rows:
+            end_time = time.time()
+            execution_time = end_time - start_time
+
+            df = pd.DataFrame(results, columns=headers)
+
+            if len(df) > self.max_output_rows:
                 messages = {
                     "status": "Success",
-                    "message": f"Returned {len(results)} rows, only showing first {self.max_output_rows}",
+                    "message": f"Returned {len(df)} rows, only showing first {self.max_output_rows}",
+                    "execution_time": f"{execution_time:.3f} seconds",
                 }
-                results = results[: self.max_output_rows]
+                df = df.head(self.max_output_rows)
             else:
                 messages = {
                     "status": "Success",
-                    "message": f"Returned {len(results)} rows",
+                    "message": f"Returned {len(df)} rows",
+                    "execution_time": f"{execution_time:.3f} seconds",
                 }
-            return results, messages
+            return df, messages
         except Exception as e:
             self.host(**self.db_info)
             return (
-                [],
+                pd.DataFrame(),
                 {"status": "Error", "message": str(traceback.format_exc())},
                 "Wrong execution",
             )

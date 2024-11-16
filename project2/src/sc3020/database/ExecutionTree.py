@@ -104,13 +104,12 @@ class ExecutionTreeNode:
     def natural_language(self):
         operation = self.operation
         condition = self.condition
-        level = self.level
-        natural_language_str = f"Perform {operation}"
+        natural_language_str = f"Perform `{operation}`"
         for cond in condition:
             total_split = cond.split(":")
             key = total_split[0].strip()
             value = ":".join(total_split[1:])
-            natural_language_str += f" with condition {key} on {value}"
+            natural_language_str += f" with condition `{key}` on `{value}`"
 
         return natural_language_str
 
