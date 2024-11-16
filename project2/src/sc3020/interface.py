@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import gradio as gr
 import sc3020.database.tcph as tcph
@@ -87,7 +88,7 @@ def connect_db(db: tcph.TPCHDataset):
 def query_console(db: tcph.TPCHDataset):
     with gr.Row(equal_height=True):
         query_input = gr.Code(
-            lines=20, label="Query", interactive=True, language="sql-pgSQL"
+            lines=30, label="Query", interactive=True, language="sql-pgSQL"
         )
         query_plan_fig = gr.Plot(label="Query Plan")
 
@@ -152,7 +153,12 @@ def query_console(db: tcph.TPCHDataset):
     )
 
 
-with gr.Blocks() as demo:
+TEMPLATE_PATH = Path(__file__).parent / "templates"
+
+with open(TEMPLATE_PATH / "header.html", "r") as f:
+    header = f.read()
+
+with gr.Blocks(head=header) as demo:
     gr.Markdown("## Connect to TPC-H Database")
 
     db = tcph.TPCHDataset()

@@ -121,7 +121,6 @@ class TPCHDataset(object):
             for idx, node in enumerate(traverse_node, 1):
                 explain_str += f"Step {idx} : {node.natural_language()}\n"
             fig = self.visualizer.visualize(tree)
-            print("output", explain_str, total_cost, startup_cost, fig)
             return explain_str, total_cost, startup_cost, fig
         except Exception as e:
             self.host(**self.db_info)

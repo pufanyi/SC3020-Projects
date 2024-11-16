@@ -22,6 +22,9 @@ class ExecutionTreeNode:
     def set_condition(self, condition: List[str]):
         self.condition = condition
 
+    def symbol(self):
+        return "circle"
+
     def add_condition(self, condition: str):
         self.condition.append(condition.strip())
 
@@ -51,9 +54,52 @@ class ExecutionTreeNode:
         else:
             return f"{' ' * level * 2}{operation}"
 
-    def visualize(self):
-        # Just an example, support latex
-        return "e^{\\pi i}"
+    def get_text(self):
+        if "Aggregate" in self.operation:
+            return "$\\gamma$"
+        elif "Hash Join" in self.operation:
+            return "$\\bowtie_H$"
+        elif "Merge Join" in self.operation:
+            return "$\\bowtie_M$"
+        elif "Nested Loop" in self.operation:
+            return "$\\bowtie_N$"
+        elif "Seq Scan" in self.operation:
+            return "$\\sigma$"
+        elif "Index Scan" in self.operation:
+            return "$\\sigma_I$"
+        elif "Bitmap Heap Scan" in self.operation:
+            return "$\\sigma_B$"
+        elif "Sort" in self.operation:
+            return "$\\tau$"
+        elif "Hash" in self.operation:
+            return "$\mathcal{{H}}$"
+        elif "Gather Merge" in self.operation:
+            return "$\\gamma_M$"
+        elif "Materialize" in self.operation:
+            return "$\\mu$"
+        elif "Append" in self.operation:
+            return "$\\cup$"
+        elif "Unique" in self.operation:
+            return "$\\delta$"
+        elif "Group" in self.operation:
+            return "$\\gamma_G$"
+        elif "Window" in self.operation:
+            return "$\\omega$"
+        elif "Limit" in self.operation:
+            return "$\\lambda$"
+        else:
+            return "$o$"
+
+    def explain(self):
+        dict_info = {
+            "operation": self.operation,
+            "level": self.level,
+            "condition": self.condition,
+            "cost": self.total_cost,
+            "rows": self.rows,
+            "width": self.width,
+        }
+        return "<br>".join([f"{key} : {value}" for key, value in dict_info.items()])
 
     def natural_language(self):
         operation = self.operation
@@ -145,6 +191,7 @@ def parse_query_explanation_to_tree(explanation: List[Tuple[str]]) -> ExecutionT
     # The first line must be the root node
     for idx, (query_plan) in enumerate(explanation[1:]):
         query_plan = query_plan[0]  # The query plan is a tuple
+        print(query_plan)
         if is_cond(query_plan):
             current_node.add_condition(query_plan)
         elif is_query(query_plan):
@@ -177,8 +224,8 @@ def parse_query_explanation_to_tree(explanation: List[Tuple[str]]) -> ExecutionT
 
                 new_node.set_level(level)
                 new_node.set_operation(query_plan.split("->")[-1].strip())
-                new_node.set_parent(all_nodes[-1].parent)
-                all_nodes[-1].parent.add_child(new_node)
+                new_node.set_parent(all_nodes[-1])
+                all_nodes[-1].add_child(new_node)
                 all_nodes.append(new_node)
                 current_level = level
                 current_node = new_node
