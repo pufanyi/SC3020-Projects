@@ -6,6 +6,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from sc3020.whatif import JOIN_REGISTRY, SCAN_REGISTRY
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -91,16 +92,32 @@ def query_console(db: tcph.TPCHDataset):
         result = gr.DataFrame(value=[], label="Result")
 
     with gr.Row():
+        scan_dropdown = gr.Dropdown(
+            choices=[k for k in SCAN_REGISTRY.keys()] + ["No Changing"],
+            label="What if change scan to ...",
+        )
+        join_dropdown = gr.Dropdown(
+            choices=[k for k in JOIN_REGISTRY.keys()] + ["No Changing"],
+            label="What if change join to ...",
+        )
+
+    with gr.Row():
         explain = gr.Textbox(lines=10, label="Explain")
 
     with gr.Row():
         query_btn = gr.Button("Execute", visible=True)
+        whatif_btn = gr.Button("Execute with What If...", visible=True)
 
     with gr.Row():
         query_logs = gr.JSON({}, label="Logs")
 
     query_btn.click(
         fn=db.execute, inputs=[query_input], outputs=[result, query_logs, explain]
+    )
+    whatif_btn.click(
+        fn=db.execute_with_what_if,
+        inputs=[query_input, scan_dropdown, join_dropdown],
+        outputs=[result, query_logs, explain],
     )
 
 
