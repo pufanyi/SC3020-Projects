@@ -93,11 +93,11 @@ def query_console(db: tcph.TPCHDataset):
 
     with gr.Row():
         scan_dropdown = gr.Dropdown(
-            choices=[k for k in SCAN_REGISTRY.keys()] + ["No Changing"],
+            choices=[k for k in SCAN_REGISTRY.keys()] + ["Default"],
             label="What if change scan to ...",
         )
         join_dropdown = gr.Dropdown(
-            choices=[k for k in JOIN_REGISTRY.keys()] + ["No Changing"],
+            choices=[k for k in JOIN_REGISTRY.keys()] + ["Default"],
             label="What if change join to ...",
         )
 

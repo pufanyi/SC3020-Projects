@@ -8,9 +8,15 @@ import gradio as gr
 import psycopg
 import psycopg.crdb
 from huggingface_hub import snapshot_download
-from sc3020.whatif import prepare_join_command, prepare_scan_command
 from tqdm import tqdm
 
+from ..whatif import (
+    JOIN_REGISTRY,
+    SCAN_REGISTRY,
+    format_set_str,
+    prepare_join_command,
+    prepare_scan_command,
+)
 from .ExecutionTree import (
     ExecutionTree,
     ExecutionTreeNode,
@@ -144,17 +150,23 @@ class TPCHDataset(object):
             return {"status": "Error", "message": str(traceback.format_exc())}
 
     def execute_with_what_if(self, query_input: str, scan_type: str, join_type: str):
-        if scan_type != "No Changing":
-            scan_command = prepare_scan_command(scan_type)
+        if scan_type == "Default":
+            scan_command = ""
+            for scan in SCAN_REGISTRY:
+                scan_command += format_set_str(SCAN_REGISTRY[scan], "on")
             self.set_query_config(scan_command)
         else:
-            scan_command = ""
+            scan_command = prepare_scan_command(scan_type)
+            self.set_query_config(scan_command)
 
-        if join_type != "No Changing":
-            join_command = prepare_join_command(join_type)
+        if join_type == "Default":
+            join_command = ""
+            for join in JOIN_REGISTRY:
+                join_command += format_set_str(JOIN_REGISTRY[join], "on")
             self.set_query_config(join_command)
         else:
-            join_command = ""
+            join_command = prepare_join_command(join_type)
+            self.set_query_config(join_command)
 
         result, query_logs, explain = self.execute(query_input)
 
