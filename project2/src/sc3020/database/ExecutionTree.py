@@ -1,14 +1,16 @@
+import json
 import queue
 from typing import List, Optional, Tuple
 
 
 class ExecutionTreeNode:
-    def __init__(self, id=0):
+    def __init__(self, id: int = 0, max_hover_text_length: int = 60):
         self.children: List[ExecutionTreeNode] = []
         self.parent = None
         self.condition: List[str] = []
         self.operation: str = None
         self.id = id
+        self.max_hover_text_length = max_hover_text_length
 
     def add_child(self, child):
         self.children.append(child)
@@ -93,13 +95,35 @@ class ExecutionTreeNode:
     def explain(self):
         dict_info = {
             "operation": self.operation,
-            "level": self.level,
-            "condition": self.condition,
             "cost": self.total_cost,
             "rows": self.rows,
             "width": self.width,
         }
-        return "<br>".join([f"{key} : {value}" for key, value in dict_info.items()])
+        if self.condition:
+            dict_info["condition"] = json.dumps(self.condition)
+        result = []
+        for k, v in dict_info.items():
+            k = k.capitalize()
+            text = f"{k}: {v}"
+            # This is a bit stupid, but we need to split the text if it is too long
+            # I cannot find a better way to do this
+            first_line = True
+            while len(text) > self.max_hover_text_length:
+                split_pos = text[: self.max_hover_text_length].rfind(" ")
+                if split_pos == -1:
+                    split_pos = self.max_hover_text_length
+                now_text = text[:split_pos]
+                if first_line:
+                    now_text = now_text.removeprefix(f"{k}: ")
+                    now_text = f"<b>{k}</b>: {now_text}"
+                first_line = False
+                result.append(now_text)
+                text = text[split_pos:].strip()
+            if first_line:
+                text = text.removeprefix(f"{k}: ")
+                text = f"<b>{k}</b>: {text}"
+            result.append(text)
+        return "<br>".join(result)
 
     def natural_language(self):
         operation = self.operation

@@ -55,6 +55,7 @@ class Visualizer(object):
                 textfont=dict(size=14, color="white"),
                 hoverinfo="text",
                 hovertext=[node.explain() for node in nodes],
+                hoverlabel=dict(font=dict(family="monospace")),
             )
         )
         layer = max([pos[1] for pos in node_layout]) + 1

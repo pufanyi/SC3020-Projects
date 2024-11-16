@@ -98,7 +98,7 @@ def connect_db(db: tcph.TPCHDataset):
 def query_console(db: tcph.TPCHDataset):
     with gr.Row(equal_height=True):
         query_input = gr.Code(
-            lines=1, label="Query", interactive=True, language="sql-pgSQL"
+            lines=20, label="Query", interactive=True, language="sql-pgSQL"
         )
         query_plan_fig = gr.Plot(label="Query Plan")
 
