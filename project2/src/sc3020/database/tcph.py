@@ -36,7 +36,7 @@ class TPCHDataset(object):
     def __init__(
         self,
         hf_path: str = "pufanyi/TPC-H",
-        max_output_rows: int = 20,
+        max_output_rows: int = 100,
     ):
         super().__init__()
         self.hf_path = hf_path

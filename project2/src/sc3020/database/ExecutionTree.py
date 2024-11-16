@@ -60,11 +60,11 @@ class ExecutionTreeNode:
         if "Aggregate" in self.operation:
             return "$\\gamma$"
         elif "Hash Join" in self.operation:
-            return "$\\bowtie_H$"
+            return "$\\Join_H$"
         elif "Merge Join" in self.operation:
-            return "$\\bowtie_M$"
+            return "$\\Join_M$"
         elif "Nested Loop" in self.operation:
-            return "$\\bowtie_N$"
+            return "$\\Join_N$"
         elif "Seq Scan" in self.operation:
             return "$\\sigma$"
         elif "Index Scan" in self.operation:
@@ -74,21 +74,21 @@ class ExecutionTreeNode:
         elif "Sort" in self.operation:
             return "$\\tau$"
         elif "Hash" in self.operation:
-            return "$\\mathcal{{H}}$"
+            return "$H$"
         elif "Gather Merge" in self.operation:
             return "$\\gamma_M$"
         elif "Materialize" in self.operation:
-            return "$\\mu$"
+            return "$M$"
         elif "Append" in self.operation:
             return "$\\cup$"
         elif "Unique" in self.operation:
             return "$\\delta$"
         elif "Group" in self.operation:
-            return "$\\gamma_G$"
+            return "$\\gamma$"
         elif "Window" in self.operation:
             return "$\\omega$"
         elif "Limit" in self.operation:
-            return "$\\lambda$"
+            return "$L$"
         else:
             return "$o$"
 

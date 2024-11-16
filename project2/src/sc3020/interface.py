@@ -138,7 +138,7 @@ def query_console(db: tcph.TPCHDataset):
         # whatif_btn = gr.Button("Execute with What If...", visible=True)
 
     with gr.Row():
-        result = gr.DataFrame(value=[], label="Result")
+        result = gr.DataFrame(value=[], label="Result (Top 100 rows)")
 
     with gr.Row():
         query_logs = gr.JSON({}, label="Logs")
