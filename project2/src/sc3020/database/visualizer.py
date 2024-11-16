@@ -7,19 +7,17 @@ from sc3020.database.ExecutionTree import ExecutionTree, ExecutionTreeNode
 
 class Visualizer(object):
     def calc_layout(self, tree: ExecutionTree):
-        # Create a dictionary mapping node IDs to ExecutionTreeNodes
         tree.finalize_id()
         nodes = tree.dfs()
-        # Create vertex list from 0 to len(nodes)-1
         parents = [node.parent.id for node in nodes if node.parent]
         edges = [(node.id, parent) for node, parent in zip(nodes[1:], parents)]
         g = Graph(n=len(nodes), edges=edges, directed=True)
-        # Increase the depth of the tree layout by setting a larger height
         node_layout = g.layout("rt", root=[0], mode="all")
-        print(list(node_layout))
+        max_y = max([pos[1] for pos in node_layout])
+        node_layout = [(pos[0], max_y - pos[1]) for pos in node_layout]
         return nodes, node_layout, edges
 
-    def draw(self, tree: ExecutionTree) -> go.Figure:
+    def visualize(self, tree: ExecutionTree) -> go.Figure:
         fig = go.Figure()
         nodes, node_layout, edges = self.calc_layout(tree)
         fig.add_trace(
@@ -27,11 +25,11 @@ class Visualizer(object):
                 x=[pos[0] for pos in node_layout],
                 y=[pos[1] for pos in node_layout],
                 mode="markers",
-                name="bla",
+                showlegend=False,
                 marker=dict(
                     symbol="circle-dot",
                     size=18,
-                    color="#6175c1",  # '#DB4551',
+                    color="#6175c1",
                     line=dict(color="rgb(50,50,50)", width=1),
                 ),
                 hoverinfo="text",
@@ -41,7 +39,6 @@ class Visualizer(object):
         )
         Xe, Ye = [], []
         for edge in edges:
-            print(edge[0], edge[1])
             Xe += [node_layout[edge[0]][0], node_layout[edge[1]][0], None]
             Ye += [node_layout[edge[0]][1], node_layout[edge[1]][1], None]
         fig.add_trace(
@@ -49,13 +46,17 @@ class Visualizer(object):
                 x=Xe,
                 y=Ye,
                 mode="lines",
+                showlegend=False,
                 line=dict(color="rgb(210,210,210)", width=1),
                 hoverinfo="none",
             )
         )
+        fig.update_layout(
+            showlegend=False,
+            margin=dict(l=0, r=0, t=0, b=0),
+            plot_bgcolor="rgba(0,0,0,0)",
+            paper_bgcolor="rgba(0,0,0,0)",
+            xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+        )
         return fig
-
-    def visualize(self, tree: ExecutionTree) -> str:  # html
-        fig = self.draw(tree)
-        fig.write_html("visualizer.html", include_plotlyjs="cdn")
-        return "visualizer.html"

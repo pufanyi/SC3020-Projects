@@ -34,7 +34,6 @@ class TPCHDataset(object):
     def __init__(
         self,
         hf_path: str = "pufanyi/TPC-H",
-        query_time_out: int = 60,
         max_output_rows: int = 20,
     ):
         super().__init__()
@@ -46,7 +45,6 @@ class TPCHDataset(object):
             )
             / "raw_data"
         )
-        self.query_time_out = query_time_out
         self.subsets = [x.stem for x in self.data_path.glob("*.tbl")]
         self.host_status = False
         self.max_output_rows = max_output_rows
@@ -85,7 +83,6 @@ class TPCHDataset(object):
         )
         self.cursor = self.conn.cursor()
         self.host_status = True
-        self.cursor.execute(f"SET statement_timeout = {self.query_time_out * 1000};")
 
         return self
 

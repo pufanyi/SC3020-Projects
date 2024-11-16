@@ -89,8 +89,10 @@ def query_console(db: tcph.TPCHDataset):
         query_input = gr.Code(
             lines=20, label="Query", interactive=True, language="sql-pgSQL"
         )
-        result = gr.DataFrame(value=[], label="Result")
+        query_plan_fig = gr.Plot(label="Query Plan")
 
+    with gr.Row():
+        result = gr.DataFrame(value=[], label="Result")
     with gr.Row():
         estimate_startup_cost = gr.Textbox(label="Estimate Startup Cost")
         estimate_total_cost = gr.Textbox(label="Estimate Total Cost")
@@ -113,12 +115,6 @@ def query_console(db: tcph.TPCHDataset):
     with gr.Row():
         query_btn = gr.Button("Execute", visible=True)
         whatif_btn = gr.Button("Execute with What If...", visible=True)
-
-    with gr.Row():
-        # html element to display the query plan
-        query_plan_fig = gr.HTML(
-            "<div>lalala</div>", label="Query Plan", show_label=True
-        )
 
     with gr.Row():
         query_logs = gr.JSON({}, label="Logs")
