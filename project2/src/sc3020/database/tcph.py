@@ -8,6 +8,7 @@ import gradio as gr
 import psycopg
 import psycopg.crdb
 from huggingface_hub import snapshot_download
+from sc3020.database.visualizer import Visualizer
 from sc3020.whatif import prepare_join_command, prepare_scan_command
 from tqdm import tqdm
 
@@ -42,6 +43,7 @@ class TPCHDataset(object):
         self.subsets = [x.stem for x in self.data_path.glob("*.tbl")]
         self.host_status = False
         self.max_output_rows = max_output_rows
+        self.visualizer = Visualizer()
 
     def __enter__(self):
         return self
@@ -115,7 +117,7 @@ class TPCHDataset(object):
             explain_str = ""
             for idx, node in enumerate(traverse_node, 1):
                 explain_str += f"Step {idx} : {node.natural_language()}\n"
-
+            fig = self.visualizer.visualize(tree)
             if len(results) > self.max_output_rows:
                 messages = {
                     "status": "Success",
@@ -127,7 +129,7 @@ class TPCHDataset(object):
                     "status": "Success",
                     "message": f"Returned {len(results)} rows",
                 }
-            return results, messages, explain_str
+            return results, messages, explain_str, fig
         except Exception as e:
             self.host(**self.db_info)
             return (
@@ -156,9 +158,7 @@ class TPCHDataset(object):
         else:
             join_command = ""
 
-        result, query_logs, explain = self.execute(query_input)
-
-        return result, query_logs, explain
+        return self.execute(query_input)
 
 
 if __name__ == "__main__":

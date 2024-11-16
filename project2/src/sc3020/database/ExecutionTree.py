@@ -3,11 +3,12 @@ from typing import List, Optional, Tuple
 
 
 class ExecutionTreeNode:
-    def __init__(self):
+    def __init__(self, id=0):
         self.children: List[ExecutionTreeNode] = []
         self.parent = None
         self.condition: List[str] = []
         self.operation: str = None
+        self.id = id
 
     def add_child(self, child):
         self.children.append(child)
@@ -36,6 +37,10 @@ class ExecutionTreeNode:
         else:
             return f"{' ' * level * 2}{operation}"
 
+    def visualize(self):
+        # Just an example, support latex
+        return "e^{\\pi i}"
+
     def natural_language(self):
         operation = self.operation
         condition = self.condition
@@ -57,6 +62,16 @@ class ExecutionTree:
     def set_root(self, root: ExecutionTreeNode):
         self.root = root
 
+    def finalize_id(
+        self, node: Optional[ExecutionTreeNode] = None, curr_id: int = 0
+    ) -> int:
+        if node is None:
+            node = self.root
+        node.id = curr_id
+        for child in node.children:
+            curr_id = self.finalize_id(child, curr_id + 1)
+        return curr_id
+
     def bfs(self) -> List[List[ExecutionTreeNode]]:
         q = queue.Queue()
         q.put(self.root)
@@ -70,7 +85,17 @@ class ExecutionTree:
                     q.put(child)
             result.append(level)
 
-    def traversal(self):
+    def dfs(self) -> List[ExecutionTreeNode]:
+        result = []
+        self._dfs(self.root, result)
+        return result
+
+    def _dfs(self, node: ExecutionTreeNode, result: List[ExecutionTreeNode]):
+        result.append(node)
+        for child in node.children:
+            self._dfs(child, result)
+
+    def traversal(self) -> List[ExecutionTreeNode]:
         return self._traversal(self.root)
 
     def _traversal(self, node: ExecutionTreeNode) -> List[ExecutionTreeNode]:

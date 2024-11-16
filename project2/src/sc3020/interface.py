@@ -109,15 +109,23 @@ def query_console(db: tcph.TPCHDataset):
         whatif_btn = gr.Button("Execute with What If...", visible=True)
 
     with gr.Row():
+        # html element to display the query plan
+        query_plan_fig = gr.HTML(
+            "<div>lalala</div>", label="Query Plan", show_label=True
+        )
+
+    with gr.Row():
         query_logs = gr.JSON({}, label="Logs")
 
     query_btn.click(
-        fn=db.execute, inputs=[query_input], outputs=[result, query_logs, explain]
+        fn=db.execute,
+        inputs=[query_input],
+        outputs=[result, query_logs, explain, query_plan_fig],
     )
     whatif_btn.click(
         fn=db.execute_with_what_if,
         inputs=[query_input, scan_dropdown, join_dropdown],
-        outputs=[result, query_logs, explain],
+        outputs=[result, query_logs, explain, query_plan_fig],
     )
 
 
