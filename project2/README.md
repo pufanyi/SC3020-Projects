@@ -15,11 +15,17 @@ python -m pip install -e .
 
 PostgreSQL is required to run the project. You can download it from [here](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads).
 
-After installing PostgreSQL, you need to login to the user and create a database. Here is an example (if you are using the default user `postgres`, and created a database `tpch`):
+After installing PostgreSQL, you need to login to the user and create a database.
+
+Here is an example.
+
+We assume the user is the default user `postgres`.
 
 ```bash
 psql -U postgres
 ```
+
+And then we create a database named `tpch`.
 
 ```sql
 CREATE DATABASE tpch;
