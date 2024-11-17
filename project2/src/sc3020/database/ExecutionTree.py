@@ -130,12 +130,34 @@ class ExecutionTreeNode:
         condition = self.condition
         natural_language_str = f"Perform `{operation}`"
         for cond in condition:
-            total_split = cond.split(":")
-            key = total_split[0].strip()
-            value = ":".join(total_split[1:])
-            natural_language_str += f" with condition `{key}` on `{value}`"
+            natural_language_str += self.parse_condition(cond)
 
         return natural_language_str
+
+    def parse_condition(self, cond: str) -> str:
+        """Parse condition into better natural language
+
+        Args:
+            cond (str): The cond to parse. e.g. Filter: (a<2)
+
+        Returns:
+            str: Refined natural language
+        """
+
+        total_split = cond.split(":")
+        key = total_split[0].strip()
+        value = ":".join(total_split[1:])
+
+        if "Filter" in key:
+            return f" and `filtering` on `{value}`"
+        elif "Key" in key:
+            ops = key.split("Key")[0].strip()
+            return f" and do `{ops}` on `{value}`"
+        elif "Cond" in key:
+            ops = key.split("Cond")[0].strip()
+            return f" and do `{ops}` with condition on `{value}`"
+        else:
+            return f" with condition `{key}` on `{value}`"
 
 
 class ExecutionTree:
