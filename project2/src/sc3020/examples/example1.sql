@@ -1,26 +1,24 @@
-SELECT
-    n_name,
-    SUM(l_extendedprice * (1 - l_discount)) AS revenue
-FROM
-    customer,
-    orders,
-    lineitem,
-    supplier,
-    nation,
-    region
-WHERE
-    c_custkey = o_custkey
-    AND l_orderkey = o_orderkey
-    AND l_suppkey = s_suppkey
-    AND c_nationkey = s_nationkey
-    AND s_nationkey = n_nationkey
-    AND n_regionkey = r_regionkey
-    AND r_name = 'ASIA'
-    AND o_orderdate >= '1994-01-01'
-    AND o_orderdate < '1995-01-01'
-    AND c_acctbal > 10
-    AND s_acctbal > 20
-GROUP BY
-    n_name
-ORDER BY
-    revenue DESC;
+-- Code copied from: https://github.com/2ndQuadrant/pg-tpch/blob/master/queries/q01.sql
+
+
+select
+	l_returnflag,
+	l_linestatus,
+	sum(l_quantity) as sum_qty,
+	sum(l_extendedprice) as sum_base_price,
+	sum(l_extendedprice * (1 - l_discount)) as sum_disc_price,
+	sum(l_extendedprice * (1 - l_discount) * (1 + l_tax)) as sum_charge,
+	avg(l_quantity) as avg_qty,
+	avg(l_extendedprice) as avg_price,
+	avg(l_discount) as avg_disc,
+	count(*) as count_order
+from
+	lineitem
+where
+	l_shipdate <= date '1998-12-01' - interval '71 days'
+group by
+	l_returnflag,
+	l_linestatus
+order by
+	l_returnflag,
+	l_linestatus;

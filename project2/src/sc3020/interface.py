@@ -125,7 +125,11 @@ def query_console(db: tcph.TPCHDataset):
 
     with gr.Row(equal_height=True):
         query_input = gr.Code(
-            lines=20, label="Query", interactive=True, language="sql-pgSQL"
+            lines=5,
+            label="Query",
+            interactive=True,
+            language="sql-pgSQL",
+            wrap_lines=True,
         )
         with gr.Column():
             query_plan_fig = gr.Plot(label="Query Plan")
@@ -142,11 +146,16 @@ def query_console(db: tcph.TPCHDataset):
                 )
 
     with gr.Row():
+        query_btns = {}
         for id, example in enumerate(examples, 1):
             with open(example, "r") as f:
                 query = f.read()
-            button = gr.Button(f"Example {id}")
-            button.click(fn=lambda: query, outputs=[query_input])
+            query_btns[id] = gr.Button(f"Example {id}")
+
+            def make_click_fn(query_text):
+                return lambda: query_text
+
+            query_btns[id].click(fn=make_click_fn(query), outputs=[query_input])
 
     with gr.Row():
         estimate_startup_cost = gr.Number(label="Estimate Startup Cost", precision=2)
