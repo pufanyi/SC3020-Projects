@@ -134,7 +134,7 @@ def query_console(db: tcph.TPCHDataset):
                 save_format = gr.Dropdown(
                     choices=["svg", "html", "pdf", "png", "jpeg", "json"],
                     label="Format",
-                    value="html",
+                    value="svg",
                     show_label=False,
                     container=False,
                 )
