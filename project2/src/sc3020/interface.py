@@ -103,6 +103,8 @@ def query_console(db: tcph.TPCHDataset):
         def save_fig(
             query_input: str, format: str = "html", path: Union[str, Path, None] = None
         ):
+            if query_input is None:
+                return
             if path is None:
                 path = Path(__file__).parent / "assets" / "cache"
             _, _, _, fig = db.explain(query_input)
