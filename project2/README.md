@@ -1,4 +1,4 @@
-# SC3020 Project
+# SC3020 Project 2
 
 ## Installation
 

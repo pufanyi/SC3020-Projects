@@ -1,6 +1,6 @@
-# Project 1
+# SC3020 Project 1
 
-[Video](docs/presentation/presentation.mp4) | [Report](docs/report/SC3020_Project1.pdf)
+[Video](docs/presentation/presentation.mp4) / [Report](docs/report/SC3020_Project1.pdf)
 
 This project is done by
 
@@ -11,7 +11,6 @@ This project is done by
 | Shan Yi  | U2222846C |
 | Tian Yidong |  U2220492B |
 | Zhang Kaichen | U2123722J |
-
 
 ## Setup
 
