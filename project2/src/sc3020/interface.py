@@ -98,141 +98,164 @@ def connect_db(db: tcph.TPCHDataset):
 
 
 def query_console(db: tcph.TPCHDataset):
-    def save_fig(
-        query_input: str, format: str = "html", path: Union[str, Path, None] = None
-    ):
-        if path is None:
-            path = Path(__file__).parent / "assets" / "cache"
-        _, _, _, fig = db.explain(query_input)
-        path.mkdir(exist_ok=True, parents=True)
-        if isinstance(path, str):
-            path = Path(path)
-        if not path.is_file():
-            path = path / f"query_plan.{format}"
-        try:
-            if format == "html":
-                fig.write_html(path, include_mathjax="cdn")
-            elif format == "json":
-                fig.write_json(path)
-            else:
-                fig.write_image(path, format=format)
-            return path
-        except Exception as e:
-            print(f"Failed to save query plan: {str(e)}")
-            gr.Error(f"Failed to save query plan: {str(e)}")
+    with gr.Accordion("Query Console", open=True):
 
-    examples = EXAMPLE_PATH.glob("example*.sql")
+        def save_fig(
+            query_input: str, format: str = "html", path: Union[str, Path, None] = None
+        ):
+            if path is None:
+                path = Path(__file__).parent / "assets" / "cache"
+            _, _, _, fig = db.explain(query_input)
+            path.mkdir(exist_ok=True, parents=True)
+            if isinstance(path, str):
+                path = Path(path)
+            if not path.is_file():
+                path = path / f"query_plan.{format}"
+            try:
+                if format == "html":
+                    fig.write_html(path, include_mathjax="cdn")
+                elif format == "json":
+                    fig.write_json(path)
+                else:
+                    fig.write_image(path, format=format)
+                return path
+            except Exception as e:
+                print(f"Failed to save query plan: {str(e)}")
+                gr.Error(f"Failed to save query plan: {str(e)}")
 
-    with gr.Row(equal_height=True):
-        query_input = gr.Code(
-            lines=5,
-            label="Query",
-            interactive=True,
-            language="sql-pgSQL",
-            wrap_lines=True,
-        )
-        with gr.Column():
-            query_plan_fig = gr.Plot(label="Query Plan")
+        examples = EXAMPLE_PATH.glob("example*.sql")
+
+        with gr.Row(equal_height=True):
+            query_input = gr.Code(
+                lines=1,
+                label="Query",
+                interactive=True,
+                language="sql-pgSQL",
+                wrap_lines=True,
+            )
             with gr.Column():
-                save_format = gr.Dropdown(
-                    choices=["svg", "html", "pdf", "png", "jpeg", "json"],
-                    label="Format",
-                    value="svg",
-                    show_label=False,
-                    container=False,
-                )
-                gr.DownloadButton(
-                    "Save", value=save_fig, inputs=[query_input, save_format]
-                )
+                query_plan_fig = gr.Plot(label="Query Plan")
+                with gr.Column():
+                    save_format = gr.Dropdown(
+                        choices=["svg", "html", "pdf", "png", "jpeg", "json"],
+                        label="Format",
+                        value="svg",
+                        show_label=False,
+                        container=False,
+                    )
+                    gr.DownloadButton(
+                        "Save", value=save_fig, inputs=[query_input, save_format]
+                    )
 
-    with gr.Row():
-        query_btns = {}
-        for id, example in enumerate(examples, 1):
-            with open(example, "r") as f:
-                query = f.read()
-            query_btns[id] = gr.Button(f"Example {id}")
+        with gr.Row():
+            query_btns = {}
+            for id, example in enumerate(examples, 1):
+                with open(example, "r") as f:
+                    query = f.read()
+                query_btns[id] = gr.Button(f"Example {id}")
 
-            def make_click_fn(query_text):
-                return lambda: query_text
+                def make_click_fn(query_text):
+                    return lambda: query_text
 
-            query_btns[id].click(fn=make_click_fn(query), outputs=[query_input])
+                query_btns[id].click(fn=make_click_fn(query), outputs=[query_input])
 
-    with gr.Row():
-        estimate_startup_cost = gr.Number(label="Estimate Startup Cost", precision=2)
-        estimate_total_cost = gr.Number(label="Estimate Total Cost", precision=2)
+        with gr.Row():
+            estimate_startup_cost = gr.Number(
+                label="Estimate Startup Cost", precision=2
+            )
+            estimate_total_cost = gr.Number(label="Estimate Total Cost", precision=2)
 
-    with gr.Row():
-        scan_dropdown = gr.Dropdown(
-            choices=[k for k in SCAN_REGISTRY.keys()] + ["Default"],
-            label="What if change scan to ...",
-            value="Default",
+        with gr.Row():
+            scan_dropdown = gr.Dropdown(
+                choices=[k for k in SCAN_REGISTRY.keys()] + ["Default"],
+                label="What if change scan to ...",
+                value="Default",
+            )
+            join_dropdown = gr.Dropdown(
+                choices=[k for k in JOIN_REGISTRY.keys()] + ["Default"],
+                label="What if change join to ...",
+                value="Default",
+            )
+
+        with gr.Row():
+            with gr.Accordion("Explain", open=False):
+                explain = gr.Markdown()
+
+        with gr.Row():
+            refresh_estimation = gr.Button("Refresh Estimation", visible=True)
+            query_btn = gr.Button("Execute", visible=True)
+            # whatif_btn = gr.Button("Execute with What If...", visible=True)
+
+        with gr.Row():
+            result = gr.DataFrame(value=[], label="Result (Top 100 rows)")
+
+        with gr.Row():
+            query_logs = gr.JSON({}, label="Logs")
+
+        refresh_estimation.click(
+            fn=db.explain,
+            inputs=[query_input],
+            outputs=[
+                explain,
+                estimate_total_cost,
+                estimate_startup_cost,
+                query_plan_fig,
+            ],
         )
-        join_dropdown = gr.Dropdown(
-            choices=[k for k in JOIN_REGISTRY.keys()] + ["Default"],
-            label="What if change join to ...",
-            value="Default",
+
+        query_input.change(
+            fn=db.explain,
+            outputs=[
+                explain,
+                estimate_total_cost,
+                estimate_startup_cost,
+                query_plan_fig,
+            ],
+            inputs=[query_input],
         )
 
-    with gr.Row():
-        with gr.Accordion("Explain", open=False):
-            explain = gr.Markdown()
+        query_btn.click(
+            fn=db.execute,
+            inputs=[query_input],
+            outputs=[
+                result,
+                query_logs,
+            ],
+        )
+        scan_dropdown.change(
+            fn=db.explain_with_what_if,
+            inputs=[query_input, scan_dropdown, join_dropdown],
+            outputs=[
+                explain,
+                estimate_total_cost,
+                estimate_startup_cost,
+                query_plan_fig,
+            ],
+        )
+        join_dropdown.change(
+            fn=db.explain_with_what_if,
+            inputs=[query_input, scan_dropdown, join_dropdown],
+            outputs=[
+                explain,
+                estimate_total_cost,
+                estimate_startup_cost,
+                query_plan_fig,
+            ],
+        )
 
-    with gr.Row():
-        refresh_estimation = gr.Button("Refresh Estimation", visible=True)
-        query_btn = gr.Button("Execute", visible=True)
-        # whatif_btn = gr.Button("Execute with What If...", visible=True)
 
-    with gr.Row():
-        result = gr.DataFrame(value=[], label="Result (Top 100 rows)")
-
-    with gr.Row():
-        query_logs = gr.JSON({}, label="Logs")
-
-    refresh_estimation.click(
-        fn=db.explain,
-        inputs=[query_input],
-        outputs=[
-            explain,
-            estimate_total_cost,
-            estimate_startup_cost,
-            query_plan_fig,
-        ],
-    )
-
-    query_input.change(
-        fn=db.explain,
-        outputs=[explain, estimate_total_cost, estimate_startup_cost, query_plan_fig],
-        inputs=[query_input],
-    )
-
-    query_btn.click(
-        fn=db.execute,
-        inputs=[query_input],
-        outputs=[
-            result,
-            query_logs,
-        ],
-    )
-    scan_dropdown.change(
-        fn=db.explain_with_what_if,
-        inputs=[query_input, scan_dropdown, join_dropdown],
-        outputs=[
-            explain,
-            estimate_total_cost,
-            estimate_startup_cost,
-            query_plan_fig,
-        ],
-    )
-    join_dropdown.change(
-        fn=db.explain_with_what_if,
-        inputs=[query_input, scan_dropdown, join_dropdown],
-        outputs=[
-            explain,
-            estimate_total_cost,
-            estimate_startup_cost,
-            query_plan_fig,
-        ],
-    )
+def db_overview(
+    dataset: str = "pufanyi/TPC-H", split: str = "train", default_subset="customer"
+):
+    with gr.Accordion("Database Overview", open=False):
+        gr.HTML(
+            f"""<iframe
+                src="https://huggingface.co/datasets/{dataset}/embed/viewer/{default_subset}/{split}"
+                frameborder="0"
+                width="100%"
+                height="560px"
+                ></iframe>"""
+        )
 
 
 with open(TEMPLATE_PATH / "header.html", "r") as f:
@@ -246,6 +269,8 @@ with gr.Blocks(head=header, theme=gr.themes.Default(text_size="lg")) as demo:
 
     db = tcph.TPCHDataset()
     db = connect_db(db)
+
+    db_overview()
 
     query_console(db)
 
