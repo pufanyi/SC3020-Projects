@@ -1,0 +1,11 @@
+datasets==3.1.0
+fastapi==0.115.5
+gradio==4.44.1
+huggingface_hub==0.26.2
+pandas==2.2.3
+plotly==5.24.1
+psycopg[binary]==3.1.18
+igraph==0.11.8
+tqdm==4.67.0
+uvicorn==0.32.0
+kaleido==0.4.1
