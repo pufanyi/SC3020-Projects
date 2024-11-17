@@ -6,8 +6,8 @@ requires = ["setuptools>=42", "wheel", "setuptools_scm[tomli]>=6.3"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "sc3020"
-version = "0.1.0"
+name = "sc3020-g6-2024"
+version = "0.2.0"
 authors = [
     { name = "Pu Fanyi", email = "FPU001@e.ntu.edu.sg" },
     { name = "Zhang Kaichen", email = "ZHAN0564@e.ntu.edu.sg" },
