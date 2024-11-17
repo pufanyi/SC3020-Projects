@@ -32,7 +32,6 @@ dependencies = [
     "datasets",
     "psycopg[binary]>=3.1.8",
     "plotly",
-    "nbformat>=4.2.0",
     "kaleido",
     "igraph",
 ]
