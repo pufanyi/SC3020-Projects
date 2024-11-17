@@ -1,0 +1,13 @@
+\section{Conclusion and Limitation}
+\label{sec:conclusion and limitation}
+
+Our software effectively utilizes an interface to allow users to interactively invoke the PostgreSQL database system for query execution and cost evaluation, as well as to visualize the effect of changing the join or the scanning methods on query execution plan and cost of plans. 
+
+By leveraging structured tree representations and intuitive visualizations of plan in tree structure view, it helps the users to understand the complex task of query generation and optimization. Make the understanding process less difficult through visual demonstration of query execution process.
+
+\paragraph{Limitations} Our application leverages PostgreSQL's configuration options for query plans to enforce the use of specific scan or join methods when generating the QEP. However, this approach cannot precisely modify individual nodes within the QEP, as it uniformly applies the specified method to all join or scan nodes. To fine-tune the processing logic for each node, extensions such as \textit{pg\_hint\_plan} can be utilized.
+
+\section{Use of AI tools}
+We used ChatGPT to help us refine the paragraph, and picked the grammar mistakes in the report. All the report draft and graphs were written and designed by us.
+
+Part of the hardcode logics, such as if-else statement for the node symbol, which require repeated work are being done by the code pilot. We coded all of our core components by ourselves.
