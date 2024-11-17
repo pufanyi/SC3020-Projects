@@ -1,7 +1,9 @@
 import os
 from pathlib import Path
+from typing import Union
 
 import gradio as gr
+import plotly.graph_objs as go
 import sc3020.database.tcph as tcph
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
@@ -97,13 +99,48 @@ def connect_db(db: tcph.TPCHDataset):
 
 
 def query_console(db: tcph.TPCHDataset):
+    def save_fig(
+        query_input: str, format: str = "html", path: Union[str, Path, None] = None
+    ):
+        if path is None:
+            path = Path(__file__).parent / "assets" / "cache"
+        _, _, _, fig = db.explain(query_input)
+        path.mkdir(exist_ok=True, parents=True)
+        if isinstance(path, str):
+            path = Path(path)
+        if not path.is_file():
+            path = path / f"query_plan.{format}"
+        try:
+            if format == "html":
+                fig.write_html(path, include_mathjax="cdn")
+            elif format == "json":
+                fig.write_json(path)
+            else:
+                fig.write_image(path, format=format)
+            return path
+        except Exception as e:
+            print(f"Failed to save query plan: {str(e)}")
+            gr.Error(f"Failed to save query plan: {str(e)}")
+
     examples = EXAMPLE_PATH.glob("example*.sql")
 
     with gr.Row(equal_height=True):
         query_input = gr.Code(
             lines=20, label="Query", interactive=True, language="sql-pgSQL"
         )
-        query_plan_fig = gr.Plot(label="Query Plan")
+        with gr.Column():
+            query_plan_fig = gr.Plot(label="Query Plan")
+            with gr.Column():
+                save_format = gr.Dropdown(
+                    choices=["svg", "html", "pdf", "png", "jpeg", "json"],
+                    label="Format",
+                    value="html",
+                    show_label=False,
+                    container=False,
+                )
+                gr.DownloadButton(
+                    "Save", value=save_fig, inputs=[query_input, save_format]
+                )
 
     with gr.Row():
         for id, example in enumerate(examples, 1):

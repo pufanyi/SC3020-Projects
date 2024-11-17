@@ -167,3 +167,5 @@ cython_debug/
 
 # bash scripts
 src/sc3020/scripts/*.sh
+
+cache/
