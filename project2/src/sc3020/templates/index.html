@@ -1,8 +1,23 @@
-{% extends "layout.html" %}
-{% block content %}
-<div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
-    <a href="/sc3020">
-        <button type="button" class="btn btn-secondary btn-lg padding: 10px 20px; font-size: 16px;">Go to Application</button>
-    </a>
+{% extends "layout.html" %} {% block content %}
+<div class="container">
+  <div
+    style="
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 80vh;
+    "
+  >
+    <div class="col-md-8 text-center">
+      <h1 class="display-4 mb-4">Welcome to SC3020 Project 2</h1>
+      <p class="lead mb-5">Database System Principles Project Implementation</p>
+      <button
+        type="button"
+        class="btn btn-secondary btn-lg padding: 10px 20px; font-size: 16px;"
+      >
+        Go to Application
+      </button>
+    </div>
+  </div>
 </div>
 {% endblock %}
