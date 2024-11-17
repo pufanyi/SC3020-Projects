@@ -111,8 +111,6 @@ class TPCHDataset(object):
             self.host(**self.db_info)
             print("Connected to database")
 
-        print(self.host_status)
-
         for subset in self.subsets:
             self.cursor.execute(f"DROP TABLE IF EXISTS {subset};")
 

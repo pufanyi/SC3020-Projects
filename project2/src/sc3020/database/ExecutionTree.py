@@ -236,7 +236,6 @@ def parse_query_explanation_to_tree(explanation: List[Tuple[str]]) -> ExecutionT
     # The first line must be the root node
     for idx, (query_plan) in enumerate(explanation[1:]):
         query_plan = query_plan[0]  # The query plan is a tuple
-        print(query_plan)
         if is_cond(query_plan):
             current_node.add_condition(query_plan)
         elif is_query(query_plan):

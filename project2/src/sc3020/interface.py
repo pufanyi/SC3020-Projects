@@ -122,7 +122,6 @@ def query_console(db: tcph.TPCHDataset):
                     fig.write_image(path, format=format)
                 return path
             except Exception as e:
-                print(f"Failed to save query plan: {str(e)}")
                 gr.Error(f"Failed to save query plan: {str(e)}")
 
         examples = list(EXAMPLE_PATH.glob("example*.sql"))
@@ -196,7 +195,6 @@ def query_console(db: tcph.TPCHDataset):
         for id, example in enumerate(examples, 1):
             with open(example, "r") as f:
                 query = f.read()
-            print(id, query)
             query_btns[id].click(
                 fn=make_click_fn(query),
                 outputs=[
