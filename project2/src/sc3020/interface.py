@@ -125,7 +125,7 @@ def query_console(db: tcph.TPCHDataset):
                 print(f"Failed to save query plan: {str(e)}")
                 gr.Error(f"Failed to save query plan: {str(e)}")
 
-        examples = EXAMPLE_PATH.glob("example*.sql")
+        examples = list(EXAMPLE_PATH.glob("example*.sql"))
 
         with gr.Row(equal_height=True):
             query_input = gr.Code(
@@ -151,15 +151,8 @@ def query_console(db: tcph.TPCHDataset):
 
         with gr.Row():
             query_btns = {}
-            for id, example in enumerate(examples, 1):
-                with open(example, "r") as f:
-                    query = f.read()
+            for id, _ in enumerate(examples, 1):
                 query_btns[id] = gr.Button(f"Example {id}")
-
-                def make_click_fn(query_text):
-                    return lambda: query_text
-
-                query_btns[id].click(fn=make_click_fn(query), outputs=[query_input])
 
         with gr.Row():
             estimate_startup_cost = gr.Number(
@@ -193,6 +186,27 @@ def query_console(db: tcph.TPCHDataset):
 
         with gr.Row():
             query_logs = gr.JSON({}, label="Logs")
+
+        def make_click_fn(query_text):
+            def click_handler():
+                return query_text, *db.explain(query_text)
+
+            return click_handler
+
+        for id, example in enumerate(examples, 1):
+            with open(example, "r") as f:
+                query = f.read()
+            print(id, query)
+            query_btns[id].click(
+                fn=make_click_fn(query),
+                outputs=[
+                    query_input,
+                    explain,
+                    estimate_total_cost,
+                    estimate_startup_cost,
+                    query_plan_fig,
+                ],
+            )
 
         refresh_estimation.click(
             fn=db.explain,
