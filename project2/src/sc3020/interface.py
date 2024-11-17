@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Union
 
 import gradio as gr
-import plotly.graph_objs as go
 import sc3020.database.tcph as tcph
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse

@@ -1,8 +1,6 @@
-import io
-
 import plotly.graph_objs as go
-from igraph import EdgeSeq, Graph
-from sc3020.database.ExecutionTree import ExecutionTree, ExecutionTreeNode
+from igraph import Graph
+from sc3020.database.ExecutionTree import ExecutionTree
 
 
 class Visualizer(object):
