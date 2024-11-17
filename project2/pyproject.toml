@@ -31,7 +31,6 @@ dependencies = [
     "gradio>=5.3.0",
     "datasets",
     "psycopg[binary]>=3.1.8",
-    "matplotlib",
     "plotly",
     "nbformat>=4.2.0",
     "kaleido",
