@@ -1,3 +1,2 @@
-# SC3020-Projects
-
-SC3020 Projects
+- [Project 1](project1/)
+- [Project 2](project2/)
