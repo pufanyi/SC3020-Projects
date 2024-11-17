@@ -132,7 +132,6 @@ def query_console(db: tcph.TPCHDataset):
                 label="Query",
                 interactive=True,
                 language="sql-pgSQL",
-                wrap_lines=True,
             )
             with gr.Column():
                 query_plan_fig = gr.Plot(label="Query Plan")
