@@ -186,9 +186,12 @@ def query_console(db: tcph.TPCHDataset):
         with gr.Row():
             query_logs = gr.JSON({}, label="Logs")
 
-        def make_click_fn(query_text):
-            def click_handler():
-                return query_text, *db.explain(query_text)
+        def make_click_fn(query_text: str):
+            def click_handler(query_input: str):
+                if query_input == query_text:
+                    return query_text, *db.explain(query_text)
+                else:
+                    return query_text, None, None, None, None
 
             return click_handler
 
@@ -197,6 +200,7 @@ def query_console(db: tcph.TPCHDataset):
                 query = f.read()
             query_btns[id].click(
                 fn=make_click_fn(query),
+                inputs=[query_input],
                 outputs=[
                     query_input,
                     explain,
