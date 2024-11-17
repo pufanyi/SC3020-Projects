@@ -11,18 +11,34 @@ conda activate sc3020
 python -m pip install -e .
 ```
 
-## Download PostgreSQL
+## Config PostgreSQL
 
 PostgreSQL is required to run the project. You can download it from [here](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads).
 
+After installing PostgreSQL, you need to login to the user and create a database.
+
+Here is an example.
+
+We assume the user is the default user `postgres`.
+
+```bash
+psql -U postgres
+```
+
+And then we create a database named `tpch`.
+
+```sql
+CREATE DATABASE tpch;
+```
+
+You don't need to load the data into the database (or if you have done, it is better), because the project will download the data and load it into the database automatically.
+
 ## Run
+
+A simple command to run the project:
 
 ```bash
 sc3020
 ```
 
-## Test
-
-```bash
-python test/run_suite.py
-```
+By default, the project will run on [`http://localhost:8000`](http://127.0.0.1:8000).
