@@ -13,6 +13,8 @@ SCAN_REGISTRY = {
     "SEQ_SCAN": "enable_seqscan",
 }
 
+# Above is the registry of the join and scan types
+
 
 def format_set_str(status: str, command: Literal["on", "off"]) -> str:
     return f"SET {status} = {command};\n"

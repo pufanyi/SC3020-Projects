@@ -44,6 +44,7 @@ class TPCHDataset(object):
 
     @property
     def data_path(self):
+        # Will fetch the dataset if does not have it
         if not hasattr(self, "_data_path"):
             self._data_path = (
                 Path(
@@ -89,6 +90,7 @@ class TPCHDataset(object):
         if self.host_status:
             self.close()
 
+        # Connect to the database
         self.conn = psycopg.connect(
             dbname=dbname, user=user, password=password, host=host, port=port
         )
@@ -131,15 +133,21 @@ class TPCHDataset(object):
         if not query:
             return None, None, None, None
         try:
+            # Execute the Explain command
             self.cursor.execute(f"EXPLAIN {query}")
             explain = self.cursor.fetchall()
+            # Parse the explain result into a tree
             tree = parse_query_explanation_to_tree(explain)
+            # Traverse the tree to get all the node
             traverse_node = tree.traversal()
+            # Get the total cost
             total_cost, startup_cost = tree.get_cost()
             explain_list = []
+            # Generate the natural language explanation
             for idx, node in enumerate(traverse_node, 1):
                 explain_list.append(f"**Step {idx}**: {node.natural_language()}")
             explain_str = "\n\n".join(explain_list)
+            # Visualize the image
             fig = self.visualizer.visualize(tree)
             return explain_str, total_cost, startup_cost, fig
         except Exception as e:
@@ -148,7 +156,7 @@ class TPCHDataset(object):
 
     def execute(self, query: str):
         try:
-            # Get column names from cursor description
+            # Execute the query
             self.cursor.execute(query)
             headers = [desc[0] for desc in self.cursor.description]
 
@@ -159,6 +167,7 @@ class TPCHDataset(object):
             end_time = time.time()
             execution_time = end_time - start_time
 
+            # Convert the result into a DataFrame
             df = pd.DataFrame(results, columns=headers)
 
             if len(df) > self.max_output_rows:
@@ -184,6 +193,7 @@ class TPCHDataset(object):
             )
 
     def set_query_config(self, query_config: str):
+        # Input will be sth like set xxx=on; set yyy=off;
         try:
             self.cursor.execute(query_config)
         except Exception as e:
@@ -192,14 +202,17 @@ class TPCHDataset(object):
 
     def explain_with_what_if(self, query_input: str, scan_type: str, join_type: str):
         if scan_type == "Default":
+            # If the scan type is default, we will set all the scan to on
             scan_command = ""
             for scan in SCAN_REGISTRY:
                 scan_command += format_set_str(SCAN_REGISTRY[scan], "on")
             self.set_query_config(scan_command)
         else:
+            # else, we set only the scan type to on
             scan_command = prepare_scan_command(scan_type)
             self.set_query_config(scan_command)
 
+        # Same logic here for the join type
         if join_type == "Default":
             join_command = ""
             for join in JOIN_REGISTRY:

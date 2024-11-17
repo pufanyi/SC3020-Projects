@@ -14,6 +14,7 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 app = FastAPI()
 
+# Mount the static library
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 
@@ -24,6 +25,7 @@ TEMPLATE_PATH = Path(__file__).parent / "templates"
 EXAMPLE_PATH = Path(__file__).parent / "examples"
 
 
+# This is the index page
 @app.get("/", response_class=HTMLResponse)
 async def main(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
@@ -36,6 +38,7 @@ def connect_db(db: tcph.TPCHDataset):
 
         gr.Markdown(connection_guide)
 
+        # Enter the detail for connecting the database
         with gr.Row(equal_height=True):
             db_info = [
                 gr.Textbox(lines=1, label="Host", value="localhost", interactive=True),
@@ -47,13 +50,17 @@ def connect_db(db: tcph.TPCHDataset):
                 gr.Textbox(label="Password", type="password", interactive=True),
             ]
 
+        # Connect and load data button
         with gr.Row(equal_height=True):
             connect_btn = gr.Button("Connect", visible=True)
             reload_data = gr.Button("Load Data", visible=True)
 
+        # Status of the connection
+        # Will be updated after the connection is made
         with gr.Row():
             status = gr.JSON({"status": "Not Connected"}, label="Status")
 
+            # Function to connect to the database
             def host(host_url, port, dbname, user, password):
                 try:
                     db.host(
@@ -72,6 +79,7 @@ def connect_db(db: tcph.TPCHDataset):
                 except Exception as e:
                     return {"status": "Not Connected", "error": str(e)}
 
+            # Function to load the data
             def setup(host_url, port, dbname, user, password):
                 try:
                     db.setup(
@@ -107,12 +115,15 @@ def query_console(db: tcph.TPCHDataset):
                 return
             if path is None:
                 path = Path(__file__).parent / "assets" / "cache"
+            # Call the explain to get the query plan
             _, _, _, fig = db.explain(query_input)
+            # Handle the path
             path.mkdir(exist_ok=True, parents=True)
             if isinstance(path, str):
                 path = Path(path)
             if not path.is_file():
                 path = path / f"query_plan.{format}"
+            # Write image into correct format
             try:
                 if format == "html":
                     fig.write_html(path, include_mathjax="cdn")
@@ -124,8 +135,10 @@ def query_console(db: tcph.TPCHDataset):
             except Exception as e:
                 gr.Error(f"Failed to save query plan: {str(e)}")
 
+        # We prepare some examples
         examples = list(EXAMPLE_PATH.glob("example*.sql"))
 
+        # Query code panel
         with gr.Row(equal_height=True):
             query_input = gr.Code(
                 lines=1,
@@ -133,6 +146,8 @@ def query_console(db: tcph.TPCHDataset):
                 interactive=True,
                 language="sql-pgSQL",
             )
+            # Plot the query plan
+            # and also save the image
             with gr.Column():
                 query_plan_fig = gr.Plot(label="Query Plan")
                 with gr.Column():
@@ -147,6 +162,7 @@ def query_console(db: tcph.TPCHDataset):
                         "Save", value=save_fig, inputs=[query_input, save_format]
                     )
 
+        # Below are for the What if analysis
         with gr.Row():
             query_btns = {}
             for id, _ in enumerate(examples, 1):
@@ -239,6 +255,8 @@ def query_console(db: tcph.TPCHDataset):
                 query_logs,
             ],
         )
+        # When it change, we will update the query plan
+        # with the new what if
         scan_dropdown.change(
             fn=db.explain_with_what_if,
             inputs=[query_input, scan_dropdown, join_dropdown],

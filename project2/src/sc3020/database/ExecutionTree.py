@@ -57,6 +57,7 @@ class ExecutionTreeNode:
             return f"{' ' * level * 2}{operation}"
 
     def get_text(self):
+        # Some hardcode logic for visualize
         if "Aggregate" in self.operation:
             return "$\\gamma$"
         elif "Hash Join" in self.operation:
@@ -99,6 +100,8 @@ class ExecutionTreeNode:
             "rows": self.rows,
             "width": self.width,
         }
+        # Above is all the info we get
+        # Below is just some logic to make text format better :D
         if self.condition:
             dict_info["condition"] = json.dumps(self.condition)
         result = []
@@ -178,6 +181,7 @@ class ExecutionTree:
         return curr_id
 
     def bfs(self) -> List[List[ExecutionTreeNode]]:
+        # Use a queue to do BFS
         q = queue.Queue()
         q.put(self.root)
         result = []
@@ -212,6 +216,7 @@ class ExecutionTree:
         return result
 
     def get_cost(self):
+        # If get cost is called, we need to traverse the tree
         nodes = self.traversal()
         total_cost = 0
         startup_cost = 0
@@ -222,6 +227,7 @@ class ExecutionTree:
 
 
 def parse_query_explanation_to_tree(explanation: List[Tuple[str]]) -> ExecutionTree:
+    # Parsing a query explanation into a tree
     tree = ExecutionTree()
     root = ExecutionTreeNode()
     root.set_level(0)
@@ -237,12 +243,18 @@ def parse_query_explanation_to_tree(explanation: List[Tuple[str]]) -> ExecutionT
     for idx, (query_plan) in enumerate(explanation[1:]):
         query_plan = query_plan[0]  # The query plan is a tuple
         if is_cond(query_plan):
+            # If it is a condition, we add it to the current node
+            # It is some condition follow the current node
             current_node.add_condition(query_plan)
         elif is_query(query_plan):
+            # If it is a query, we add a new node
             new_node = ExecutionTreeNode()
+            # Get the position of the arrow
             arrow_position = query_plan.index("->")
             if arrow_position not in arrow_places:
+                # If not exist, we add it to the arrow places
                 arrow_places.append(arrow_position)
+            # The level equals to the pos in the arrow position
             level = arrow_places.index(arrow_position)
 
             # If we access to a child node of current node
@@ -266,10 +278,14 @@ def parse_query_explanation_to_tree(explanation: List[Tuple[str]]) -> ExecutionT
                 while all_nodes[-1].level >= level:
                     all_nodes.pop()
 
+                # Add the operation and level as usual
                 new_node.set_level(level)
                 new_node.set_operation(query_plan.split("->")[-1].strip())
+                # This last node is the parent of the new node
                 new_node.set_parent(all_nodes[-1])
+                # Add the new node to the parent
                 all_nodes[-1].add_child(new_node)
+                # Append this node
                 all_nodes.append(new_node)
                 current_level = level
                 current_node = new_node
