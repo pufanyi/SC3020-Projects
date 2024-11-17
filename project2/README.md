@@ -1,8 +1,10 @@
 # SC3020 Project 2
 
+[Report](https://pufanyi.github.io/SC3020-Projects/project2/report/report.pdf) / [Code](https://github.com/pufanyi/SC3020-Projects/tree/main/project2)
+
 ## Installation
 
-You can either choose to build from source or build from pypi, we require python version to be at least 3.9
+You can either choose to build from source or build from PyPI, we require python version to be at least 3.9.
 
 ## Build from source
 
