@@ -24,7 +24,7 @@ python -m pip install -e .
 
 ## Build from PyPI
 
-We have also prepared a PyPI version of it, you can also download it simply using pip. The code version is the same as the code in GitHub.
+We have also prepared a [PyPI version](https://pypi.org/project/sc3020-g6-2024/) of it, you can also download it simply using pip. The code version is the same as the code in GitHub.
 
 ```bash
 python -m pip install sc3020-g6-2024
